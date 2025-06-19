@@ -1,0 +1,29 @@
+.splash-screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #ffffff;
+
+  img {
+    width: 150px;
+    animation: fadeIn 1s ease-in-out;
+  }
+
+  h1 {
+    margin-top: 1rem;
+    font-size: 24px;
+    animation: fadeIn 2s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+}
