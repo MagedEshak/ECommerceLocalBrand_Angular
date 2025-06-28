@@ -1,1 +1,170 @@
-<p>product-details works!</p>
+<main>
+    <!-- Start Product Details -->
+    <section class="mb-16 md:flex md:mt-20 md:p-20">
+        <!-- Start Img -->
+        <div class="w-full my-20 md:my-0">
+            <img alt="" src="https://liztressens.com/cdn/shop/files/1.png?v=1749968107&width=1800"
+                class="h-64 w-full object-cover md:h-[25rem]" />
+        </div>
+        <!-- End Img -->
+
+        <!-- Start Details -->
+        <div class="md:w-full md:px-37 md:start-20 md:relative">
+            <h3 class="font-bold text-2xl ms-4">BIEGE ROGUE</h3>
+            <p class="font-monospace text-xl ms-4">LE 750.00</p>
+
+            <div>
+                <!-- Start Form to choose size and Quantity-->
+                <form class="px-5 mt-4 mb-4">
+                    <fieldset class="font-bold mb-4">Size</fieldset>
+
+                    <!-- Start size -->
+                    <div class="flex items-center justify-baseline gap-6">
+                        <label for="s"
+                            class="flex items-center justify-between gap-4 rounded border border-gray-300 bg-transparent p-3 text-sm font-medium shadow-sm transition-colors  cursor-pointer hover:bg-gray-50 has-checked:border-black has-checked:ring-1 has-checked:ring-black has-checked:hover:bg-black  has-checked:hover:text-white">
+                            <input type="radio" name="Small" id="s" value="Small" class="sr-only">
+                            <span class="font-bold">S</span>
+                        </label>
+
+                        <label for="m"
+                            class="flex items-center justify-between gap-4 rounded border border-gray-300 bg-transparent p-3 text-sm font-medium shadow-sm transition-colors cursor-pointer hover:bg-gray-50 has-checked:border-black has-checked:ring-1 has-checked:ring-black has-checked:hover:bg-black  has-checked:hover:text-white">
+                            <input type="radio" name="Medium" id="m" value="medium" class="sr-only">
+                            <span class="font-bold">M</span>
+                        </label>
+
+                        <label for="L"
+                            class="flex items-center justify-between gap-4 rounded border border-gray-300 bg-transparent p-3 text-sm font-medium shadow-sm transition-colors  cursor-pointer hover:bg-gray-50 has-checked:border-black has-checked:ring-1 has-checked:ring-black has-checked:hover:bg-black  has-checked:hover:text-white">
+                            <input type="radio" name="Large" id="L" value="Large" class="sr-only">
+                            <span class="font-bold">L</span>
+                        </label>
+                    </div>
+                    <!-- End size -->
+
+                    <!-- Start choose Quantity -->
+                    <div class="mt-4 mb-4 flex items-center justify-between gap-2 w-full">
+                        <label for="Quantity" class="sr-only"> Quantity </label>
+                        <div
+                            class="flex items-center rounded-sm text-black font-bold border border-gray-400 hover:bg-white ">
+                            <button type="button" class="size-10 leading-10 text-black transition hover:opacity-75">
+                                &minus;
+                            </button>
+
+                            <input type="number" id="Quantity" value="1"
+                                class="h-10 w-16 border-transparent text-center [-moz-appearance:_textfield] sm:text-sm [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none" />
+
+                            <button type="button" class="size-10 leading-10 text-black transition hover:opacity-75">
+                                &plus;
+                            </button>
+                        </div>
+                        <!-- End  choose Quantity -->
+
+                        <!-- Start Btn Add to cart -->
+                        <button type="button"
+                            class="uppercase whitespace-nowrap flex items-center justify-center gap-3 rounded-sm bg-black text-white px-2 py-2 w-48 transition hover:bg-transparent hover:text-black hover:border">
+                            <i class="fa-solid fa-cart-plus"></i> Add to cart
+                        </button>
+                        <!-- End Btn Add to cart -->
+                    </div>
+
+                    <!-- Start Btn Buy it Now -->
+                    <button type="button"
+                        class="uppercase flex items-center justify-center gap-3 rounded-sm bg-black text-white px-4 py-2 w-full font-bold transition hover:bg-transparent hover:text-black hover:border">
+                        Buy it Now
+                    </button>
+                    <!-- End Btn Buy it Now -->
+                </form>
+                <!-- End Form to choose size and Quantity-->
+
+                <!-- Start Details Accordion -->
+                <div class="w-full max-w-xl mx-auto space-y-4 bg-transparent px-2">
+                    <!-- Accordion Item 1 -->
+                    <details class="group rounded-lg overflow-hidden">
+                        <summary
+                            class="cursor-pointer select-none flex justify-between items-start px-4 py-3 bg-transparent text-gray-800 hover:bg-gray-200 transition">
+                            <span>Product Details</span>
+                            <i class="fa-solid fa-plus"></i>
+                        </summary>
+                        <p class="px-4 py-3 text-black font-mono">
+                            Silkscreen+ Halftone Print
+                        </p>
+                        <p class="px-4 py-3 text-black font-mono">
+                            Relaxed/ Cropped Fit.
+                        </p>
+                        <p class="px-4 py-3 text-black font-mono">
+                            Relaxed Arm Cuff.
+                        </p>
+                        <p class="px-4 py-3 text-black font-mono">
+                            Stiff material.
+                        </p>
+                    </details>
+
+                    <!-- Accordion Item 2 -->
+                    <details class="group rounded-lg overflow-hidden">
+                        <summary
+                            class="cursor-pointer select-none flex justify-between items-start px-4 py-3 bg-transparent text-gray-800 hover:bg-gray-200 transition">
+                            <span>Care & Maintenance</span>
+                            <i class="fa-solid fa-plus"></i>
+                        </summary>
+                        <div class="px-4 py-3 text-black font-mono">
+                            <p class="capitalize mb-3">To preserve the quality and fit of your product:</p>
+                            <ul class="capitalize px-5">
+                                <li class="list-disc">Always iron inside out.</li>
+                                <li class="list-disc whitespace-break-spaces">Avoid hot water to maintain the elegance
+                                    of the print and the
+                                    perfect fit of the
+                                    fabric.
+                                </li>
+                            </ul>
+                        </div>
+                    </details>
+
+                    <!-- Accordion Item 3 -->
+                    <details class="group rounded-lg overflow-hidden">
+                        <summary
+                            class="cursor-pointer select-none flex justify-between items-start px-4 py-3 bg-transparent text-gray-800 hover:bg-gray-200 transition">
+                            <span>Size & Fit</span>
+                            <i class="fa-solid fa-plus"></i>
+                        </summary>
+                        <h1 class="px-4 py-3 text-black ">
+                            Biege T-shirt size chart
+                        </h1>
+                        <img src="" alt="">
+                    </details>
+
+                </div>
+                <!-- End Details Accordion -->
+
+                <p class="lowercase px-4">delivered within <span class="font-bold ">4 to 7 business days.</span></p>
+            </div>
+            <!-- End Details -->
+        </div>
+    </section>
+    <!-- End Product Details -->
+
+    <!-- Start RELATED ITEMS -->
+    <section>
+        <h2 class="font-bold text-2xl ms-4">RELATED ITEMS</h2>
+
+        <section
+            class="flex justify-between flex-wrap gap-5 mb-16 md:flex md:mt-20 md:p-20 md:flex-nowrap mx-auto px-8">
+            <a href="#" class="w-full flex flex-col items-center mb-20">
+                <img alt="" src="https://liztressens.com/cdn/shop/files/1.png?v=1749968107&width=500"
+                    class="h-64 w-full object-cover md:h-[25rem]" />
+
+                <h3 class="mt-4 text-lg font-bold text-gray-900 sm:text-xl">Lorem, ipsum dolor.</h3>
+
+                <p class="mt-2 max-w-sm text-black">LE 500.00 EGP </p>
+            </a>
+
+            <a href="#" class="w-full flex flex-col items-center mb-20">
+                <img alt="" src="https://liztressens.com/cdn/shop/files/1.png?v=1749968107&width=500"
+                    class="h-64 w-full object-cover md:h-[25rem]" />
+
+                <h3 class="mt-4 text-lg font-bold text-gray-900 sm:text-xl">Lorem, ipsum dolor.</h3>
+
+                <p class="mt-2 max-w-sm text-black">LE 500.00 EGP </p>
+            </a>
+        </section>
+    </section>
+    <!-- End RELATED ITEMS -->
+</main>
