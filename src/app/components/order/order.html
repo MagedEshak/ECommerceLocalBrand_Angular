@@ -1,1 +1,285 @@
-<p>order works!</p>
+<main class="bg-white h-auto md:flex">
+    <!-- Start Details Accordion -->
+    <section class="block md:hidden py-4">
+        <div class="w-full max-w-xl mx-auto space-y-4 bg-[#e0e0e0] px-2">
+            <!-- Accordion Item 1 -->
+            <details class="group rounded-lg overflow-hidden">
+                <summary
+                    class="cursor-pointer select-none flex justify-between items-start px-4 py-6 bg-transparent text-gray-800 hover:bg-gray-200 transition-all ease duration-700">
+
+                    <!-- Start Title -->
+                    <div class="flex justify-between gap-3 font-bold">
+                        <span class="capitalize">Order Summary</span>
+                        <i class="fa-solid fa-chevron-down mt-1"></i>
+                    </div>
+                    <h2 class="font-bold">LE 750.00</h2>
+                    <!-- End Title -->
+                </summary>
+
+                <!-- Start Details -->
+                <section class="w-full bg-neutral-200 px-4 py-8 sm:px-6 lg:px-8" aria-modal="true" role="dialog"
+                    tabindex="-1">
+
+                    <article class=" space-y-2">
+                        <div class="">
+                            <div class="flex gap-6 w-screen">
+                                <div class="relative">
+                                    <img src="https://liztressens.com/cdn/shop/files/1.png?v=1749968107&width=500"
+                                        alt="" class="size-16 rounded-sm object-cover" />
+                                    <span
+                                        class="absolute start-10 bottom-14 bg-neutral-300 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
+                                        1
+                                    </span>
+                                </div>
+
+                                <div class="w-full">
+                                    <h3 class="text-sm font-light leading-tight text-black">
+                                        Basic aksnd frbh
+                                    </h3>
+
+                                    <div class="flex justify-start gap-34">
+                                        <span class="text-neutral-500">M</span>
+                                        <span class="font-bold">LE 750.00</span>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="flex justify-between">
+                                <div class="mt-10">
+                                    <p class="capitalize text-sm">Subtotal</p>
+                                    <p class="capitalize text-sm mt-5">Shipping</p>
+                                    <p class="capitalize font-bold mt-10  text-xl">Total</p>
+                                </div>
+
+                                <div class="mt-10 grid justify-items-end">
+                                    <h2>LE 750.00</h2>
+                                    <h2 class="mt-5">LE 100.00</h2>
+                                    <h2 class="capitalize text-xl font-bold mt-10"><span class="text-neutral-500">EGP
+                                        </span>LE 850.00</h2>
+                                </div>
+                            </div>
+                        </div>
+
+                    </article>
+                </section>
+
+                <!-- End Details -->
+            </details>
+        </div>
+    </section>
+    <!-- End Details Accordion -->
+
+    <!-- Start Form -->
+    <section class="bg-white mt-10  md:w-full">
+        <section class="px-3 grid justify-center">
+            <form class="mb-5 overflow-hidden">
+                <div class="flex items-center justify-between">
+                    <h2 class="font-bold text-2xl ms-4">Contact</h2>
+                    <a href="" class="underline pe-8">Log in</a>
+                </div>
+                <div class="flex flex-col items-center justify-center">
+                    <input type="email" name="email" id="email_Id" placeholder="Email"
+                        class="mt-5 h-12 w-80 md:min-w-xl sm:min-w-xl  rounded-md border border-neutral-400 sm:text-sm p-4 mb-5 placeholder:text-neutral-400" />
+                </div>
+                <div>
+                    <h2 class="font-bold text-2xl ms-4 my-4">Delivery</h2>
+
+                    <div class="flex flex-col items-center justify-center">
+                        <select name="country" id="country_ID"
+                            class="h-auto w-80 md:min-w-xl sm:min-w-xl rounded-md border border-neutral-400 sm:text-sm p-4 mb-5">
+                            <option value="Egypt" selected>Egypt</option>
+                        </select>
+
+                        <input type="text" name="fname" id="fname_Id" placeholder="First Name"
+                            class="h-12 w-80 md:min-w-xl sm:min-w-xl rounded-md border border-neutral-400 sm:text-sm p-4 mb-5 placeholder:text-neutral-400" />
+
+                        <input type="text" name="lname" id="lname_Id" placeholder="Last Name"
+                            class="h-12 w-80 md:min-w-xl sm:min-w-xl rounded-md border border-neutral-400 sm:text-sm p-4 mb-5 placeholder:text-neutral-400" />
+
+                        <input type="text" name="Phone" id="phone_Id" placeholder="Phone Number"
+                            pattern="^01[0125][0-9]{8}$" maxlength="11"
+                            class="h-12 w-80 md:min-w-xl sm:min-w-xl rounded-md border border-neutral-400 sm:text-sm p-4 mb-5 placeholder:text-neutral-400" />
+
+                        <h2 class="font-bold text-2xl my-4">Enter Your Address Details</h2>
+
+                        <input type="text" name="address" id="address" placeholder="Address"
+                            class="h-12 w-80 md:min-w-xl sm:min-w-xl rounded-md border border-neutral-400 sm:text-sm p-4 mb-5 placeholder:text-neutral-400" />
+
+                        <input type="text" name="city" id="city_Id" placeholder="City"
+                            class="h-12 w-80 md:min-w-xl sm:min-w-xl rounded-md border border-neutral-400 sm:text-sm p-4 mb-5 placeholder:text-neutral-400" />
+
+                        <select name="country" id="country_ID"
+                            class="h-auto w-80 md:min-w-xl sm:min-w-xl rounded-md border border-neutral-400 sm:text-sm p-4 mb-5">
+                            <option value="" selected disabled>Please Select Your Governorate
+                            </option>
+                            <option value="Cairo">Cairo</option>
+                        </select>
+
+
+                        <h5 class="font-bold text-2xl my-4">Shipping method</h5>
+                        <input type="text" name="city" id="city_Id" value="EGP 100.00" disabled
+                            class="h-12 w-80 md:min-w-xl sm:min-w-xl rounded-md border border-neutral-400 sm:text-sm p-4 mb-5 placeholder:text-neutral-400" />
+
+
+                        <!-- Start Details Accordion -->
+                        <section class="block md:hidden py-4">
+                            <div class="w-full max-w-xl mx-auto space-y-4 bg-[#e0e0e0] px-2">
+                                <!-- Accordion Item 1 -->
+                                <div class="group rounded-lg overflow-hidden">
+                                    <div
+                                        class="cursor-pointer select-none flex justify-between items-start px-32 py-6 bg-transparent text-gray-800 hover:bg-gray-200 transition-all ease duration-700">
+
+                                        <!-- Start Title -->
+                                        <div class="flex justify-between gap-3 font-bold">
+                                            <span class="capitalize">Order Summary</span>
+                                        </div>
+                                        <h2 class="font-bold">LE 750.00</h2>
+                                        <!-- End Title -->
+                                    </div>
+
+                                    <!-- Start Details -->
+                                    <section class="w-full bg-neutral-200 px-32 py-8 sm:px-6 lg:px-8" aria-modal="true"
+                                        role="dialog" tabindex="-1">
+
+                                        <article class=" space-y-2">
+                                            <div>
+                                                <div class="flex gap-6 w-screen">
+                                                    <div class="relative">
+                                                        <img src="https://liztressens.com/cdn/shop/files/1.png?v=1749968107&width=500"
+                                                            alt="" class="size-16 rounded-sm object-cover" />
+                                                        <span
+                                                            class="absolute start-10 bottom-14 bg-neutral-300 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
+                                                            1
+                                                        </span>
+                                                    </div>
+
+                                                    <div class="w-full">
+                                                        <h3 class="text-sm font-light leading-tight text-black">
+                                                            Basic aksnd frbh
+                                                        </h3>
+
+                                                        <div class="flex justify-start gap-34">
+                                                            <span class="text-neutral-500">M</span>
+                                                            <span class="font-bold">LE 750.00</span>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+
+                                                <div class="flex justify-between">
+                                                    <div class="mt-10">
+                                                        <p class="capitalize text-sm">Subtotal</p>
+                                                        <p class="capitalize text-sm mt-5">Shipping</p>
+                                                        <p class="capitalize font-bold mt-10  text-xl">Total</p>
+                                                    </div>
+
+                                                    <div class="mt-10 grid justify-items-end">
+                                                        <h2>LE 750.00</h2>
+                                                        <h2 class="mt-5">LE 100.00</h2>
+                                                        <h2 class="capitalize text-xl font-bold mt-10"><span
+                                                                class="text-neutral-500">EGP
+                                                            </span>LE 850.00</h2>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </article>
+                                    </section>
+
+                                    <!-- End Details -->
+                                </div>
+                            </div>
+                        </section>
+                        <!-- End Details Accordion -->
+
+                        <!-- Start Btn Buy it Now -->
+                        <button
+                            class="mt-4 w-80 md:min-w-xl sm:min-w-xl rounded-md bg-black py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-slate-600 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+                            type="button">
+                            Complete Orders
+                        </button>
+                        <!-- End Btn Buy it Now -->
+                    </div>
+                </div>
+            </form>
+
+        </section>
+    </section>
+    <!-- End Form -->
+
+    <!-- Start order Details in full screen-->
+    <section class="hidden md:block py-4 w-screen h-auto border border-s-3 border-neutral-500">
+        <div class="w-full min-w-lg bg-[#f5f5f5] px-2 h-full">
+            <!-- Accordion Item 1 -->
+            <div class="group rounded-lg overflow-hidden ">
+                <div
+                    class="cursor-pointer select-none flex justify-between items-start px-4 py-6 bg-transparent text-gray-800 hover:bg-gray-200 transition-all ease duration-700">
+
+                    <!-- Start Title -->
+                    <div class="flex justify-between gap-3 font-bold">
+                        <span class="capitalize">Order Summary</span>
+                    </div>
+                    <h2 class="font-bold">LE 750.00</h2>
+                    <!-- End Title -->
+                </div>
+
+                <!-- Start Details -->
+                <section class="w-full px-4 py-8 sm:px-6 lg:px-8" aria-modal="true" role="dialog" tabindex="-1">
+
+                    <article class=" space-y-2">
+                        <div>
+                            <div class="flex justify-between">
+                                <div class="flex gap-5">
+                                    <div class="relative">
+                                        <img src="https://liztressens.com/cdn/shop/files/1.png?v=1749968107&width=500"
+                                            alt="" class="size-16 rounded-sm object-cover" />
+                                        <span
+                                            class="absolute start-10 bottom-14 bg-neutral-300 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
+                                            1
+                                        </span>
+                                    </div>
+
+
+                                    <h3 class="flex flex-col text-sm font-light leading-tight text-black">
+                                        Basic aksnd frbh
+                                        <span class="text-neutral-500">M</span>
+                                    </h3>
+                                </div>
+
+                                <div>
+
+                                    <div class="flex justify-between">
+
+                                        <span class="font-bold">LE 750.00</span>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="flex justify-between">
+                                <div class="mt-10">
+                                    <p class="capitalize text-sm">Subtotal</p>
+                                    <p class="capitalize text-sm mt-5">Shipping</p>
+                                    <p class="capitalize font-bold mt-10  text-xl">Total</p>
+                                </div>
+
+                                <div class="mt-10 grid justify-items-end">
+                                    <h2>LE 750.00</h2>
+                                    <h2 class="mt-5">LE 100.00</h2>
+                                    <h2 class="capitalize text-xl font-bold mt-10"><span class="text-neutral-500">EGP
+                                        </span>LE 850.00</h2>
+                                </div>
+                            </div>
+                        </div>
+
+                    </article>
+                </section>
+
+                <!-- End Details -->
+            </div>
+        </div>
+    </section>
+    <!-- End order Details in full screen-->
+
+</main>

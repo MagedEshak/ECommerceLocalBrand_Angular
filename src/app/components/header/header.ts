@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { RouterStateService } from '../../services/router-state.service';
 
 @Component({
   selector: 'app-header',
@@ -9,11 +9,16 @@ import { Router } from '@angular/router';
   styleUrls: ['./header.css']
 })
 export class Header {
-  constructor(public router: Router) {
-
+  constructor(public routerState: RouterStateService) {
   }
 
   get isHome(): boolean {
-    return this.router.url === '/' || this.router.url === '/home' ;
+    return this.routerState.isHome;
   }
+
+  get isNotFound(): boolean {
+    return this.routerState.isNotFound;
+  }
+
+
 }
