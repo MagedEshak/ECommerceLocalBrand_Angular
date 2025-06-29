@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "Ecommerce_local_brand_front": {
+    "ECommerceLocalBrand_Angular": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -18,14 +18,19 @@
               "zone.js"
             ],
             "tsConfig": "tsconfig.app.json",
-            "assets": [
-              {
-                "glob": "**/*",
-                "input": "public"
-              }
-            ],
+           "assets": [
+                  "src/assets",
+                 "src/favicon.ico"
+                ],
             "styles": [
+              "src/custom-theme.scss",
+              "node_modules/@fortawesome/fontawesome-free/css/all.min.css",
+              "node_modules/aos/dist/aos.css",
+              "node_modules/ngx-spinner/animations/ball-scale-multiple.css",
               "src/styles.css"
+            ],
+            "scripts": [
+              "/node_modules/aos/dist/aos.js"
             ],
             "server": "src/main.server.ts",
             "outputMode": "server",
@@ -67,10 +72,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "Ecommerce_local_brand_front:build:production"
+              "buildTarget": "ECommerceLocalBrand_Angular:build:production"
             },
             "development": {
-              "buildTarget": "Ecommerce_local_brand_front:build:development"
+              "buildTarget": "ECommerceLocalBrand_Angular:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -87,13 +92,17 @@
             ],
             "tsConfig": "tsconfig.spec.json",
             "assets": [
-              {
-                "glob": "**/*",
-                "input": "public"
-              }
+              "src/assets",
+                "src/favicon.ico"
             ],
             "styles": [
+              "node_modules/@fortawesome/fontawesome-free/css/all.min.css",
+              "node_modules/aos/dist/aos.css",
+              "node_modules/ngx-spinner/animations/ball-scale-multiple.css" ,
               "src/styles.css"
+            ],
+            "scripts": [
+              "/node_modules/aos/dist/aos.js"
             ]
           }
         }

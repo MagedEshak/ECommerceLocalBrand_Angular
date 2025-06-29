@@ -1,11 +1,24 @@
+import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import { RouterStateService } from '../../services/router-state.service';
 
 @Component({
   selector: 'app-header',
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './header.html',
-  styleUrl: './header.css'
+  styleUrls: ['./header.css']
 })
 export class Header {
+  constructor(public routerState: RouterStateService) {
+  }
+
+  get isHome(): boolean {
+    return this.routerState.isHome;
+  }
+
+  get isNotFound(): boolean {
+    return this.routerState.isNotFound;
+  }
+
 
 }
