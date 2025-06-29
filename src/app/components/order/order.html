@@ -1,4 +1,4 @@
-<main class="bg-white h-auto md:flex">
+<main class="bg-white min-h-screen md:flex scroll-smooth">
     <!-- Start Details Accordion -->
     <section class="block md:hidden py-4">
         <div class="w-full max-w-xl mx-auto space-y-4 bg-[#e0e0e0] px-2">
@@ -71,7 +71,7 @@
     <!-- End Details Accordion -->
 
     <!-- Start Form -->
-    <section class="bg-white mt-10  md:w-full">
+    <section class="bg-white mt-10 md:w-full">
         <section class="px-3 grid justify-center">
             <form class="mb-5 overflow-hidden">
                 <div class="flex items-center justify-between">
@@ -116,9 +116,11 @@
                             <option value="Cairo">Cairo</option>
                         </select>
 
-
-                        <h5 class="font-bold text-2xl my-4">Shipping method</h5>
-                        <input type="text" name="city" id="city_Id" value="EGP 100.00" disabled
+                        <div class="flex items-center justify-between w-full">
+                            <h5 class="font-bold text-2xl my-4">Shipping Cost</h5>
+                            <span class="font-bold text-3xl">LE 100.00</span>
+                        </div>
+                        <input type="text" name="city" id="city_Id" value="EGP 100.00" hidden
                             class="h-12 w-80 md:min-w-xl sm:min-w-xl rounded-md border border-neutral-400 sm:text-sm p-4 mb-5 placeholder:text-neutral-400" />
 
 
@@ -209,18 +211,19 @@
     <!-- End Form -->
 
     <!-- Start order Details in full screen-->
-    <section class="hidden md:block py-4 w-screen h-auto border border-s-3 border-neutral-500">
+    <section
+        class="hidden md:block py-4 w-[100%] border-s border-neutral-300 sticky top-0 h-screen overflow-y-auto scroll-smooth">
         <div class="w-full min-w-lg bg-[#f5f5f5] px-2 h-full">
             <!-- Accordion Item 1 -->
-            <div class="group rounded-lg overflow-hidden ">
+            <div class="group rounded-lg overflow-hidden">
                 <div
                     class="cursor-pointer select-none flex justify-between items-start px-4 py-6 bg-transparent text-gray-800 hover:bg-gray-200 transition-all ease duration-700">
 
                     <!-- Start Title -->
-                    <div class="flex justify-between gap-3 font-bold">
+                    <div class="flex justify-between gap-3 font-bold md:hidden">
                         <span class="capitalize">Order Summary</span>
                     </div>
-                    <h2 class="font-bold">LE 750.00</h2>
+                    <h2 class="font-bold md:hidden">LE 750.00</h2>
                     <!-- End Title -->
                 </div>
 
