@@ -7,23 +7,13 @@ import { provideClientHydration, withEventReplay } from '@angular/platform-brows
 import { importProvidersFrom } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
-import { MatOptionModule } from '@angular/material/core';
+
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
     provideAnimations(),
     provideHttpClient(),
-    provideClientHydration(withEventReplay()),
-
-    // هنا بنستخدم importProvidersFrom علشان نضيف موديولات Material
-    importProvidersFrom(
-      CommonModule,
-      MatFormFieldModule,
-      MatSelectModule,
-      MatOptionModule
-    )
+    provideClientHydration(withEventReplay())
   ]
 };

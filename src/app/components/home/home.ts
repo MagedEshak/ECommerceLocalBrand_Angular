@@ -1,13 +1,12 @@
 import { Component } from '@angular/core';
 import { from } from 'rxjs';
-import { Header } from '../header/header';
-import { Footer } from '../footer/footer';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { NewArrivalComponent } from '../newArrival/newArrival.component';
 
 @Component({
   selector: 'app-home',
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, NewArrivalComponent],
   templateUrl: './home.html',
   styleUrl: './home.css'
 })
