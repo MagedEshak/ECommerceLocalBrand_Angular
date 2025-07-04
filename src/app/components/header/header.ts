@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterStateService } from '../../services/router-state.service';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-header',
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './header.html',
   styleUrls: ['./header.css']
 })
@@ -16,9 +17,9 @@ export class Header {
     return this.routerState.isHome;
   }
 
-  get isNotFound(): boolean {
-    return this.routerState.isNotFound;
-  }
+  // get isNotFound(): boolean {
+  //   return this.routerState.isNotFound;
+  // }
 
 
 }

@@ -27,9 +27,9 @@ export class RouterStateService {
     return this.currentUrl === '/' || this.currentUrl === '/home' || this.currentUrl === '';
   }
 
-  get isNotFound(): boolean {
-    return this.currentUrl === '/notFound' || this.currentUrl === '/order';
-  }
+  // get isNotFound(): boolean {
+  //   return this.currentUrl === '/notFound' || this.currentUrl === '/order';
+  // }
 
   
 }
