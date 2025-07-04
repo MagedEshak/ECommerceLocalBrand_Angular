@@ -8,12 +8,12 @@ import { RouterStateService } from './services/router-state.service';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, Header, Footer],
+  imports: [RouterOutlet],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
 export class App {
-  protected title = 'Ecommerce_local_brand_front';
+  protected title = 'E-Commerce CashLook';
 
   constructor(public routerState: RouterStateService) { }
 }
