@@ -16,9 +16,9 @@ export class Header {
     return this.routerState.isHome;
   }
 
-  get isNotFound(): boolean {
-    return this.routerState.isNotFound;
-  }
+  // get isNotFound(): boolean {
+  //   return this.routerState.isNotFound;
+  // }
 
 
 }

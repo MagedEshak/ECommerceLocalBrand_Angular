@@ -4,15 +4,23 @@ import { Home } from './components/home/home';
 import { NotFound } from './components/not-found/not-found';
 import { ProductDetails } from './components/product-details/product-details';
 import { Order } from './components/order/order';
+import { MainLayout } from './components/main-layout/main-layout';
 
 export const routes: Routes = [
-  { path: '', component: Splash },
-  { path: 'home', component: Home, title: 'Home' },
-  { path: 'product-details', component: ProductDetails, title: 'Product Details' },
+
+  {
+    path: '',
+    component: MainLayout,
+    children: [
+      { path: '', component: Splash },
+      { path: 'home', component: Home, title: 'Home' },
+      { path: 'product-details/:id', component: ProductDetails, title: 'Product Details' }
+    ]
+  },
+
   { path: 'order', component: Order, title: 'Checkout ' },
 
-
   //Notfound
-  { path: 'notFound', component: NotFound, title: 'Notfound' },
-  { path: '**', redirectTo: 'notFound' }
+  // { path: 'notFound', component: NotFound, title: 'Notfound' },
+  { path: '**', component: NotFound }
 ];
