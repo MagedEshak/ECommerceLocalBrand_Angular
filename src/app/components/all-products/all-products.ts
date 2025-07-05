@@ -17,6 +17,7 @@ export class AllProducts implements OnInit {
   currentPageIndex = 1;
   totalPages = 1;
 
+
   constructor(private _ProductService: ProductService) { }
 
   ngOnInit(): void {
@@ -26,12 +27,15 @@ export class AllProducts implements OnInit {
   loadProducts(pageIndex: number = 1): void {
     this._ProductService.getAllProductsByPaginate(pageIndex).subscribe({
       next: (response) => {
-        console.log('API Response:', response);
-        this.filteredProducts = response.items;
-        this.currentPageIndex = response.pageIndex;
-        this.totalPages = response.totalPages;
+        setTimeout(() => {
+          this.filteredProducts = response.items;
+          this.currentPageIndex = response.pageIndex;
+          this.totalPages = response.totalPages;
+ 
+        }, 1000);
       }, error: (err) => {
         console.log("error fetch data", err);
+
       }
     });
   }
@@ -45,6 +49,10 @@ export class AllProducts implements OnInit {
     }
   }
 
-
+  getProductSizesDisplay(product: IProduct): string {
+    return product.productSizes && product.productSizes.length
+      ? product.productSizes.map(s => s.size.charAt(0)).join(', ')
+      : 'N/A';
+  }
 
 }

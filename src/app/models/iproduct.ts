@@ -1,3 +1,7 @@
+import { INewArrivals } from './inew-arrivals';
+import { IProductImagesPaths } from "./iproduct-images-paths";
+import { IProductSizes } from "./iproduct-sizes";
+
 export interface IProduct {
     id: number,
     name: string,
@@ -5,5 +9,8 @@ export interface IProduct {
     price: number,
     discountPercentage: number,
     categoryId: number,
-    isDeleted: boolean
+    isDeleted: boolean,
+    productSizes?: IProductSizes[]; // optional
+    productImagesPaths: IProductImagesPaths[]; // required
+    NewArrival: INewArrivals
 }

@@ -10,10 +10,8 @@ import { Router, RouterModule } from '@angular/router';
   styleUrls: ['./splash.css'],
 })
 export class Splash implements OnInit {
-  constructor(private router: Router) { }
+  constructor() { }
   ngOnInit(): void {
-    setTimeout(() => {
-      this.router.navigateByUrl('/home');
-    }, 5000);
+
   }
 }
