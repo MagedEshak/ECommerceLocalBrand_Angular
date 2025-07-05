@@ -5,6 +5,7 @@ import { NotFound } from './components/not-found/not-found';
 import { ProductDetails } from './components/product-details/product-details';
 import { Order } from './components/order/order';
 import { MainLayout } from './components/main-layout/main-layout';
+import { AllProducts } from './components/all-products/all-products';
 
 export const routes: Routes = [
 
@@ -21,6 +22,11 @@ export const routes: Routes = [
         path: 'home',
         component: Home,
         title: 'Home'
+      },
+      {
+        path: 'allProducts',
+        component: AllProducts,
+        title: 'All Products'
       },
       {
         path: 'product-details/:id',
