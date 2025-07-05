@@ -9,18 +9,36 @@ import { MainLayout } from './components/main-layout/main-layout';
 export const routes: Routes = [
 
   {
+    // Pages with Header and Footer
     path: '',
     component: MainLayout,
     children: [
-      { path: '', component: Splash },
-      { path: 'home', component: Home, title: 'Home' },
-      { path: 'product-details/:id', component: ProductDetails, title: 'Product Details' }
+      {
+        path: '',
+        component: Splash
+      },
+      {
+        path: 'home',
+        component: Home,
+        title: 'Home'
+      },
+      {
+        path: 'product-details/:id',
+        component: ProductDetails,
+        title: 'Product Details'
+      }
     ]
   },
-
-  { path: 'order', component: Order, title: 'Checkout ' },
+  // Pages without Header and Footer
+  {
+    path: 'order',
+    component: Order,
+    title: 'Checkout'
+  },
 
   //Notfound
-  // { path: 'notFound', component: NotFound, title: 'Notfound' },
-  { path: '**', component: NotFound }
+  {
+    path: '**',
+    component: NotFound
+  }
 ];
