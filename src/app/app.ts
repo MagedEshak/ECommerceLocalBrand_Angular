@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { Header } from './components/header/header';
 import { Footer } from './components/footer/footer';
-import { RouterStateService } from './services/router-state.service';
+import { RouterStateService } from './shared/services/Router-State/router-state.service';
 
 
 @Component({

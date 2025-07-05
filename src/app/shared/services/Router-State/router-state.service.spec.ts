@@ -1,13 +1,14 @@
+import { RouterStateService } from './router-state.service';
 import { TestBed } from '@angular/core/testing';
 
-import { ThemeService } from './theme-service';
 
-describe('ThemeService', () => {
-  let service: ThemeService;
+
+describe('RouterStateService', () => {
+  let service: RouterStateService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(ThemeService);
+    service = TestBed.inject(RouterStateService);
   });
 
   it('should be created', () => {
