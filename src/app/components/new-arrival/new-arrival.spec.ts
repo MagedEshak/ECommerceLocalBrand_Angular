@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { NewArrival } from './new-arrival';
 
-describe('Order', () => {
+describe('NewArrival', () => {
   let component: NewArrival;
   let fixture: ComponentFixture<NewArrival>;
 

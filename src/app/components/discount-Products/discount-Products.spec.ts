@@ -3,7 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 
 
-describe('Order', () => {
+describe('DiscountProducts', () => {
   let component: DiscountProducts;
   let fixture: ComponentFixture<DiscountProducts>;
 
