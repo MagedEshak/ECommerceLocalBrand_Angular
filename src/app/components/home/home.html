@@ -1,25 +1,30 @@
-<a href="#">
-    <section
-        class="bg-[url('/assets/images/images.jpeg')] bg-cover bg-center bg-no-repeat h-[32rem] grid place-items-end">
-        <div class="w-full bg-black/50 backdrop-brightness-90">
-            <div class="mx-auto max-w-screen-xl px-4 py-16 sm:px-6 sm:py-24 md:grid md:items-center text-white">
+<!-- Splash عند أول تحميل -->
+<!-- <app-splash *ngIf="isLoading"></app-splash> -->
 
-                <!-- content -->
-                <div class="max-w-prose text-left">
-                    <h1 class="capitalize text-2xl sm:text-5xl font-bold leading-tight">
-                        Go Teba Collection
-                    </h1>
-                    <div class="mt-6">
-                        <a
-                            class="inline-block rounded border border-white bg-transparent px-5 py-3 font-bold text-white shadow-sm transition hover:bg-white hover:text-black">
-                            Shop now
-                        </a>
+<div>
+    <a href="#">
+        <section
+            class="bg-[url('/assets/images/images.jpeg')] bg-cover bg-center bg-no-repeat h-[32rem] grid place-items-end">
+            <div class="w-full bg-black/50 backdrop-brightness-90">
+                <div class="mx-auto max-w-screen-xl px-4 py-16 sm:px-6 sm:py-24 md:grid md:items-center text-white">
+
+                    <!-- content -->
+                    <div class="max-w-prose text-left">
+                        <h1 class="capitalize text-2xl sm:text-5xl font-bold leading-tight">
+                            Go Teba Collection
+                        </h1>
+                        <div class="mt-6">
+                            <a [routerLink]="['/allProducts']"
+                                class="inline-block rounded border border-white bg-transparent px-5 py-3 font-bold text-white shadow-sm transition hover:bg-white hover:text-black">
+                                Shop now
+                            </a>
+                        </div>
                     </div>
+
                 </div>
-
             </div>
-        </div>
-    </section>
-</a>
+        </section>
+    </a>
 
-<app-new-arrival></app-new-arrival>
+    <app-new-arrival (loaded)="onChildLoaded()"></app-new-arrival>
+</div>

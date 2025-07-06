@@ -1,14 +1,32 @@
-<section class="flex flex-col mx-auto px-8 mt-15 gap-10">
-  <h2 class="font-bold text-2xl ms-4">New Arrivals</h2>
-  <section class="flex justify-between flex-wrap mx-auto px-8">
+<h2 class="font-bold text-2xl ms-4 mt-15">New Arrivals</h2>
 
+<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 px-8 mt-6">
+  @for (prd of filteredProducts; track $index) {
+  <section class="shadow-md rounded-lg overflow-hidden flex flex-col">
     <a href="#" class="flex flex-col items-center mb-20">
-      <img alt="" src="https://liztressens.com/cdn/shop/files/1.png?v=1749968107&width=500"
-        class="h-64 w-full object-cover sm:h-80 lg:h-96" />
 
-      <h3 class="mt-4 text-lg font-bold text-gray-900 sm:text-xl">Lorem, ipsum dolor.</h3>
+      <div class="h-64 w-full overflow-hidden">
+        <img alt="{{ prd.name }}" [src]="prd.productImagesPaths[0]?.imagePath || 'assets/images/images.jpeg'"
+          class="w-full h-full object-cover" />
+      </div>
 
-      <p class="mt-2 max-w-sm text-black">LE 500.00 EGP </p>
+      <h3 class="mt-4 text-lg font-bold text-gray-900 sm:text-xl">{{prd.name}}</h3>
+      <p class="text-gray-700 mt-1">
+        Size: {{getProductSizesDisplay(prd) }}
+      </p>
+
+
+      <p class="mt-2 max-w-sm text-black">{{prd.price| currency : 'EGP ' : 'code'}}</p>
     </a>
   </section>
+  }@empty {
+  <section class="flex justify-center items-center mx-auto px-8">
+    <h3 class="mt-4 text-lg font-bold text-gray-900 sm:text-xl">No Products.</h3>
+  </section>
+  }
+
 </section>
+
+
+<app-pagination [currentPageIndex]="currentPageIndex" [totalPages]="totalPages" (pageChange)="changePage($event)">
+</app-pagination>

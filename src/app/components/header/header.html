@@ -12,7 +12,7 @@
                 <nav aria-label="Global" class="hidden md:block ">
                     <ul class="flex items-center gap-6 text-sm">
                         <li>
-                            <a [ngClass]="{'text-white  group-hover:text-black':isHome
+                            <a [routerLink]="['/allProducts']" [ngClass]="{'text-white  group-hover:text-black':isHome
                             }" class="text-black transition  hover:text-gray-400/75" href="#">
                                 Catalog </a>
                         </li>
@@ -45,7 +45,7 @@
             <!-- End Nav drop down list -->
 
             <!-- Start Logo -->
-            <div class="flex-1 md:flex md:items-center md:gap-12" [routerLink]="['home']">
+            <div class="flex-1 md:flex md:items-center md:gap-12" [routerLink]="['/']">
                 <a [ngClass]="{' text-white group-hover:text-black':isHome}" class="block text-black" href="#">
                     <span class="sr-only">Home</span>
                     <svg class="h-8" viewBox="0 0 28 24" fill="none" xmlns="http://www.w3.org/2000/svg">

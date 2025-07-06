@@ -1,10 +1,10 @@
 import { Routes } from '@angular/router';
-import { Splash } from './components/splash/splash';
 import { Home } from './components/home/home';
 import { NotFound } from './components/not-found/not-found';
 import { ProductDetails } from './components/product-details/product-details';
 import { Order } from './components/order/order';
 import { MainLayout } from './components/main-layout/main-layout';
+import { AllProducts } from './components/all-products/all-products';
 
 export const routes: Routes = [
 
@@ -15,12 +15,18 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        component: Splash
+        component: Home,
+        title: 'Home'
       },
       {
         path: 'home',
         component: Home,
         title: 'Home'
+      },
+      {
+        path: 'allProducts',
+        component: AllProducts,
+        title: 'All Products'
       },
       {
         path: 'product-details/:id',
