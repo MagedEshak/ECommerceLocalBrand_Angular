@@ -4,6 +4,7 @@ import { NewArrivalsService } from '../../shared/services/new-arrivals/new-arriv
 import { IProduct } from '../../models/iproduct';
 import { Pagination } from '../pagination/pagination';
 
+
 @Component({
   selector: 'app-new-arrival',
   templateUrl: './new-arrival.html',
@@ -14,30 +15,23 @@ export class NewArrival implements OnInit {
   filteredProducts: IProduct[] = [] as IProduct[];
   currentPageIndex = 1;
   totalPages = 1;
-  isLoading: boolean = false;
 
-  @Output() loaded = new EventEmitter<void>();
 
   constructor(private _NewArrivalsService: NewArrivalsService) { }
 
   ngOnInit() {
     this.loadNewArrivals();
   }
+
   loadNewArrivals(pageIndex: number = 1): void {
-    this.isLoading = true;
     this._NewArrivalsService.getNewArrivalProducts(pageIndex).subscribe({
       next: (response) => {
-        setTimeout(() => {
-          this.filteredProducts = response.items;
-          this.currentPageIndex = response.pageIndex;
-          this.totalPages = response.totalPages;
-          this.isLoading = false;
-          this.loaded.emit();
-          console.log('✅ Event Emitted from NewArrival');
-        }, 1000);
+    
+        this.filteredProducts = response.items;
+        this.currentPageIndex = response.pageIndex;
+        this.totalPages = response.totalPages;
       }, error: (err) => {
         console.log("error fetch data", err);
-        this.isLoading = false;
       }
     });
   }

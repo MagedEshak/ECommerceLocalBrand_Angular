@@ -5,6 +5,7 @@ import { ProductDetails } from './components/product-details/product-details';
 import { Order } from './components/order/order';
 import { MainLayout } from './components/main-layout/main-layout';
 import { AllProducts } from './components/all-products/all-products';
+import { Login } from './components/login/login';
 
 export const routes: Routes = [
 
@@ -41,6 +42,12 @@ export const routes: Routes = [
     component: Order,
     title: 'Checkout'
   },
+  {
+    path: 'login',
+    component: Login,
+    title: 'Login'
+  },
+
 
   //Notfound
   {
