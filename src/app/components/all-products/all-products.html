@@ -2,13 +2,12 @@
 
 <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 px-8 mt-6">
     @for (prd of filteredProducts; track $index) {
-    <section class="shadow-md rounded-lg overflow-hidden flex flex-col" data-aos="zoom-in" data-aos-duration="500"
-        data-aos-offset="100">
-        <a class="flex flex-col items-center mb-20">
+    <section class="shadow-md rounded-lg overflow-hidden flex flex-col"  data-aos="zoom-in" data-aos-duration="500"
+    data-aos-offset="100">
+        <a [routerLink]="['/product-details', prd.id]" class="flex flex-col items-center mb-20">
 
             <div class="h-64 w-full overflow-hidden">
-                <img alt="{{ prd.name }}" [src]="prd.productImagesPaths[0]?.imagePath || 'assets/images/images.jpeg'"
-                    class="w-full h-full object-cover" />
+                <img [src]="getImageUrl(prd)" [alt]="prd.name" class="w-full h-full object-cover" />
             </div>
 
             <h3 class="mt-4 text-lg font-bold text-gray-900 sm:text-xl">{{prd.name}}</h3>

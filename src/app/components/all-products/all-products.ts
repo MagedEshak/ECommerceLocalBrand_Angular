@@ -1,24 +1,22 @@
 import { Component, OnInit } from '@angular/core';
-import { ProductService } from '../../shared/services/Product/product.sercivce';
+import { ProductService } from '../../shared/services/Product/product.service';
 import { IProduct } from '../../models/iproduct';
 import { CurrencyPipe } from '@angular/common';
-import { Pagination } from "../pagination/pagination";
-
+import { Pagination } from '../pagination/pagination';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-all-products',
-  imports: [CurrencyPipe, Pagination],
+  imports: [CurrencyPipe, Pagination, RouterModule],
   templateUrl: './all-products.html',
-  styleUrl: './all-products.css'
+  styleUrl: './all-products.css',
 })
 export class AllProducts implements OnInit {
-
   filteredProducts: IProduct[] = [] as IProduct[];
   currentPageIndex = 1;
   totalPages = 1;
 
-
-  constructor(private _ProductService: ProductService) { }
+  constructor(private _ProductService: ProductService) {}
 
   ngOnInit(): void {
     this.loadProducts();
@@ -44,12 +42,11 @@ export class AllProducts implements OnInit {
           this.filteredProducts = response.items;
           this.currentPageIndex = response.pageIndex;
           this.totalPages = response.totalPages;
-
         }, 1000);
-      }, error: (err) => {
-        console.log("error fetch data", err);
-
-      }
+      },
+      error: (err) => {
+        console.log('error fetch data', err);
+      },
     });
   }
 
@@ -85,8 +82,13 @@ export class AllProducts implements OnInit {
 
   getProductSizesDisplay(product: IProduct): string {
     return product.productSizes && product.productSizes.length
-      ? product.productSizes.map(s => s.size.charAt(0)).join(', ')
+      ? product.productSizes.map((s) => s.size.charAt(0)).join(', ')
       : 'N/A';
   }
 
+  getImageUrl(product: IProduct): string {
+    const baseUrl = 'https://localhost:7140'; // غيرها للدومين الحقيقي لو رفعته
+    const imagePath = product.productImagesPaths?.[0]?.imagePath;
+    return imagePath ? `${baseUrl}${imagePath}` : 'assets/images/default.png';
+  }
 }
