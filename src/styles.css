@@ -58,3 +58,7 @@ body {
     background: #000;
     /* عند الـ hover */
 }
+
+button {
+    cursor: pointer;
+}

@@ -22,13 +22,14 @@
     </a>
   </section>
   }@empty {
-  <section class="flex justify-center items-center mx-auto px-8">
+  <section class="grid justify-items-center px-8 mt-6">
     <h3 class="mt-4 text-lg font-bold text-gray-900 sm:text-xl">No Products.</h3>
   </section>
   }
 
 </section>
 
-
+@if(filteredProducts.length !== 0){
 <app-pagination [currentPageIndex]="currentPageIndex" [totalPages]="totalPages" (pageChange)="changePage($event)">
 </app-pagination>
+}

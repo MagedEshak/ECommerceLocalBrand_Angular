@@ -45,8 +45,9 @@
             <!-- End Nav drop down list -->
 
             <!-- Start Logo -->
-            <div class="flex-1 md:flex md:items-center md:gap-12" [routerLink]="['/home']">
-                <a [ngClass]="{' text-white group-hover:text-black':isHome}" class="block text-black" href="#">
+            <div class="flex-1 md:flex md:items-center md:gap-12">
+                <a [ngClass]="{' text-white group-hover:text-black':isHome}" class="block text-black"
+                    [routerLink]="['/home']">
                     <span class="sr-only">Home</span>
                     <svg class="h-8" viewBox="0 0 28 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path
@@ -89,13 +90,13 @@
 
                         <div class="grid justify-items-center sm:grid-cols-2">
                             <a [routerLink]="['/order']"
-                                class="block rounded-lg px-4 py-2 text-sm text-black hover:bg-gray-50 hover:text-gray-700"
+                                class="block rounded-sm px-6 py-2 text-sm border border-neutral-500 text-black hover:bg-gray-50 hover:text-gray-700"
                                 role="menuitem">
                                 <i class="fa-solid fa-box"></i> Orders
                             </a>
 
                             <a [routerLink]="['/profile']"
-                                class="block rounded-lg px-4 py-2 text-sm text-black hover:bg-gray-50 hover:text-gray-700"
+                                class="block rounded-sm px-6 py-2 text-sm border border-neutral-500 text-black hover:bg-gray-50 hover:text-gray-700"
                                 role="menuitem">
                                 <i class="fa-solid fa-user"></i> Profile
                             </a>

@@ -27,5 +27,7 @@
     }
 </section>
 
+
+@if(filteredProducts.length !== 0){
 <app-pagination [currentPageIndex]="currentPageIndex" [totalPages]="totalPages" (pageChange)="changePage($event)">
-</app-pagination>
+</app-pagination> }
