@@ -1,7 +1,7 @@
 <header [ngClass]="{
     'absolute w-screen end-0 top-0 z-10 group hover:bg-white': isHome,
     'bg-transparent border-b border-neutral-400': !isHome,
-  }" class="font-bold transition-all ease duration-700">
+}" class="font-bold transition-all ease duration-700">
 
 
     <div class="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
@@ -45,8 +45,9 @@
             <!-- End Nav drop down list -->
 
             <!-- Start Logo -->
-            <div class="flex-1 md:flex md:items-center md:gap-12" [routerLink]="['/']">
-                <a [ngClass]="{' text-white group-hover:text-black':isHome}" class="block text-black" href="#">
+            <div class="flex-1 md:flex md:items-center md:gap-12">
+                <a [ngClass]="{' text-white group-hover:text-black':isHome}" class="block text-black"
+                    [routerLink]="['/home']">
                     <span class="sr-only">Home</span>
                     <svg class="h-8" viewBox="0 0 28 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path
@@ -59,53 +60,63 @@
 
             <!-- Start icons -->
             <div class="md:flex md:items-center md:justify-between md:gap-6">
-                <i [ngClass]="{' text-white group-hover:text-black':isHome}"
-                    class="fa-solid fa-user me-3  text-xl cursor-pointer transition duration-300 "></i>
+                <div (click)="hideProfile()">
+                    <i [ngClass]="{' text-white group-hover:text-black':isHome}"
+                        class="fa-solid fa-user me-3  text-xl cursor-pointer transition duration-300 "></i>
+                </div>
 
-                <i [ngClass]="{' text-white group-hover:text-black':isHome}"
-                    class="fa-solid fa-bag-shopping text-white group-hover:text-black text-xl cursor-pointer transition duration-300"></i>
+                <div (click)="hideCart()">
+                    <i [ngClass]="{' text-white group-hover:text-black':isHome}"
+                        class="fa-solid fa-bag-shopping text-white group-hover:text-black text-xl cursor-pointer transition duration-300"></i>
+                </div>
             </div>
             <!-- End Icons -->
 
             <!-- Drop down list in all screens -->
-            <div class="hidden md:relative md:hidden">
-                <div class="absolute end-10 z-10 mt-3 w-56 divide-y divide-gray-100 rounded-md border border-gray-100 bg-white shadow-xl"
+            <div class="hidden md:relative md:hidden md:top-5.5" #profileIcon>
+                <div class="absolute end-10 z-10 mt-3 w-80 px-5 py-3 divide-y divide-gray-100 rounded-md border border-gray-100 bg-white shadow-xl"
                     role="menu">
-                    <div class="p-2">
-                        <a href="#"
-                            class="block rounded-lg px-4 py-2 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                            role="menuitem">
-                            My profile
-                        </a>
+                    <h3>Account</h3>
+                    <div class="p-2 flex flex-col gap-5">
 
-                        <a href="#"
-                            class="block rounded-lg px-4 py-2 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                            role="menuitem">
-                            Billing summary
-                        </a>
-
-                        <a href="#"
-                            class="block rounded-lg px-4 py-2 text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                            role="menuitem">
-                            Team settings
-                        </a>
-                    </div>
-
-                    <div class="p-2">
-                        <form method="POST" action="#">
-                            <button type="submit"
-                                class="flex w-full items-center gap-2 rounded-lg px-4 py-2 text-sm text-red-700 hover:bg-red-50"
+                        <div class="grid justify-items-center">
+                            <a [routerLink]="['/login']"
+                                class="block w-full rounded-sm bg-black text-center px-5 py-2 text-sm border text-white transition hover:bg-transparent hover:text-black"
                                 role="menuitem">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                    stroke-width="1.5" stroke="currentColor" class="size-4">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
-                                </svg>
+                                Sign in
+                            </a>
+                        </div>
 
-                                Logout
-                            </button>
-                        </form>
+
+                        <div class="grid justify-items-center sm:grid-cols-2">
+                            <a [routerLink]="['/order']"
+                                class="block rounded-sm px-6 py-2 text-sm border border-neutral-500 text-black hover:bg-gray-50 hover:text-gray-700"
+                                role="menuitem">
+                                <i class="fa-solid fa-box"></i> Orders
+                            </a>
+
+                            <a [routerLink]="['/profile']"
+                                class="block rounded-sm px-6 py-2 text-sm border border-neutral-500 text-black hover:bg-gray-50 hover:text-gray-700"
+                                role="menuitem">
+                                <i class="fa-solid fa-user"></i> Profile
+                            </a>
+                        </div>
                     </div>
+
+                    <!-- LogOut -->
+                    <!-- <div class="p-2">
+                        <button type="button"
+                            class="flex w-full items-center gap-2 rounded-lg px-4 py-2 text-sm text-red-700 hover:bg-red-50"
+                            role="menuitem">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="size-4">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
+                            </svg>
+
+                            Logout
+                        </button>
+                    </div> -->
                 </div>
             </div>
 
@@ -191,7 +202,7 @@
 
             <!-- Cart -->
             <div class="hidden fixed end-0 top-0 md:top-11 md:end-18 z-30 w-96 h-screen max-w-sm bg-neutral-200 px-4 py-8 sm:px-6 lg:px-8"
-                aria-modal="true" role="dialog" tabindex="-1">
+                #cartIcon aria-modal="true" role="dialog" tabindex="-1">
                 <div class="flex gap-2">
                     <h2 class="capitalize font-semibold text-2xl">Cart</h2>
                     <span
@@ -202,7 +213,7 @@
                 <button class="absolute end-4 top-4 mb-7 text-gray-600 transition hover:scale-110 cursor-pointer">
                     <span class="sr-only">Close cart</span>
 
-                    <i
+                    <i (click)="closeCartBtn()"
                         class="fa-solid fa-xmark text-2xl relative end-3 mb-6 mt-2 hover:text-gray-700 transition-all ease-in duration-200"></i>
                 </button>
 
@@ -281,7 +292,7 @@
 
                     <!-- btn -->
                     <div class="space-y-4 text-center">
-                        <a href="#"
+                        <a [routerLink]="['/order']"
                             class="block rounded-sm bg-black px-5 py-3 text-sm border text-white transition hover:bg-transparent hover:text-black">
                             Checkout
                         </a>

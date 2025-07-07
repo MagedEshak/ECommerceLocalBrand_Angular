@@ -1,8 +1,8 @@
-import { Component } from '@angular/core';
+import { AfterViewInit, Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { Header } from './components/header/header';
-import { Footer } from './components/footer/footer';
+
 import { RouterStateService } from './shared/services/Router-State/router-state.service';
+import * as AOS from 'aos';
 
 
 @Component({
@@ -12,8 +12,13 @@ import { RouterStateService } from './shared/services/Router-State/router-state.
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
-export class App {
+export class App implements AfterViewInit {
   protected title = 'E-Commerce CashLook';
 
   constructor(public routerState: RouterStateService) { }
+
+  ngAfterViewInit(): void {
+    AOS.init();
+    AOS.refresh();
+  }
 }
