@@ -19,4 +19,9 @@ export class LoginService {
       }
     });
   }
+
+  loginAfterGetCode(email: string, code: string): Observable<any> {
+    return this._httpClient.post(
+      `${environment.urlPath}Account/CustomerAccountLogin`, { email, code });
+  }
 }

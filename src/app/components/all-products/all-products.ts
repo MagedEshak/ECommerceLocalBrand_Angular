@@ -11,6 +11,7 @@ import { RouterModule } from '@angular/router';
   templateUrl: './all-products.html',
   styleUrl: './all-products.css',
 })
+
 export class AllProducts implements OnInit {
   filteredProducts: IProduct[] = [] as IProduct[];
   currentPageIndex = 1;
