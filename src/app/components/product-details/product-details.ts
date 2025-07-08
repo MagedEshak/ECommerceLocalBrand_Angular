@@ -20,7 +20,7 @@ export class ProductDetails implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private productDetailsService: ProductDetailsService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
@@ -45,7 +45,7 @@ export class ProductDetails implements OnInit {
 
   get imageUrl(): string {
     const baseUrl = 'https://localhost:7140'; // عدل على حسب سيرفرك الحقيقي
-    const imagePath = this.product?.productImagesPaths?.[0]?.imagePath;
+    const imagePath = this.product?.productImagesPaths?.[0]?.imagePath || 'assets/images/images.jpeg';
     return imagePath
       ? `${baseUrl}${imagePath}`
       : `${baseUrl}/uploads/default.png`;

@@ -4,12 +4,18 @@
   @for (prd of filteredProducts; track $index) {
   <section class="rounded-lg overflow-hidden flex flex-col" data-aos="zoom-in" data-aos-duration="500"
     data-aos-offset="150">
-    <a class="flex flex-col items-center mb-20">
+    <a [routerLink]="['/product-details', prd.id]" class="flex flex-col items-center mb-20">
 
-      <div class="h-64 w-full overflow-hidden">
-        <img alt="{{ prd.name }}"
-          [src]="prd.productImagesPaths?.length ? prd.productImagesPaths[0].imagePath : 'assets/images/images.jpeg'"
-          class="w-full h-full object-cover hover:-translate-1.5 transition-all ease-in duration-200" />
+      <div class="relative h-96 w-full overflow-hidden group">
+      
+        <!-- الصورة الأساسية -->
+        <img [src]="getImageUrl(prd, 0)" [alt]="prd.name"
+          class="absolute inset-0 w-full h-full object-cover transition-opacity duration-500 opacity-100 group-hover:opacity-0" />
+      
+        <!-- الصورة الثانية تظهر مع الهوفر -->
+        <img [src]="getImageUrl(prd, 1)" [alt]="prd.name + ' alt'"
+          class="absolute inset-0 w-full h-full object-cover transition-opacity duration-500 opacity-0 group-hover:opacity-100" />
+      
       </div>
 
       <h3 class="mt-4 text-lg font-bold text-gray-900 sm:text-xl">{{prd.name}}</h3>

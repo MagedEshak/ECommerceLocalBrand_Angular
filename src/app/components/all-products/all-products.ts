@@ -16,7 +16,7 @@ export class AllProducts implements OnInit {
   currentPageIndex = 1;
   totalPages = 1;
 
-  constructor(private _ProductService: ProductService) {}
+  constructor(private _ProductService: ProductService) { }
 
   ngOnInit(): void {
     this.loadProducts();
@@ -85,10 +85,19 @@ export class AllProducts implements OnInit {
       ? product.productSizes.map((s) => s.size.charAt(0)).join(', ')
       : 'N/A';
   }
+  hoveredProductIndex = -1;
 
-  getImageUrl(product: IProduct): string {
-    const baseUrl = 'https://localhost:7140'; // غيرها للدومين الحقيقي لو رفعته
-    const imagePath = product.productImagesPaths?.[0]?.imagePath;
-    return imagePath ? `${baseUrl}${imagePath}` : 'assets/images/default.png';
+  getImageUrl(product: IProduct, index: number): string {
+    const baseUrl = 'https://localhost:7140';
+    const defaultImage = 'assets/images/images.jpeg';
+    const images = product.productImagesPaths;
+
+    if (!images || images.length === 0) return defaultImage;
+
+    // لو ماوس واقف عليه، رجع الصورة التانية لو فيه أكتر من صورة
+    if (!images[index]) return `${baseUrl}${images[0].imagePath}`;
+
+    return `${baseUrl}${images[index].imagePath}`;
   }
+
 }
