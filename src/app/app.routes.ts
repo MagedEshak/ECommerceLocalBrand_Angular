@@ -36,17 +36,18 @@ export const routes: Routes = [
       },
       {
         path: 'profile',
-        loadComponent: () => import('./components/profile/profile').then(m => m.Profile),
-        canActivate: [authGuard]
+        loadComponent: () =>
+          import('./components/profile/profile').then((m) => m.Profile),
+        canActivate: [authGuard],
+      },
+      {
+        path: 'order',
+        component: Order,
+        title: 'Checkout',
       },
     ],
   },
   // Pages without Header and Footer
-  {
-    path: 'order',
-    component: Order,
-    title: 'Checkout',
-  },
   {
     path: 'login',
     component: Login,
@@ -59,4 +60,3 @@ export const routes: Routes = [
     component: NotFound,
   },
 ];
-

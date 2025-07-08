@@ -5,25 +5,29 @@ import { IProduct } from '../../models/iproduct';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
+import { environment } from '../../../environments/environment.development';
+import { CartItemService } from '../../shared/services/cart/cart.service';
+import { AuthService } from '../../shared/services/Auth/auth.service';
 
 @Component({
   selector: 'app-product-details',
   standalone: true,
-  imports: [CommonModule, CurrencyPipe, FormsModule], // ✅ فاصلة أهي
+  imports: [CommonModule, CurrencyPipe, FormsModule],
   templateUrl: './product-details.html',
-  styleUrls: ['./product-details.css'], // ✅ urls مش url
+  styleUrls: ['./product-details.css'],
 })
 export class ProductDetails implements OnInit {
   product: IProduct | null = null;
   isLoading = true;
   selectedSize: string | null = null;
   quantity: number = 1;
-
   currentSlide = 0;
 
   constructor(
     private route: ActivatedRoute,
-    private productDetailsService: ProductDetailsService
+    private productDetailsService: ProductDetailsService,
+    private cartItemService: CartItemService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -32,8 +36,6 @@ export class ProductDetails implements OnInit {
       this.productDetailsService.getProductById(+id).subscribe({
         next: (res) => {
           this.product = res;
-          console.log('✅ Images array:', res.productImagesPaths);
-          console.log('✅ Sizes:', res.productSizes);
           this.selectedSize = res.productSizes?.[0]?.size || null;
           this.isLoading = false;
         },
@@ -50,13 +52,12 @@ export class ProductDetails implements OnInit {
   }
 
   get imageUrl(): string {
-    const baseUrl = 'https://localhost:7140';
     const imagePath =
       this.product?.productImagesPaths?.[0]?.imagePath ||
       'assets/images/images.jpeg';
     return imagePath
-      ? `${baseUrl}${imagePath}`
-      : `${baseUrl}/uploads/default.png`;
+      ? `${environment.baseServerUrl}${imagePath}`
+      : `${environment.baseServerUrl}uploads/default.png`;
   }
 
   get sortedImageUrls(): string[] {
@@ -73,7 +74,7 @@ export class ProductDetails implements OnInit {
       .map((img) => {
         if (img.imagePath.startsWith('http')) return img.imagePath;
         if (img.imagePath.startsWith('/uploads'))
-          return `https://localhost:7140${img.imagePath}`;
+          return `${environment.baseServerUrl}${img.imagePath}`;
         return `/assets/images/${img.imagePath}`;
       });
   }
@@ -130,20 +131,6 @@ export class ProductDetails implements OnInit {
     }
   }
 
-  isTokenValid(): boolean {
-    const token = localStorage.getItem('token');
-    if (!token) return false;
-
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      const expiry = payload.exp;
-      const now = Math.floor(Date.now() / 1000);
-      return expiry > now;
-    } catch (e) {
-      return false;
-    }
-  }
-
   showAlert(msg: string) {
     Swal.fire({
       icon: 'success',
@@ -158,49 +145,109 @@ export class ProductDetails implements OnInit {
     selectedSize: string,
     quantity: number
   ) {
+    const sizeObj = product.productSizes?.find((s) => s.size === selectedSize);
+    if (!sizeObj) {
+      Swal.fire({
+        icon: 'error',
+        title: 'المقاس المختار غير صالح.',
+      });
+      return;
+    }
+
+    const cartItem = {
+      cartId: 0,
+      productId: product.id,
+      productSizeId: sizeObj.id,
+      quantity: quantity,
+      unitPrice: product.price,
+      totalPriceForOneItemType: product.price * quantity,
+      name: product.name, // إضافي لعرض المنتج في العربة المحلية
+      image: product.productImagesPaths?.[0]?.imagePath || null, // إضافي
+    };
+
     const existingCart = JSON.parse(localStorage.getItem('guestCart') || '[]');
     const foundItem = existingCart.find(
-      (item: any) => item.id === product.id && item.size === selectedSize
+      (item: any) =>
+        item.productId === product.id && item.productSizeId === sizeObj.id
     );
 
     if (foundItem) {
       foundItem.quantity += quantity;
       this.showAlert('✅ تم زيادة الكمية للمنتج في السلة');
     } else {
-      existingCart.push({
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        size: selectedSize,
-        quantity,
-        image: product.productImagesPaths?.[0]?.imagePath || null,
-      });
+      existingCart.push(cartItem);
       this.showAlert('✅ تمت إضافة المنتج للسلة');
     }
 
     localStorage.setItem('guestCart', JSON.stringify(existingCart));
   }
 
+  syncLocalCartWithServer() {
+    this.authService.isLoggedIn().subscribe((isAuthenticated) => {
+      if (!isAuthenticated) return;
+
+      const localCart = JSON.parse(localStorage.getItem('guestCart') || '[]');
+      if (localCart.length === 0) return;
+
+      for (const item of localCart) {
+        this.cartItemService
+          .addToCart(
+            {
+              id: item.productId,
+              price: item.unitPrice,
+              name: item.name,
+              productSizes: [
+                { id: item.productSizeId, size: '', stockQuantity: 0 },
+              ],
+              productImagesPaths: item.image
+                ? [{ imagePath: item.image, priority: 0 }]
+                : [],
+            },
+            '',
+            item.quantity
+          )
+          .subscribe({
+            next: () => console.log('تمت مزامنة العنصر:', item.name),
+            error: (err) => console.error('فشل مزامنة العنصر:', item.name, err),
+          });
+      }
+
+      localStorage.removeItem('guestCart');
+      this.showAlert('✅ تمت مزامنة السلة مع السيرفر');
+    });
+  }
+
   addToCart() {
     if (!this.product || !this.selectedSize) {
       Swal.fire({
         icon: 'warning',
-        title: 'اختر المقاس أولًا',
-        confirmButtonText: 'تمام',
+        title: 'من فضلك اختر مقاس أولًا.',
+        confirmButtonText: 'موافق',
       });
       return;
     }
 
-    if (this.isTokenValid()) {
-      console.log('✅ Logged in. Send to real cart API.');
-      // TODO: هتربط هنا API إضافة للسلة لما يجهز
-    } else {
-      console.log('❌ Not logged in. Saving to localStorage...');
-      this.addToLocalStorageCart(
-        this.product,
-        this.selectedSize,
-        this.quantity
-      );
-    }
+    this.authService.isLoggedIn().subscribe((isAuthenticated) => {
+      if (isAuthenticated) {
+        this.cartItemService
+          .addToCart(this.product!, this.selectedSize!, this.quantity)
+          .subscribe({
+            next: () => this.showAlert('✅ تم إضافة المنتج إلى العربة'),
+            error: (err) =>
+              Swal.fire({
+                icon: 'error',
+                title: 'خطأ',
+                text:
+                  err?.error?.message || err?.message || 'فشل إضافة المنتج.',
+              }),
+          });
+      } else {
+        this.addToLocalStorageCart(
+          this.product!,
+          this.selectedSize!,
+          this.quantity
+        );
+      }
+    });
   }
 }
