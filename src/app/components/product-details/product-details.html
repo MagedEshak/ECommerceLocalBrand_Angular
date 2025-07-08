@@ -4,16 +4,16 @@
         <!-- Start Img -->
         <div class="w-full my-20 md:my-0">
             <div class="w-full my-20 md:my-0">
-                <img [src]="imageUrl" [alt]="product?.name" class="h-64 w-full object-cover md:h-[25rem]" />
+                <img [src]="imageUrl" [alt]="product.name" class="h-64 w-full object-cover md:h-[25rem]" />
             </div>
         </div>
         <!-- End Img -->
 
         <!-- Start Details -->
         <div class="md:w-full md:px-37 md:start-20 md:relative">
-            <h3 class="font-bold text-2xl ms-4">{{ product?.name }}</h3>
+            <h3 class="font-bold text-2xl ms-4">{{ product.name }}</h3>
             <p class="font-monospace text-xl ms-4">
-                {{ product?.price | currency: 'EGP' : 'symbol' }}
+                {{ product.price | currency: 'EGP' : 'symbol' }}
             </p>
 
             <div>
@@ -73,7 +73,7 @@
                             <i class="fa-solid fa-plus"></i>
                         </summary>
                         <p class="px-4 py-3 text-black font-mono">
-                            {{ product?.description || 'No description available.' }}
+                            {{ product.description || 'No description available.' }}
                         </p>
                     </details>
                 </div>

@@ -20,10 +20,11 @@
         </div>
 
         <!-- Form -->
-        <form class="space-y-4">
-            <input type="email" name="email" id="email_Id" placeholder="Email"
+        <form class="space-y-4" [formGroup]="form" (ngSubmit)="sendCode()">
+            <input type="text" name="email" id="email_Id" placeholder="Email" formControlName="email"
                 class="w-full h-12 rounded-md border border-neutral-300 p-4 text-sm placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-black" />
-
+            <div *ngIf="form.get('email')?.invalid && form.get('email')?.touched">
+                Invalid email address </div>
             <button type="submit"
                 class="w-full h-12 rounded-md bg-black text-white text-sm font-semibold transition hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-black">
                 Continue
