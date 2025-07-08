@@ -76,49 +76,51 @@
             <div class="hidden md:relative md:hidden md:top-5.5" #profileIcon>
                 <div class="absolute end-10 z-10 mt-3 w-80 px-5 py-3 divide-y divide-gray-100 rounded-md border border-gray-100 bg-white shadow-xl"
                     role="menu">
-                    <h3>Account</h3>
+
+                    <h3 class="font-bold mb-2">Account</h3>
+
                     <div class="p-2 flex flex-col gap-5">
 
-                        <div class="grid justify-items-center">
+                        <!-- إذا لم يكن مسجل دخول -->
+
+
+                        @if(isLoggedIn == false){
+                        <div class="text-center">
                             <a [routerLink]="['/login']"
-                                class="block w-full rounded-sm bg-black text-center px-5 py-2 text-sm border text-white transition hover:bg-transparent hover:text-black"
-                                role="menuitem">
+                                class="block w-full rounded bg-black text-white py-2 text-sm font-medium hover:bg-transparent hover:text-black border border-transparent hover:border-black transition">
                                 Sign in
                             </a>
                         </div>
-
-
-                        <div class="grid justify-items-center sm:grid-cols-2">
+                        }@else{
+                        <div class="grid justify-items-center sm:grid-cols-2 gap-2">
                             <a [routerLink]="['/order']"
-                                class="block rounded-sm px-6 py-2 text-sm border border-neutral-500 text-black hover:bg-gray-50 hover:text-gray-700"
-                                role="menuitem">
-                                <i class="fa-solid fa-box"></i> Orders
+                                class="block rounded-sm px-6 py-2 text-sm border border-neutral-500 text-black hover:bg-gray-50 hover:text-gray-700">
+                                <i class="fa-solid fa-box me-1"></i> Orders
                             </a>
 
                             <a [routerLink]="['/profile']"
-                                class="block rounded-sm px-6 py-2 text-sm border border-neutral-500 text-black hover:bg-gray-50 hover:text-gray-700"
-                                role="menuitem">
-                                <i class="fa-solid fa-user"></i> Profile
+                                class="block rounded-sm px-6 py-2 text-sm border border-neutral-500 text-black hover:bg-gray-50 hover:text-gray-700">
+                                <i class="fa-solid fa-user me-1"></i> Profile
                             </a>
                         </div>
+
+                        <!-- LogOut -->
+                        <div class="pt-4" (click)="logout()">
+                            <button type="button"
+                                class="flex w-full items-center gap-2 rounded-lg px-4 py-2 text-sm text-red-700 hover:bg-red-50 transition">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="size-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
+                                </svg>
+                                Logout
+                            </button>
+                        </div>
+                        }
                     </div>
-
-                    <!-- LogOut -->
-                    <!-- <div class="p-2">
-                        <button type="button"
-                            class="flex w-full items-center gap-2 rounded-lg px-4 py-2 text-sm text-red-700 hover:bg-red-50"
-                            role="menuitem">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                stroke="currentColor" class="size-4">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
-                            </svg>
-
-                            Logout
-                        </button>
-                    </div> -->
                 </div>
             </div>
+
 
 
             <!-- Drop down list in Mobile Screen -->
