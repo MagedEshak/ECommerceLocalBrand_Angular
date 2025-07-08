@@ -35,7 +35,8 @@ export class Login {
 
     this._loginService.getVerifyingCodeToLogin(email).subscribe({
       next: () => {
-        alert('Verification code sent to your email.')
+        alert('Verification code sent to your email.');
+        this.form.reset();
       },
       error: (err) => {
         console.error(err);
@@ -43,7 +44,6 @@ export class Login {
       }
     });
   }
-
 
 
   get isHome(): boolean {
