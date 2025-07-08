@@ -1,13 +1,40 @@
 <main>
     <!-- Start Product Details -->
     <section class="mb-16 md:flex md:mt-20 md:p-20" *ngIf="!isLoading && product">
-        <!-- Start Img -->
+        <!-- Start Bootstrap Carousel -->
         <div class="w-full my-20 md:my-0">
+<<<<<<< Updated upstream
             <div class="w-full my-20 md:my-0">
                 <img [src]="imageUrl" [alt]="product.name" class="h-64 w-full object-cover md:h-[25rem]" />
+=======
+            <div id="productImagesCarousel" class="carousel slide" data-bs-ride="carousel"
+                *ngIf="sortedImageUrls.length > 0">
+                <div class="carousel-indicators">
+                    <button *ngFor="let img of sortedImageUrls; let i = index" type="button"
+                        data-bs-target="#productImagesCarousel" [attr.data-bs-slide-to]="i" [class.active]="i === 0"
+                        [attr.aria-current]="i === 0 ? 'true' : null" [attr.aria-label]="'Slide ' + (i+1)"></button>
+                </div>
+                <div class="carousel-inner">
+                    <div *ngFor="let img of sortedImageUrls; let i = index" class="carousel-item"
+                        [class.active]="i === 0">
+                        <img [src]="img" [alt]="product?.name + ' image ' + (i+1)"
+                            class="d-block w-100 h-64 object-cover md:h-[25rem]" />
+                    </div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#productImagesCarousel"
+                    data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#productImagesCarousel"
+                    data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+>>>>>>> Stashed changes
             </div>
         </div>
-        <!-- End Img -->
+        <!-- End Bootstrap Carousel -->
 
         <!-- Start Details -->
         <div class="md:w-full md:px-37 md:start-20 md:relative">
@@ -22,35 +49,44 @@
                     <fieldset class="font-bold mb-4">Size</fieldset>
 
                     <!-- Start size -->
-                    <div class="flex items-center justify-baseline gap-6">
+                    <div class="flex items-center justify-start gap-4">
                         <label *ngFor="let size of getSizes(); let i = index" [attr.for]="'size-' + i"
-                            class="flex items-center justify-between gap-4 rounded border border-gray-300 bg-transparent p-3 text-sm font-medium shadow-sm transition-colors cursor-pointer hover:bg-gray-50">
-                            <input type="radio" name="size" [id]="'size-' + i" [value]="size" class="sr-only" />
-                            <span class="font-bold">{{ size }}</span>
+                            class="flex items-center justify-center px-4 py-2 rounded-full border border-gray-400 text-sm font-bold transition-colors cursor-pointer hover:bg-gray-100">
+                            <input type="radio" name="size" [id]="'size-' + i" [value]="size" [(ngModel)]="selectedSize"
+                                class="sr-only" />
+                            <span>{{ size }}</span>
+                            <span *ngIf="getStockQuantity(size) === 1"
+                                class="ml-2 text-xs text-red-500 font-medium stock-indicator">
+                                (Only 1 left)
+                            </span>
                         </label>
                     </div>
-                    <!-- End size -->
-
-                    <!-- Start choose Quantity -->
+                    <div *ngIf="!selectedSize" class="text-red-500 text-sm mt-2">
+                        Please select a size.
+                    </div>
+                    <!-- End size --> <!-- Start choose Quantity -->
                     <div class="mt-4 mb-4 flex items-center justify-between gap-2 w-full">
                         <label for="Quantity" class="sr-only"> Quantity </label>
                         <div
                             class="flex items-center rounded-sm text-black font-bold border border-gray-400 hover:bg-white">
-                            <button type="button" class="size-10 leading-10 text-black transition hover:opacity-75">
+                            <button type="button" class="size-10 leading-10 text-black transition hover:opacity-75"
+                                (click)="decreaseQuantity()">
                                 &minus;
                             </button>
 
-                            <input type="number" id="Quantity" value="1"
-                                class="h-10 w-16 border-transparent text-center [-moz-appearance:_textfield] sm:text-sm [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none" />
+                            <input type="number" id="Quantity" [value]="quantity" readonly
+                                class="h-10 w-16 border-transparent text-center sm:text-sm" />
 
-                            <button type="button" class="size-10 leading-10 text-black transition hover:opacity-75">
+                            <button type="button" class="size-10 leading-10 text-black transition hover:opacity-75"
+                                (click)="increaseQuantity()">
                                 &plus;
                             </button>
                         </div>
 
                         <!-- Start Btn Add to cart -->
                         <button type="button"
-                            class="uppercase whitespace-nowrap flex items-center justify-center gap-3 rounded-sm bg-black text-white px-2 py-2 w-48 transition hover:bg-transparent hover:text-black hover:border">
+                            class="uppercase flex items-center justify-center gap-3 rounded-sm bg-black text-white px-4 py-2 w-full font-bold transition hover:bg-transparent hover:text-black hover:border"
+                            (click)="addToCart()">
                             <i class="fa-solid fa-cart-plus"></i> Add to cart
                         </button>
                     </div>
