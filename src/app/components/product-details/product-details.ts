@@ -9,9 +9,9 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-product-details',
   standalone: true,
-  imports: [CommonModule, CurrencyPipe, FormsModule],
+  imports: [CommonModule, CurrencyPipe, FormsModule], // ✅ فاصلة أهي
   templateUrl: './product-details.html',
-  styleUrl: './product-details.css',
+  styleUrls: ['./product-details.css'], // ✅ urls مش url
 })
 export class ProductDetails implements OnInit {
   product: IProduct | null = null;
@@ -19,10 +19,12 @@ export class ProductDetails implements OnInit {
   selectedSize: string | null = null;
   quantity: number = 1;
 
+  currentSlide = 0;
+
   constructor(
     private route: ActivatedRoute,
     private productDetailsService: ProductDetailsService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
@@ -47,17 +49,14 @@ export class ProductDetails implements OnInit {
     return this.product?.productSizes?.map((s) => s.size) || [];
   }
 
-<<<<<<< Updated upstream
   get imageUrl(): string {
-    const baseUrl = 'https://localhost:7140'; // عدل على حسب سيرفرك الحقيقي
-    const imagePath = this.product?.productImagesPaths?.[0]?.imagePath || 'assets/images/images.jpeg';
+    const baseUrl = 'https://localhost:7140';
+    const imagePath =
+      this.product?.productImagesPaths?.[0]?.imagePath ||
+      'assets/images/images.jpeg';
     return imagePath
       ? `${baseUrl}${imagePath}`
       : `${baseUrl}/uploads/default.png`;
-=======
-  getStockQuantity(size: string): number {
-    const sizeObj = this.product?.productSizes?.find((s) => s.size === size);
-    return sizeObj ? sizeObj.stockQuantity : 0;
   }
 
   get sortedImageUrls(): string[] {
@@ -67,37 +66,47 @@ export class ProductDetails implements OnInit {
     ) {
       return ['/assets/images/default.png'];
     }
+
     return this.product.productImagesPaths
       .slice()
       .sort((a, b) => a.priority - b.priority)
       .map((img) => {
-        // If imagePath is already absolute (starts with http), use as is
         if (img.imagePath.startsWith('http')) return img.imagePath;
-        // If imagePath starts with /uploads, use the API root
         if (img.imagePath.startsWith('/uploads'))
           return `https://localhost:7140${img.imagePath}`;
-        // Otherwise, treat as relative to /assets/images
         return `/assets/images/${img.imagePath}`;
       });
   }
 
-  // Carousel logic
-  currentSlide = 0;
+  get currentImage(): string {
+    return (
+      this.sortedImageUrls[this.currentSlide] || '/assets/images/default.png'
+    );
+  }
 
   nextSlide() {
     if (this.currentSlide < this.sortedImageUrls.length - 1) {
       this.currentSlide++;
+    } else {
+      this.currentSlide = 0;
     }
   }
 
   prevSlide() {
     if (this.currentSlide > 0) {
       this.currentSlide--;
+    } else {
+      this.currentSlide = this.sortedImageUrls.length - 1;
     }
   }
 
   goToSlide(index: number) {
     this.currentSlide = index;
+  }
+
+  getStockQuantity(size: string): number {
+    const sizeObj = this.product?.productSizes?.find((s) => s.size === size);
+    return sizeObj ? sizeObj.stockQuantity : 0;
   }
 
   increaseQuantity(): void {
@@ -150,7 +159,6 @@ export class ProductDetails implements OnInit {
     quantity: number
   ) {
     const existingCart = JSON.parse(localStorage.getItem('guestCart') || '[]');
-
     const foundItem = existingCart.find(
       (item: any) => item.id === product.id && item.size === selectedSize
     );
@@ -194,6 +202,5 @@ export class ProductDetails implements OnInit {
         this.quantity
       );
     }
->>>>>>> Stashed changes
   }
 }
