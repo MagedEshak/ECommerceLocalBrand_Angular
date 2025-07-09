@@ -23,12 +23,16 @@ import { Router } from '@angular/router';
 })
 export class Login {
   form!: FormGroup;
+  isVerificationPopupVisible = false;
+  verificationCode = '';
+  countdown = 120;
+  private timer: any = null;
 
   constructor(
     public routerState: RouterStateService,
     private _loginService: LoginService,
     private fb: FormBuilder,
-    private cookieService: CookieService, // ✅
+    private cookieService: CookieService,
     private router: Router,
     private _authService: AuthService
   ) {
@@ -36,11 +40,6 @@ export class Login {
       email: ['', [Validators.email, Validators.required]],
     });
   }
-
-  isVerificationPopupVisible = false;
-  verificationCode = '';
-  countdown = 120;
-  private timer: any = null;
 
   sendCode() {
     const email = this.form.get('email')?.value;
@@ -52,7 +51,7 @@ export class Login {
 
     this._loginService.getVerifyingCodeToLogin(email).subscribe({
       next: () => {
-        this.startCountdown(); // يبدأ العد التنازلي
+        this.startCountdown();
         this.isVerificationPopupVisible = true;
       },
       error: (err) => {
@@ -62,17 +61,17 @@ export class Login {
     });
   }
 
-  countdownDisplay = '02:00'; // 👈 إضافة متغير لعرض النص
+  countdownDisplay = '02:00';
 
   startCountdown() {
     this.countdown = 120;
-    this.updateCountdownDisplay(); // أول تحديث
+    this.updateCountdownDisplay();
     clearInterval(this.timer);
 
     this.timer = setInterval(() => {
       this.countdown--;
 
-      this.updateCountdownDisplay(); // كل ثانية
+      this.updateCountdownDisplay();
 
       if (this.countdown <= 0) {
         clearInterval(this.timer);
@@ -108,13 +107,13 @@ export class Login {
 
     this._loginService.loginAfterGetCode(email, code).subscribe({
       next: (res) => {
-        alert('✅ Verification successful!');
+        alert(' Verification successful!');
         this.isVerificationPopupVisible = false;
         this._authService.setLogin(res.token);
         // this.cookieService.set('authToken', res.token, 1); // 1 يوم صلاحية
         this.router.navigate(['/home']);
       },
-      error: () => alert('❌ Invalid code.'),
+      error: () => alert('Invalid code.'),
     });
   }
 
