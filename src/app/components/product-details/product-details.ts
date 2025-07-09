@@ -55,9 +55,11 @@ export class ProductDetails implements OnInit {
     const imagePath =
       this.product?.productImagesPaths?.[0]?.imagePath ||
       'assets/images/images.jpeg';
-    return imagePath
-      ? `${environment.baseServerUrl}${imagePath}`
-      : `${environment.baseServerUrl}uploads/default.png`;
+    if (imagePath.startsWith('http')) return imagePath;
+    if (imagePath.startsWith('/uploads'))
+      return `${environment.baseServerUrl}${imagePath}`;
+    if (imagePath.startsWith('/assets')) return imagePath;
+    return `/assets/images/${imagePath}`;
   }
 
   get sortedImageUrls(): string[] {
@@ -67,7 +69,6 @@ export class ProductDetails implements OnInit {
     ) {
       return ['/assets/images/default.png'];
     }
-
     return this.product.productImagesPaths
       .slice()
       .sort((a, b) => a.priority - b.priority)
@@ -75,6 +76,7 @@ export class ProductDetails implements OnInit {
         if (img.imagePath.startsWith('http')) return img.imagePath;
         if (img.imagePath.startsWith('/uploads'))
           return `${environment.baseServerUrl}${img.imagePath}`;
+        if (img.imagePath.startsWith('/assets')) return img.imagePath;
         return `/assets/images/${img.imagePath}`;
       });
   }
@@ -194,14 +196,26 @@ export class ProductDetails implements OnInit {
           .addToCart(
             {
               id: item.productId,
-              price: item.unitPrice,
               name: item.name,
+              description: '',
+              price: item.unitPrice,
+              discountPercentage: 0,
+              categoryId: 0,
+              isDeleted: false,
               productSizes: [
-                { id: item.productSizeId, size: '', stockQuantity: 0 },
+                {
+                  id: item.productSizeId,
+                  size: '',
+                  productId: item.productId,
+                  stockQuantity: 0,
+                  width: 0,
+                  height: 0,
+                },
               ],
               productImagesPaths: item.image
-                ? [{ imagePath: item.image, priority: 0 }]
+                ? [{ id: 0, imagePath: item.image, priority: 0 }]
                 : [],
+              NewArrival: {} as any,
             },
             '',
             item.quantity

@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { IProduct } from '../../../models/iproduct'; // عدّل المسار حسب مكان الموديل
@@ -40,6 +40,22 @@ export class CartItemService {
       totalPriceForOneItemType: unitPrice * quantity,
     };
 
-    return this.http.post(this.apiUrl, payload);
+    // Get token from cookies
+    const token = this.getTokenFromCookies('token');
+    let headers = new HttpHeaders();
+    if (token) {
+      headers = headers.set('Authorization', `Bearer ${token}`);
+    }
+    return this.http.post(this.apiUrl, payload, { headers });
+
   }
-}
+
+  /**
+   * Helper to get a cookie value by name
+   */
+  private getTokenFromCookies(name: string): string | null {
+    const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+    return match ? decodeURIComponent(match[2]) : null;
+  }
+  }
+
