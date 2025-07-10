@@ -119,8 +119,8 @@ export class ProductDetails implements OnInit {
     } else {
       Swal.fire({
         icon: 'warning',
-        title: 'خد بالك',
-        html: '<b>فيه بس قطعة واحدة متاحة!</b>',
+        title: 'Warning',
+        html: '<b>There is only one piece remaining!</b>',
         showConfirmButton: false,
         timer: 2500,
       });
@@ -151,7 +151,7 @@ export class ProductDetails implements OnInit {
     if (!sizeObj) {
       Swal.fire({
         icon: 'error',
-        title: 'المقاس المختار غير صالح.',
+        title: 'Selected size is not valid.',
       });
       return;
     }
@@ -163,8 +163,8 @@ export class ProductDetails implements OnInit {
       quantity: quantity,
       unitPrice: product.price,
       totalPriceForOneItemType: product.price * quantity,
-      name: product.name, // إضافي لعرض المنتج في العربة المحلية
-      image: product.productImagesPaths?.[0]?.imagePath || null, // إضافي
+      name: product.name, // For displaying product in local cart
+      image: product.productImagesPaths?.[0]?.imagePath || null, // Optional image
     };
 
     const existingCart = JSON.parse(localStorage.getItem('guestCart') || '[]');
@@ -174,69 +174,45 @@ export class ProductDetails implements OnInit {
     );
 
     if (foundItem) {
-      foundItem.quantity += quantity;
-      this.showAlert('✅ تم زيادة الكمية للمنتج في السلة');
+      const totalQuantity = foundItem.quantity + quantity;
+      if (totalQuantity > sizeObj.stockQuantity) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Quantity limit exceeded',
+          html: `<b>Requested: ${totalQuantity}, Available: ${sizeObj.stockQuantity}</b>`,
+          showConfirmButton: false,
+          timer: 2500,
+        });
+        return;
+      }
+
+      foundItem.quantity = totalQuantity;
+      this.showAlert('✅ Product quantity updated in cart');
     } else {
+      if (quantity > sizeObj.stockQuantity) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Quantity limit exceeded',
+          html: `<b>Requested: ${quantity}, Available: ${sizeObj.stockQuantity}</b>`,
+          showConfirmButton: false,
+          timer: 2500,
+        });
+        return;
+      }
+
       existingCart.push(cartItem);
-      this.showAlert('✅ تمت إضافة المنتج للسلة');
+      this.showAlert('✅ Product added to cart successfully');
     }
 
     localStorage.setItem('guestCart', JSON.stringify(existingCart));
-  }
-
-  syncLocalCartWithServer() {
-    this.authService.isLoggedIn().subscribe((isAuthenticated) => {
-      if (!isAuthenticated) return;
-
-      const localCart = JSON.parse(localStorage.getItem('guestCart') || '[]');
-      if (localCart.length === 0) return;
-
-      for (const item of localCart) {
-        this.cartItemService
-          .addToCart(
-            {
-              id: item.productId,
-              name: item.name,
-              description: '',
-              price: item.unitPrice,
-              discountPercentage: 0,
-              categoryId: 0,
-              isDeleted: false,
-              productSizes: [
-                {
-                  id: item.productSizeId,
-                  size: '',
-                  productId: item.productId,
-                  stockQuantity: 0,
-                  width: 0,
-                  height: 0,
-                },
-              ],
-              productImagesPaths: item.image
-                ? [{ id: 0, imagePath: item.image, priority: 0 }]
-                : [],
-              NewArrival: {} as any,
-            },
-            '',
-            item.quantity
-          )
-          .subscribe({
-            next: () => console.log('تمت مزامنة العنصر:', item.name),
-            error: (err) => console.error('فشل مزامنة العنصر:', item.name, err),
-          });
-      }
-
-      localStorage.removeItem('guestCart');
-      this.showAlert('✅ تمت مزامنة السلة مع السيرفر');
-    });
   }
 
   addToCart() {
     if (!this.product || !this.selectedSize) {
       Swal.fire({
         icon: 'warning',
-        title: 'من فضلك اختر مقاس أولًا.',
-        confirmButtonText: 'موافق',
+        title: 'Please select a size first.',
+        confirmButtonText: 'OK',
       });
       return;
     }
@@ -246,13 +222,12 @@ export class ProductDetails implements OnInit {
         this.cartItemService
           .addToCart(this.product!, this.selectedSize!, this.quantity)
           .subscribe({
-            next: () => this.showAlert('✅ تم إضافة المنتج إلى العربة'),
+            next: () => this.showAlert('✅ Product added to cart'),
             error: (err) =>
               Swal.fire({
                 icon: 'error',
-                title: 'خطأ',
-                text:
-                  err?.error?.message || err?.message || 'فشل إضافة المنتج.',
+                title: 'Error',
+                text: err?.message || 'Failed to add product to cart.',
               }),
           });
       } else {

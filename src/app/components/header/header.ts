@@ -1,19 +1,23 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterStateService } from '../../shared/services/Router-State/router-state.service';
-import { RouterLink, Router } from '@angular/router';
+import { RouterLink, Router, NavigationEnd } from '@angular/router';
 import { AuthService } from '../../shared/services/Auth/auth.service';
+import { Cart } from '../cart/cart';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-header',
-  imports: [CommonModule, RouterLink],
+  standalone: true,
+  imports: [CommonModule, RouterLink, Cart],
   templateUrl: './header.html',
   styleUrls: ['./header.css'],
 })
 export class Header {
-  @ViewChild('profileIcon') profileIcon!: ElementRef;
-  @ViewChild('cartIcon') cartIcon!: ElementRef;
   isLoggedIn = false;
+  isCartVisible = false;
+  isProfileVisible = false;
+
   constructor(
     public routerState: RouterStateService,
     private router: Router,
@@ -22,6 +26,13 @@ export class Header {
     this.authService.isLoggedIn().subscribe((status) => {
       this.isLoggedIn = status;
     });
+
+    this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe(() => {
+        this.isCartVisible = false;
+        this.closeProfile();
+      });
   }
 
   logout() {
@@ -29,41 +40,23 @@ export class Header {
     this.router.navigate(['/home']);
   }
 
-  hideProfile() {
-    const el = this.profileIcon.nativeElement.classList;
-
-    if (el.contains('md:hidden')) {
-      el.remove('md:hidden');
-      el.add('md:block');
-    } else {
-      el.add('md:hidden');
-      el.remove('md:block');
-    }
+  toggleProfile() {
+    this.isProfileVisible = !this.isProfileVisible;
   }
 
-  hideCart() {
-    const el = this.cartIcon.nativeElement.classList;
-    if (el.contains('md:hidden')) {
-      el.remove('md:hidden');
-      el.add('md:block');
-    } else {
-      el.add('md:hidden');
-      el.remove('md:block');
-    }
+  closeProfile() {
+    this.isProfileVisible = false;
   }
 
-  closeCartBtn() {
-    const el = this.cartIcon.nativeElement.classList;
-    el.add('md:hidden');
-    el.remove('md:block');
+  toggleCart() {
+    this.isCartVisible = !this.isCartVisible;
+  }
+
+  closeCart() {
+    this.isCartVisible = false;
   }
 
   get isHome(): boolean {
     return this.routerState.isHome;
   }
-  // logout() {
-  //   alert('✅ LogOut');
-  //   this.cookieService.deleteAll();
-  //   this.router.navigate(['/home']);
-  // }
 }
