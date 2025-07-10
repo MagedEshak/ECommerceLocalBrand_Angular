@@ -1,21 +1,21 @@
 <h2 class="font-bold text-2xl ms-4 mt-15">New Arrivals</h2>
 
 <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 px-8 mt-6">
-  @for (prd of filteredProducts; track $index) {
+  @for (prd of filteredProducts; track prd.id) {
   <section class="rounded-lg overflow-hidden flex flex-col" data-aos="zoom-in" data-aos-duration="500"
     data-aos-offset="150">
     <a [routerLink]="['/product-details', prd.id]" class="flex flex-col items-center mb-20">
 
       <div class="relative h-96 w-full overflow-hidden group">
-      
+
         <!-- الصورة الأساسية -->
         <img [src]="getImageUrl(prd, 0)" [alt]="prd.name"
           class="absolute inset-0 w-full h-full object-cover transition-opacity duration-500 opacity-100 group-hover:opacity-0" />
-      
+
         <!-- الصورة الثانية تظهر مع الهوفر -->
         <img [src]="getImageUrl(prd, 1)" [alt]="prd.name + ' alt'"
           class="absolute inset-0 w-full h-full object-cover transition-opacity duration-500 opacity-0 group-hover:opacity-100" />
-      
+
       </div>
 
       <h3 class="mt-4 text-lg font-bold text-gray-900 sm:text-xl">{{prd.name}}</h3>
