@@ -15,6 +15,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { CookieService } from 'ngx-cookie-service';
 import { Router } from '@angular/router';
+import Swal from 'sweetalert2';
 @Component({
   selector: 'app-login',
   imports: [CommonModule, RouterLink, ReactiveFormsModule, FormsModule],
@@ -45,10 +46,10 @@ export class Login {
     const email = this.form.get('email')?.value;
 
     if (this.form.invalid) {
-      alert('Please enter a valid email.');
+      this.showWarning('Please enter a valid email.');
       return;
     }
-
+    this.showWarning('Waiting');
     this._loginService.getVerifyingCodeToLogin(email).subscribe({
       next: () => {
         this.startCountdown();
@@ -56,7 +57,7 @@ export class Login {
       },
       error: (err) => {
         console.error(err);
-        alert('Failed to send verification code.');
+        this.showError('Failed to send verification code.');
       },
     });
   }
@@ -97,7 +98,7 @@ export class Login {
       next: () => {
         this.startCountdown();
       },
-      error: () => alert('Failed to resend code.'),
+      error: () => this.showError('Failed to resend code.'),
     });
   }
 
@@ -107,17 +108,43 @@ export class Login {
 
     this._loginService.loginAfterGetCode(email, code).subscribe({
       next: (res) => {
-        alert(' Verification successful!');
+        this.showSuccess(' Verification successful!');
+        // alert(' Verification successful!');
         this.isVerificationPopupVisible = false;
         this._authService.setLogin(res.token);
         // this.cookieService.set('authToken', res.token, 1); // 1 يوم صلاحية
         this.router.navigate(['/home']);
       },
-      error: () => alert('Invalid code.'),
+      error: () => this.showError('Invalid code.'),
     });
   }
 
   get isHome(): boolean {
     return this.routerState.isHome;
+  }
+
+  showSuccess(message: string) {
+    Swal.fire({
+      icon: 'success',
+      title: message,
+      showConfirmButton: false,
+      timer: 2000,
+    });
+  }
+
+  showError(message: string) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: message,
+    });
+  }
+
+  showWarning(message: string) {
+    Swal.fire({
+      icon: 'warning',
+      title: message,
+      confirmButtonText: 'Ok',
+    });
   }
 }
