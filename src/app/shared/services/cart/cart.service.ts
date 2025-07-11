@@ -1,19 +1,21 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, throwError } from 'rxjs';
+import { Observable } from 'rxjs';
 import { IProduct } from '../../../models/iproduct';
 import { environment } from '../../../../environments/environment.development';
+import { AuthService } from '../Auth/auth.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CartItemService {
   private apiUrl = `${environment.baseServerUrl}/api/CartItem`;
+  private cartUrl = `${environment.baseServerUrl}/api/Cart`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private authService: AuthService) {}
 
   /**
-   * Add an item to the cart after validating quantity against existing items
+   * إضافة منتج للكارت
    */
   addToCart(
     product: IProduct,
@@ -30,16 +32,15 @@ export class CartItemService {
         return;
       }
 
-      const token = this.getTokenFromCookies('token');
+      const token = this.authService.getToken();
       let headers = new HttpHeaders();
       if (token) {
         headers = headers.set('Authorization', `Bearer ${token}`);
       }
 
-      // Step 1: Fetch current cart from server
       this.getCurrentUserCart().subscribe({
         next: (cart: any) => {
-          const cartItems = cart.cartItems || [];
+          const cartItems = cart?.cartItems || [];
 
           const existingItem = cartItems.find(
             (item: any) =>
@@ -52,18 +53,15 @@ export class CartItemService {
           if (totalQuantity > sizeObj.stockQuantity) {
             observer.error(
               new Error(
-                `Requested quantity  (${totalQuantity}) is more than avaialable quantity (${sizeObj.stockQuantity})`
+                `الكمية المطلوبة (${totalQuantity}) أكثر من المتاح (${sizeObj.stockQuantity})`
               )
             );
             return;
           }
 
-          // باقي الكود...
-
-          // Step 2: Send POST to add to cart
           const unitPrice = product.price;
           const payload = {
-            cartId: 0, // سيتم تعيينه من خلال السيرفر للمستخدم الحالي
+            cartId: 0, // السيرفر هيحدد الكارت للمستخدم الحالي
             productId: product.id,
             productSizeId: sizeObj.id,
             quantity: quantity,
@@ -76,38 +74,24 @@ export class CartItemService {
               observer.next();
               observer.complete();
             },
-            error: (err) => {
-              observer.error(err);
-            },
+            error: (err) => observer.error(err),
           });
         },
-        error: (err) => {
-          observer.error(err);
-        },
+        error: (err) => observer.error(err),
       });
     });
   }
 
   /**
-   * Get the current user's cart from the server
+   * تحميل كارت المستخدم من السيرفر
    */
-  getCurrentUserCart(): Observable<any[]> {
-    const token = this.getTokenFromCookies('token');
+  getCurrentUserCart(): Observable<any> {
+    const token = this.authService.getToken();
     let headers = new HttpHeaders();
     if (token) {
       headers = headers.set('Authorization', `Bearer ${token}`);
     }
 
-    const url = `${environment.baseServerUrl}/api/Cart`;
-    return this.http.get<any[]>(url, { headers });
-  }
-  /**
-   * Helper to get a cookie value by name
-   */
-  private getTokenFromCookies(name: string): string | null {
-    const match = document.cookie.match(
-      new RegExp('(^| )' + name + '=([^;]+)')
-    );
-    return match ? decodeURIComponent(match[2]) : null;
+    return this.http.get<any>(this.cartUrl, { headers });
   }
 }
