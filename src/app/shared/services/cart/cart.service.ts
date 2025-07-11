@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { IProduct } from '../../../models/iproduct';
 import { environment } from '../../../../environments/environment.development';
 import { AuthService } from '../Auth/auth.service';
+import { ICartItem } from '../../../models/ICartItem';
 
 @Injectable({
   providedIn: 'root',
@@ -61,12 +62,18 @@ export class CartItemService {
 
           const unitPrice = product.price;
           const payload = {
-            cartId: 0, // السيرفر هيحدد الكارت للمستخدم الحالي
+            id: 0, // 👈 لازم موجود حتى لو السيرفر بيهمله في الإضافة
+            cartId: 0, // 👈 كذلك
             productId: product.id,
             productSizeId: sizeObj.id,
             quantity: quantity,
-            unitPrice: unitPrice,
-            totalPriceForOneItemType: unitPrice * quantity,
+            unitPrice: product.price,
+            totalPriceForOneItemType: product.price * quantity,
+
+            // خصائص اتضافت في الـ DTO
+            productName: product.name,
+            productImageUrl: product.productImagesPaths?.[0]?.imagePath ?? '',
+            productSizeName: selectedSize,
           };
 
           this.http.post(this.apiUrl, payload, { headers }).subscribe({
@@ -93,5 +100,33 @@ export class CartItemService {
     }
 
     return this.http.get<any>(this.cartUrl, { headers });
+  }
+
+  /**
+   * تعديل كمية عنصر في الكارت
+   */
+  updateCartItemQuantity(item: ICartItem): Observable<any> {
+    const token = this.authService.getToken();
+    let headers = new HttpHeaders();
+    if (token) {
+      headers = headers.set('Authorization', `Bearer ${token}`);
+    }
+
+    return this.http.put(this.apiUrl, item, { headers });
+  }
+
+  /**
+   * حذف عنصر من الكارت
+   */
+  deleteCartItem(cartItemId: number): Observable<any> {
+    const token = this.authService.getToken();
+    let headers = new HttpHeaders();
+    if (token) {
+      headers = headers.set('Authorization', `Bearer ${token}`);
+    }
+
+    return this.http.delete(`${this.apiUrl}?cartItemId=${cartItemId}`, {
+      headers,
+    });
   }
 }

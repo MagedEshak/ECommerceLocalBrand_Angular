@@ -118,9 +118,9 @@ export class ProductDetails implements OnInit {
       this.quantity++;
     } else {
       Swal.fire({
-        icon: 'warning',
-        title: 'Warning',
-        html: '<b>There is only one piece remaining!</b>',
+        icon: 'error',
+        title: 'Insufficient quantity available',
+        text: 'The requested quantity exceeds the available stock.',
         showConfirmButton: false,
         timer: 2500,
       });
@@ -191,12 +191,13 @@ export class ProductDetails implements OnInit {
     } else {
       if (quantity > sizeObj.stockQuantity) {
         Swal.fire({
-          icon: 'warning',
-          title: 'Quantity limit exceeded',
-          html: `<b>Requested: ${quantity}, Available: ${sizeObj.stockQuantity}</b>`,
+          icon: 'error',
+          title: 'Insufficient quantity available',
+          text: 'The requested quantity exceeds the available stock.',
           showConfirmButton: false,
           timer: 2500,
         });
+
         return;
       }
 
@@ -228,6 +229,8 @@ export class ProductDetails implements OnInit {
                 icon: 'error',
                 title: 'Error',
                 text: err?.message || 'Failed to add product to cart.',
+                showConfirmButton: false,
+                timer: 2500,
               }),
           });
       } else {
@@ -238,5 +241,9 @@ export class ProductDetails implements OnInit {
         );
       }
     });
+  }
+
+  onSizeChange(): void {
+    this.quantity = 1;
   }
 }

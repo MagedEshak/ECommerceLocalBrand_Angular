@@ -1,4 +1,5 @@
 export interface ICartItem {
+  id: number;
   productId: number;
   productName: string;
   productImageUrl: string;
