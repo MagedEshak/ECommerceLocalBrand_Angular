@@ -61,13 +61,21 @@ export class Cart implements OnInit {
     });
   }
   loadLocalCart(): void {
-    const storedCart = localStorage.getItem('cart');
+    const storedCart = localStorage.getItem('guestCart');
     if (storedCart) {
       try {
-        this.cartItems = JSON.parse(storedCart);
+        const rawItems = JSON.parse(storedCart);
+
+        this.cartItems = rawItems.map((item: any) => ({
+          ...item,
+          productImageUrl: item.image
+            ? item.image // الصورة جهزناها بالفعل ومعاها baseServerUrl
+            : '/assets/images/default.png',
+        }));
+
         this.calculateTotal();
       } catch (e) {
-        console.error('❌ Error parsing local cart:', e);
+        console.error('❌ Error parsing local guest cart:', e);
       }
     }
   }
@@ -80,10 +88,12 @@ export class Cart implements OnInit {
   }
 
   increaseQuantity(item: ICartItem): void {
-    item.quantity++;
-    item.totalPriceForOneItemType = item.unitPrice * item.quantity;
+    const token = this.authService.getToken();
 
-    if (this.authService.getToken()) {
+    if (token) {
+      item.quantity++;
+      item.totalPriceForOneItemType = item.unitPrice * item.quantity;
+
       this.cartService.updateCartItemQuantity(item).subscribe({
         next: () => this.calculateTotal(),
         error: (err) => {
@@ -99,6 +109,30 @@ export class Cart implements OnInit {
         },
       });
     } else {
+      // ✅ تحقق من الكمية المتاحة في الـ localStorage
+      const storedCart = localStorage.getItem('guestCart');
+      if (storedCart) {
+        const parsedCart = JSON.parse(storedCart);
+        const matchingItem = parsedCart.find(
+          (ci: any) =>
+            ci.productId === item.productId &&
+            ci.productSizeId === item.productSizeId
+        );
+
+        if (matchingItem && item.quantity + 1 > matchingItem.stockQuantity) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Insufficient quantity available',
+            text: `Only ${matchingItem.stockQuantity} item(s) available in stock.`,
+            showConfirmButton: false,
+            timer: 2500,
+          });
+          return;
+        }
+      }
+
+      item.quantity++;
+      item.totalPriceForOneItemType = item.unitPrice * item.quantity;
       this.updateLocalCartItem(item);
     }
   }
@@ -147,7 +181,7 @@ export class Cart implements OnInit {
 
     if (index !== -1) {
       this.cartItems[index] = updatedItem;
-      localStorage.setItem('cart', JSON.stringify(this.cartItems));
+      localStorage.setItem('guestCart', JSON.stringify(this.cartItems));
       this.calculateTotal();
     }
   }

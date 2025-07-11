@@ -99,7 +99,23 @@ export class CartItemService {
       headers = headers.set('Authorization', `Bearer ${token}`);
     }
 
-    return this.http.get<any>(this.cartUrl, { headers });
+    return new Observable((observer) => {
+      this.http.get<any>(this.cartUrl, { headers }).subscribe({
+        next: (cart) => {
+          observer.next(cart);
+          observer.complete();
+        },
+        error: (err) => {
+          if (err.status === 404) {
+            // ✅ مفيش كارت، نعتبرها null مش خطأ
+            observer.next(null);
+            observer.complete();
+          } else {
+            observer.error(err);
+          }
+        },
+      });
+    });
   }
 
   /**

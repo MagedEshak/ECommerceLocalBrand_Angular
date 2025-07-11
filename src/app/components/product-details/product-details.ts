@@ -164,7 +164,11 @@ export class ProductDetails implements OnInit {
       unitPrice: product.price,
       totalPriceForOneItemType: product.price * quantity,
       name: product.name, // For displaying product in local cart
-      image: product.productImagesPaths?.[0]?.imagePath || null, // Optional image
+      image: product.productImagesPaths?.[0]
+        ? environment.baseServerUrl + product.productImagesPaths[0].imagePath
+        : null,
+      productSizeName: selectedSize, // ✅ أضف السطر ده
+      productName: product.name,
     };
 
     const existingCart = JSON.parse(localStorage.getItem('guestCart') || '[]');
