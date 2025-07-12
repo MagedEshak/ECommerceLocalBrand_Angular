@@ -6,6 +6,7 @@ import { ICartItem } from '../../models/ICartItem';
 import { RouterModule } from '@angular/router';
 import { environment } from '../../../environments/environment.development';
 import Swal from 'sweetalert2';
+import { ProductDetailsService } from '../../shared/services/Product/product-details.service';
 
 @Component({
   selector: 'app-cart',
@@ -22,7 +23,8 @@ export class Cart implements OnInit {
 
   constructor(
     private cartService: CartItemService,
-    private authService: AuthService // ⬅️ نستخدمه بدل ما نعتمد على cartService.getToken()
+    private authService: AuthService, // ⬅️ نستخدمه بدل ما نعتمد على cartService.getToken()
+    private productDetailsService: ProductDetailsService // ⬅️ ضفنا السيرفيس هنا
   ) {}
 
   ngOnInit(): void {
@@ -91,6 +93,7 @@ export class Cart implements OnInit {
     const token = this.authService.getToken();
 
     if (token) {
+      // لو يوزر مسجل دخول
       item.quantity++;
       item.totalPriceForOneItemType = item.unitPrice * item.quantity;
 
@@ -109,31 +112,49 @@ export class Cart implements OnInit {
         },
       });
     } else {
-      // ✅ تحقق من الكمية المتاحة في الـ localStorage
-      const storedCart = localStorage.getItem('guestCart');
-      if (storedCart) {
-        const parsedCart = JSON.parse(storedCart);
-        const matchingItem = parsedCart.find(
-          (ci: any) =>
-            ci.productId === item.productId &&
-            ci.productSizeId === item.productSizeId
-        );
+      // Guest user 🧑‍🦲
+      this.productDetailsService.getProductById(item.productId).subscribe({
+        next: (res) => {
+          const sizeObj = res.productSizes?.find(
+            (s) => +s.id === +item.productSizeId // نعمل casting للأمان
+          );
 
-        if (matchingItem && item.quantity + 1 > matchingItem.stockQuantity) {
+          if (!sizeObj) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Size not found',
+              text: 'The selected size does not exist anymore.',
+              showConfirmButton: false,
+              timer: 2500,
+            });
+            return;
+          }
+
+          const availableStock = sizeObj?.stockQuantity || 0;
+
+          if (item.quantity < availableStock) {
+            item.quantity++;
+            item.totalPriceForOneItemType = item.unitPrice * item.quantity;
+            this.updateLocalCartItem(item);
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Insufficient quantity available',
+              text: `Only ${availableStock} left in stock.`,
+              showConfirmButton: false,
+              timer: 2500,
+            });
+          }
+        },
+        error: (err) => {
+          console.error('❌ Failed to fetch stock info:', err);
           Swal.fire({
             icon: 'error',
-            title: 'Insufficient quantity available',
-            text: `Only ${matchingItem.stockQuantity} item(s) available in stock.`,
-            showConfirmButton: false,
-            timer: 2500,
+            title: 'Something went wrong',
+            text: 'Unable to verify available stock.',
           });
-          return;
-        }
-      }
-
-      item.quantity++;
-      item.totalPriceForOneItemType = item.unitPrice * item.quantity;
-      this.updateLocalCartItem(item);
+        },
+      });
     }
   }
 
