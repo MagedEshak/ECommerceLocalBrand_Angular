@@ -8,6 +8,9 @@ import Swal from 'sweetalert2';
 import { environment } from '../../../environments/environment.development';
 import { CartItemService } from '../../shared/services/cart/cart.service';
 import { AuthService } from '../../shared/services/Auth/auth.service';
+import { Router } from '@angular/router';
+
+// جوه الـ constructor
 
 @Component({
   selector: 'app-product-details',
@@ -27,7 +30,8 @@ export class ProductDetails implements OnInit {
     private route: ActivatedRoute,
     private productDetailsService: ProductDetailsService,
     private cartItemService: CartItemService,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router // ✅ أضف ده
   ) {}
 
   ngOnInit(): void {
@@ -250,4 +254,45 @@ export class ProductDetails implements OnInit {
   onSizeChange(): void {
     this.quantity = 1;
   }
+
+  buyNow() {
+    if (!this.product || !this.selectedSize) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Please select a size first.',
+        confirmButtonText: 'OK',
+      });
+      return;
+    }
+
+    const sizeObj = this.product.productSizes?.find(
+      (s) => s.size === this.selectedSize
+    );
+
+    if (!sizeObj) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Selected size is not valid.',
+      });
+      return;
+    }
+
+    const buyNowItem = {
+      productId: this.product.id,
+      productSizeId: sizeObj.id,
+      productName: this.product.name,
+      productSizeName: sizeObj.size,
+      productImageUrl: this.product.productImagesPaths?.[0]
+        ? environment.baseServerUrl +
+          this.product.productImagesPaths[0].imagePath
+        : '/assets/images/default.png',
+      quantity: this.quantity,
+      unitPrice: this.product.price,
+      totalPriceForOneItemType: this.product.price * this.quantity,
+    };
+
+    sessionStorage.setItem('buyNowItem', JSON.stringify(buyNowItem));
+
+    this.router.navigate(['/order']);
+      }
 }
