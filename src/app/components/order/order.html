@@ -26,58 +26,89 @@
     <!-- ✅ فورم البيانات -->
     <section class="bg-white mt-10 md:w-full">
         <section class="px-3 grid justify-center">
-            <form class="mb-5 overflow-hidden">
+<form class="mb-5 overflow-hidden">
 
-                <!-- Contact -->
-                <div class="flex items-center justify-between">
-                    <h2 class="font-bold text-2xl ms-4">Contact</h2>
-                    <a href="" class="underline pe-8">Log in</a>
-                </div>
+  <!-- Contact Info -->
+  <div class="flex items-center justify-between">
+    <h2 class="font-bold text-2xl ms-4">Contact</h2>
+    <a href="#" class="underline pe-8">Log in</a>
+  </div>
 
-                <!-- Email -->
-                <div class="flex flex-col items-center justify-center">
-                    <input type="email" placeholder="Email"
-                        class="mt-5 h-12 w-80 rounded-md border border-neutral-400 sm:text-sm p-4 mb-5 placeholder:text-neutral-400" />
-                </div>
+  <div class="flex flex-col items-center justify-center">
+    <input type="email" placeholder="Email"
+      class="mt-5 h-12 w-80 rounded-md border border-neutral-400 sm:text-sm p-4 mb-5 placeholder:text-neutral-400" />
+    <input type="text" placeholder="First Name"
+      class="h-12 w-80 rounded-md border border-neutral-400 sm:text-sm p-4 mb-5 placeholder:text-neutral-400" />
+    <input type="text" placeholder="Last Name"
+      class="h-12 w-80 rounded-md border border-neutral-400 sm:text-sm p-4 mb-5 placeholder:text-neutral-400" />
+    <input type="text" placeholder="Phone Number" pattern="^01[0125][0-9]{8}$" maxlength="11"
+      class="h-12 w-80 rounded-md border border-neutral-400 sm:text-sm p-4 mb-5 placeholder:text-neutral-400" />
+  </div>
 
-                <!-- Delivery -->
-                <h2 class="font-bold text-2xl ms-4 my-4">Delivery</h2>
-                <div class="flex flex-col items-center justify-center">
-                    <select class="h-auto w-80 rounded-md border border-neutral-400 sm:text-sm p-4 mb-5">
-                        <option value="Egypt" selected>Egypt</option>
-                    </select>
+  <!-- Delivery Section -->
+  <h2 class="font-bold text-2xl ms-4 my-4">Delivery</h2>
+  <div class="flex flex-col items-center justify-center">
 
-                    <input type="text" placeholder="First Name"
-                        class="h-12 w-80 rounded-md border border-neutral-400 sm:text-sm p-4 mb-5 placeholder:text-neutral-400" />
-                    <input type="text" placeholder="Last Name"
-                        class="h-12 w-80 rounded-md border border-neutral-400 sm:text-sm p-4 mb-5 placeholder:text-neutral-400" />
-                    <input type="text" placeholder="Phone Number" pattern="^01[0125][0-9]{8}$" maxlength="11"
-                        class="h-12 w-80 rounded-md border border-neutral-400 sm:text-sm p-4 mb-5 placeholder:text-neutral-400" />
+    <!-- Country -->
+    <select class="h-auto w-80 rounded-md border border-neutral-400 sm:text-sm p-4 mb-5">
+      <option value="Egypt" selected>Egypt</option>
+    </select>
 
-                    <h2 class="font-bold text-2xl my-4">Enter Your Address Details</h2>
-                    <input type="text" placeholder="Address"
-                        class="h-12 w-80 rounded-md border border-neutral-400 sm:text-sm p-4 mb-5 placeholder:text-neutral-400" />
+    <!-- Old or New Address Selector -->
+    <select class="h-auto w-80 rounded-md border border-neutral-400 sm:text-sm p-4 mb-5">
+      <option value="" disabled selected>Select Address</option>
+      <option value="new">Use New Address</option>
+      <option value="1">15 Street Name, Cairo</option>
+      <option value="2">10 Tahrir Sq, Giza</option>
+    </select>
 
-                    <select class="h-auto w-80 rounded-md border border-neutral-400 sm:text-sm p-4 mb-5">
-                        <option value="" selected disabled>Please Select Your Governorate</option>
-                        <option value="Cairo">Cairo</option>
-                    </select>
+    <!-- Address Details (only shown if new or editable) -->
+    <div class="w-full flex flex-col items-center">
+      <h2 class="font-bold text-2xl my-4">Address Details</h2>
+      <input type="text" placeholder="Street Address"
+        class="h-12 w-80 rounded-md border border-neutral-400 sm:text-sm p-4 mb-5 placeholder:text-neutral-400" />
+      <input type="text" placeholder="Apartment"
+        class="h-12 w-80 rounded-md border border-neutral-400 sm:text-sm p-4 mb-5 placeholder:text-neutral-400" />
+      <input type="text" placeholder="Building"
+        class="h-12 w-80 rounded-md border border-neutral-400 sm:text-sm p-4 mb-5 placeholder:text-neutral-400" />
+      <input type="text" placeholder="Floor"
+        class="h-12 w-80 rounded-md border border-neutral-400 sm:text-sm p-4 mb-5 placeholder:text-neutral-400" />
 
-                    <div class="flex items-center justify-between w-full">
-                        <h5 class="font-bold text-2xl my-4">Shipping Cost</h5>
-                        <span class="font-bold text-3xl">100.00 EGP</span>
-                    </div>
+      <!-- Governorate -->
+      <select class="h-auto w-80 rounded-md border border-neutral-400 sm:text-sm p-4 mb-5">
+        <option value="" disabled selected>Please Select Your Governorate</option>
+        <option value="1">Cairo</option>
+        <option value="2">Giza</option>
+        <option value="3">Alexandria</option>
+      </select>
+    </div>
 
-                    <input type="text" hidden />
+    <!-- Payment Method -->
+    <h2 class="font-bold text-2xl my-4">Payment Method</h2>
+    <select class="h-auto w-80 rounded-md border border-neutral-400 sm:text-sm p-4 mb-5">
+      <option value="2" selected>Cash on Delivery</option>
+      <option value="0">Credit Card</option>
+      <option value="1">Mobile Wallet</option>
+    </select>
 
-                    <!-- زر تأكيد الطلب -->
-                    <button type="button"
-                        class="mt-4 w-80 rounded-md bg-black py-2 px-4 text-sm text-white transition-all hover:bg-slate-700">
-                        Complete Order
-                    </button>
-                </div>
+    <!-- Shipping Cost -->
+    <div class="flex items-center justify-between w-full px-4">
+      <h5 class="font-bold text-2xl my-4">Shipping Cost</h5>
+      <span class="font-bold text-3xl">100.00 EGP</span>
+    </div>
 
-            </form>
+    <!-- Hidden input for AddressId if selected -->
+    <input type="text" hidden />
+
+    <!-- Confirm Button -->
+    <button type="button"
+      class="mt-4 w-80 rounded-md bg-black py-2 px-4 text-sm text-white transition-all hover:bg-slate-700">
+      Complete Order
+    </button>
+
+  </div>
+</form>
+
         </section>
     </section>
 
