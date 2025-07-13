@@ -4,6 +4,7 @@ import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { RouterStateService } from '../../shared/services/Router-State/router-state.service';
 import { LoginService } from '../../shared/services/login/login.service';
+import Swal from 'sweetalert2';
 import {
   ReactiveFormsModule,
   FormGroup,
@@ -105,19 +106,31 @@ export class Login {
   verifyCode() {
     const email = this.form.get('email')?.value;
     const code = this.verificationCode;
-
+  
     this._loginService.loginAfterGetCode(email, code).subscribe({
       next: (res) => {
-        alert('✅ Verification successful!');
+        Swal.fire({
+          icon: 'success',
+          title: 'Verification Successful',
+          text: '✅ You have been logged in successfully!',
+          timer: 2000,
+          showConfirmButton: false
+        });
+  
         this.isVerificationPopupVisible = false;
         this._authService.setLogin(res.token);
-        // this.cookieService.set('authToken', res.token, 1); // 1 يوم صلاحية
         this.router.navigate(['/home']);
       },
-      error: () => alert('❌ Invalid code.'),
+      error: () => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Invalid Code',
+          text: '❌ Please enter the correct verification code.',
+        });
+      }
     });
   }
-
+  
   get isHome(): boolean {
     return this.routerState.isHome;
   }
