@@ -8,6 +8,9 @@ import Swal from 'sweetalert2';
 import { environment } from '../../../environments/environment.development';
 import { CartItemService } from '../../shared/services/cart/cart.service';
 import { AuthService } from '../../shared/services/Auth/auth.service';
+import { Router } from '@angular/router';
+
+// جوه الـ constructor
 
 @Component({
   selector: 'app-product-details',
@@ -27,7 +30,8 @@ export class ProductDetails implements OnInit {
     private route: ActivatedRoute,
     private productDetailsService: ProductDetailsService,
     private cartItemService: CartItemService,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router // ✅ أضف ده
   ) {}
 
   ngOnInit(): void {
@@ -97,7 +101,15 @@ export class ProductDetails implements OnInit {
     if (this.quantity < stock) {
       this.quantity++;
     } else {
-      this.showWarning('Only one item is available in stock!');
+
+      Swal.fire({
+        icon: 'error',
+        title: 'Insufficient quantity available',
+        text: 'The requested quantity exceeds the available stock.',
+        showConfirmButton: false,
+        timer: 2500,
+      });
+
     }
   }
 
@@ -139,51 +151,152 @@ export class ProductDetails implements OnInit {
     selectedSize: string,
     quantity: number
   ) {
+
+    const sizeObj = product.productSizes?.find((s) => s.size === selectedSize);
+    if (!sizeObj) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Selected size is not valid.',
+      });
+      return;
+    }
+
+    const cartItem = {
+      cartId: 0,
+      productId: product.id,
+      productSizeId: sizeObj.id,
+      quantity: quantity,
+      unitPrice: product.price,
+      totalPriceForOneItemType: product.price * quantity,
+      name: product.name, // For displaying product in local cart
+      image: product.productImagesPaths?.[0]
+        ? environment.baseServerUrl + product.productImagesPaths[0].imagePath
+        : null,
+      productSizeName: selectedSize, // ✅ أضف السطر ده
+      productName: product.name,
+    };
+
+
     const existingCart = JSON.parse(localStorage.getItem('guestCart') || '[]');
     const foundItem = existingCart.find(
       (item: any) => item.id === product.id && item.size === selectedSize
     );
 
     if (foundItem) {
-      foundItem.quantity += quantity;
-      this.showSuccess('✅ Quantity increased for the product in your cart.');
+
+      const totalQuantity = foundItem.quantity + quantity;
+      if (totalQuantity > sizeObj.stockQuantity) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Quantity limit exceeded',
+          html: `<b>Requested: ${totalQuantity}, Available: ${sizeObj.stockQuantity}</b>`,
+          showConfirmButton: false,
+          timer: 2500,
+        });
+        return;
+      }
+
+      foundItem.quantity = totalQuantity;
+      this.showAlert('✅ Product quantity updated in cart');
     } else {
-      existingCart.push({
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        size: selectedSize,
-        quantity,
-        image: product.productImagesPaths?.[0]?.imagePath || null,
-      });
-      this.showSuccess('✅ Product added to your cart.');
+      if (quantity > sizeObj.stockQuantity) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Insufficient quantity available',
+          text: 'The requested quantity exceeds the available stock.',
+          showConfirmButton: false,
+          timer: 2500,
+        });
+
+        return;
+      }
+
+      existingCart.push(cartItem);
+      this.showAlert('✅ Product added to cart successfully');
+
     }
 
     localStorage.setItem('guestCart', JSON.stringify(existingCart));
   }
 
-  showSuccess(message: string) {
-    Swal.fire({
-      icon: 'success',
-      title: message,
-      showConfirmButton: false,
-      timer: 2000,
+  addToCart() {
+    if (!this.product || !this.selectedSize) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Please select a size first.',
+        confirmButtonText: 'OK',
+      });
+      return;
+    }
+
+    this.authService.isLoggedIn().subscribe((isAuthenticated) => {
+      if (isAuthenticated) {
+        this.cartItemService
+          .addToCart(this.product!, this.selectedSize!, this.quantity)
+          .subscribe({
+            next: () => this.showAlert('✅ Product added to cart'),
+            error: (err) =>
+              Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: err?.message || 'Failed to add product to cart.',
+                showConfirmButton: false,
+                timer: 2500,
+              }),
+          });
+      } else {
+        this.addToLocalStorageCart(
+          this.product!,
+          this.selectedSize!,
+          this.quantity
+        );
+      }
+
     });
   }
 
-  showError(message: string) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: message,
-    });
+  onSizeChange(): void {
+    this.quantity = 1;
   }
 
-  showWarning(message: string) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Warning',
-      text: message,
-    });
-  }
+  buyNow() {
+    if (!this.product || !this.selectedSize) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Please select a size first.',
+        confirmButtonText: 'OK',
+      });
+      return;
+    }
+
+    const sizeObj = this.product.productSizes?.find(
+      (s) => s.size === this.selectedSize
+    );
+
+    if (!sizeObj) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Selected size is not valid.',
+      });
+      return;
+    }
+
+    const buyNowItem = {
+      productId: this.product.id,
+      productSizeId: sizeObj.id,
+      productName: this.product.name,
+      productSizeName: sizeObj.size,
+      productImageUrl: this.product.productImagesPaths?.[0]
+        ? environment.baseServerUrl +
+          this.product.productImagesPaths[0].imagePath
+        : '/assets/images/default.png',
+      quantity: this.quantity,
+      unitPrice: this.product.price,
+      totalPriceForOneItemType: this.product.price * this.quantity,
+    };
+
+    sessionStorage.setItem('buyNowItem', JSON.stringify(buyNowItem));
+
+    this.router.navigate(['/order']);
+      }
 }

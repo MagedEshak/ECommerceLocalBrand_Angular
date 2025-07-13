@@ -1,61 +1,148 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, throwError } from 'rxjs';
-import { IProduct } from '../../../models/iproduct'; // عدّل المسار حسب مكان الموديل
+import { Observable } from 'rxjs';
+import { IProduct } from '../../../models/iproduct';
 import { environment } from '../../../../environments/environment.development';
+import { AuthService } from '../Auth/auth.service';
+import { ICartItem } from '../../../models/ICartItem';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CartItemService {
   private apiUrl = `${environment.baseServerUrl}/api/CartItem`;
+  private cartUrl = `${environment.baseServerUrl}/api/Cart`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private authService: AuthService) {}
 
   /**
-   * Add an item to the cart using full product model
+   * إضافة منتج للكارت
    */
   addToCart(
     product: IProduct,
     selectedSize: string,
     quantity: number
-  ): Observable<any> {
-    if (!product.productSizes || product.productSizes.length === 0) {
-      return throwError(() => new Error('Product sizes not available'));
-    }
+  ): Observable<void> {
+    return new Observable<void>((observer) => {
+      const sizeObj = product.productSizes?.find(
+        (s) => s.size === selectedSize
+      );
 
-    const sizeObj = product.productSizes.find((s) => s.size === selectedSize);
+      if (!sizeObj) {
+        observer.error(new Error('Selected size not found in product'));
+        return;
+      }
 
-    if (!sizeObj) {
-      return throwError(() => new Error('Selected size not found in product'));
-    }
+      const token = this.authService.getToken();
+      let headers = new HttpHeaders();
+      if (token) {
+        headers = headers.set('Authorization', `Bearer ${token}`);
+      }
 
-    const unitPrice = product.price;
-    const payload = {
-      cartId: 0, // السيرفر هيحسبها بناءً على اليوزر غالبًا
-      productId: product.id,
-      productSizeId: sizeObj.id,
-      quantity: quantity,
-      unitPrice: unitPrice,
-      totalPriceForOneItemType: unitPrice * quantity,
-    };
+      this.getCurrentUserCart().subscribe({
+        next: (cart: any) => {
+          const cartItems = cart?.cartItems || [];
 
-    // Get token from cookies
-    const token = this.getTokenFromCookies('token');
+          const existingItem = cartItems.find(
+            (item: any) =>
+              item.productId === product.id && item.productSizeId === sizeObj.id
+          );
+
+          const oldQuantity = existingItem?.quantity || 0;
+          const totalQuantity = oldQuantity + quantity;
+
+          if (totalQuantity > sizeObj.stockQuantity) {
+            observer.error(
+              new Error(
+                `الكمية المطلوبة (${totalQuantity}) أكثر من المتاح (${sizeObj.stockQuantity})`
+              )
+            );
+            return;
+          }
+
+          const unitPrice = product.price;
+          const payload = {
+            id: 0, // 👈 لازم موجود حتى لو السيرفر بيهمله في الإضافة
+            cartId: 0, // 👈 كذلك
+            productId: product.id,
+            productSizeId: sizeObj.id,
+            quantity: quantity,
+            unitPrice: product.price,
+            totalPriceForOneItemType: product.price * quantity,
+
+            // خصائص اتضافت في الـ DTO
+            productName: product.name,
+            productImageUrl: product.productImagesPaths?.[0]?.imagePath ?? '',
+            productSizeName: selectedSize,
+          };
+
+          this.http.post(this.apiUrl, payload, { headers }).subscribe({
+            next: () => {
+              observer.next();
+              observer.complete();
+            },
+            error: (err) => observer.error(err),
+          });
+        },
+        error: (err) => observer.error(err),
+      });
+    });
+  }
+
+  /**
+   * تحميل كارت المستخدم من السيرفر
+   */
+  getCurrentUserCart(): Observable<any> {
+    const token = this.authService.getToken();
     let headers = new HttpHeaders();
     if (token) {
       headers = headers.set('Authorization', `Bearer ${token}`);
     }
-    return this.http.post(this.apiUrl, payload, { headers });
 
+    return new Observable((observer) => {
+      this.http.get<any>(this.cartUrl, { headers }).subscribe({
+        next: (cart) => {
+          observer.next(cart);
+          observer.complete();
+        },
+        error: (err) => {
+          if (err.status === 404) {
+            // ✅ مفيش كارت، نعتبرها null مش خطأ
+            observer.next(null);
+            observer.complete();
+          } else {
+            observer.error(err);
+          }
+        },
+      });
+    });
   }
 
   /**
-   * Helper to get a cookie value by name
+   * تعديل كمية عنصر في الكارت
    */
-  private getTokenFromCookies(name: string): string | null {
-    const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-    return match ? decodeURIComponent(match[2]) : null;
-  }
+  updateCartItemQuantity(item: ICartItem): Observable<any> {
+    const token = this.authService.getToken();
+    let headers = new HttpHeaders();
+    if (token) {
+      headers = headers.set('Authorization', `Bearer ${token}`);
+    }
+
+    return this.http.put(this.apiUrl, item, { headers });
   }
 
+  /**
+   * حذف عنصر من الكارت
+   */
+  deleteCartItem(cartItemId: number): Observable<any> {
+    const token = this.authService.getToken();
+    let headers = new HttpHeaders();
+    if (token) {
+      headers = headers.set('Authorization', `Bearer ${token}`);
+    }
+
+    return this.http.delete(`${this.apiUrl}?cartItemId=${cartItemId}`, {
+      headers,
+    });
+  }
+}

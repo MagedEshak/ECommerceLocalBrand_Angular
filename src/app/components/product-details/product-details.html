@@ -39,16 +39,22 @@
                         <label [attr.for]="'size-' + i"
                             class="flex items-center justify-center w-full px-4 py-2 rounded-full border text-sm font-medium transition-colors cursor-pointer text-center"
                             [ngClass]="{
-                  'bg-black text-white border-black': selectedSize === size,
-                  'bg-white text-black border-gray-400': selectedSize !== size
-                }">
+                                                'bg-black text-white border-black': selectedSize === size,
+                                                'bg-white text-black border-gray-400': selectedSize !== size,
+                                                'opacity-50 cursor-not-allowed': getStockQuantity(size) === 0
+                                              }">
                             <input type="radio" name="size" [id]="'size-' + i" [value]="size" [(ngModel)]="selectedSize"
-                                class="sr-only" />
+                                [disabled]="getStockQuantity(size) === 0" (change)="onSizeChange()" class="sr-only" />
                             <span class="text-base">{{ size }}</span>
                         </label>
                         <span *ngIf="getStockQuantity(size) === 1"
-                            class="text-[10px] text-red-500 font-medium mt-1 leading-none">Only 1 left</span>
+                            class="text-[10px] text-red-500 font-medium mt-1 leading-none">Only 1
+                            left</span>
+                        <span *ngIf="getStockQuantity(size) === 0"
+                            class="text-[10px] text-red-600 font-medium mt-1 leading-none">Out of
+                            stock</span>
                     </div>
+
                 </div>
 
                 <!-- Quantity -->
@@ -78,7 +84,7 @@
                     class="bg-black text-white px-6 py-2 rounded hover:bg-white hover:text-black border hover:border-black">
                     <i class="fa-solid fa-cart-plus"></i> Add to Cart
                 </button>
-                <button
+                <button (click)="buyNow()"
                     class="bg-white text-black px-6 py-2 rounded border border-black hover:bg-black hover:text-white">
                     Buy it Now
                 </button>

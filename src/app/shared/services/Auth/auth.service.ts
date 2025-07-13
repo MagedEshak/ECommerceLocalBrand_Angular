@@ -28,4 +28,8 @@ export class AuthService {
     this.cookieService.delete('token');
     this.authStatus.next(false);
   }
+
+  getToken(): string | null {
+    return this.cookieService.get('token') || null;
+  }
 }

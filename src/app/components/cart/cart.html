@@ -1,1 +1,104 @@
-<p>cart works!</p>
+<div class="fixed end-0 top-0 z-30 w-96 h-screen max-w-sm bg-neutral-200 px-4 py-8 sm:px-6 lg:px-8 shadow-lg transition-transform duration-300 ease-in-out"
+    aria-modal="true" role="dialog" tabindex="-1">
+    <!-- Header -->
+    <div class="flex gap-2">
+        <h2 class="capitalize font-semibold text-2xl">Cart</h2>
+        <span class="bg-neutral-300 rounded-full w-9 h-9 flex items-center justify-center text-xl font-bold">
+            {{ cartItems.length }}
+        </span>
+    </div>
+
+    <!-- Close Button -->
+    <button class="absolute end-4 top-4 mb-7 text-gray-600 transition hover:scale-110 cursor-pointer">
+        <span class="sr-only">Close cart</span>
+        <i (click)="closeCartBtn()"
+            class="fa-solid fa-xmark text-2xl relative end-3 mb-6 mt-2 hover:text-gray-700 transition-all ease-in duration-200"></i>
+    </button>
+
+    <!-- Cart Items -->
+    <div class="mt-9 space-y-6">
+        <ul class="space-y-4">
+            <li *ngFor="let item of cartItems"
+                class="flex items-center gap-4 p-2 rounded-md hover:bg-neutral-400 transition-all ease-in duration-200">
+
+                <img [src]="item.productImageUrl" alt="" class="size-16 rounded-sm object-cover" />
+
+                <div class="flex flex-col justify-between flex-1">
+                    <div>
+                        <h3 class="text-sm font-bold leading-tight text-black">
+                            {{ item.productName }}
+                        </h3>
+
+                        <dl class="mt-0.5 space-y-px text-[10px] text-gray-600">
+                            <div>
+                                <dt class="inline">Size: </dt>
+                                <dd class="inline">{{ item.productSizeName }}</dd>
+                            </div>
+                        </dl>
+
+                        <h3 class="text-sm font-bold text-black whitespace-nowrap">
+                            LE {{ item.unitPrice | number: '1.2-2' }} EGP
+                        </h3>
+                    </div>
+
+                    <!-- Quantity Section -->
+                    <div class="flex items-center justify-start gap-2 mt-2">
+                        <div
+                            class="flex items-center rounded-sm text-black font-bold border border-gray-400 hover:bg-white">
+                            <button type="button" class="size-10 leading-10 text-black transition hover:opacity-75"
+                                (click)="decreaseQuantity(item)">
+                                &minus;
+                            </button>
+
+                            <input type="number" [value]="item.quantity" readonly
+                                class="h-10 w-16 border-transparent text-center sm:text-sm" />
+
+                            <button type="button" class="size-10 leading-10 text-black transition hover:opacity-75"
+                                (click)="increaseQuantity(item)">
+                                &plus;
+                            </button>
+                        </div>
+
+                        <button class="text-black transition hover:text-red-600" (click)="removeItem(item)">
+                            <span class="sr-only">Remove item</span>
+                            <i class="fa-regular fa-trash-can"></i>
+                        </button>
+                    </div>
+                </div>
+            </li>
+        </ul>
+
+
+        <!-- Total + Footer -->
+        <div class="space-y-4">
+            <div class="flex items-start justify-between">
+                <h3 class="capitalize font-bold">Estimated total</h3>
+                <h3 class="capitalize font-bold">
+                    LE {{ estimatedTotal | number: '1.2-2' }} EGP
+                </h3>
+            </div>
+
+            <p class="lowercase whitespace-nowrap text-sm text-gray-500">
+                Taxes and
+                <a href="#"
+                    class="lowercase inline-block text-sm text-black font-semibold transition hover:text-gray-700">
+                    shipping
+                </a>
+                calculated at checkout.
+            </p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="space-y-4 text-center">
+            <a [routerLink]="['/order']"
+                class="block rounded-sm bg-black px-5 py-3 text-sm border text-white transition hover:bg-transparent hover:text-black">
+                Checkout
+            </a>
+
+            <a href="#" (click)="closeCartBtn()"
+                class="inline-block text-sm text-gray-500 underline underline-offset-4 transition hover:text-gray-600">
+                Continue shopping
+            </a>
+        </div>
+    </div>
+</div>
