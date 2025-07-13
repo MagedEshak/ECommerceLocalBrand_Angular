@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { CartItemService } from '../../shared/services/cart/cart.service';
 import { AuthService } from '../../shared/services/Auth/auth.service';
@@ -13,9 +13,10 @@ import { Router, RouterModule } from '@angular/router';
   templateUrl: './order.html',
   styleUrl: './order.css',
 })
-export class Order implements OnInit {
+export class Order implements OnInit, OnDestroy {
   cartItems: ICartItem[] = [];
   estimatedTotal: number = 0;
+  private completedCheckout: boolean = false;
 
   constructor(
     private cartService: CartItemService,
@@ -125,5 +126,19 @@ export class Order implements OnInit {
       (acc, item) => acc + item.totalPriceForOneItemType,
       0
     );
+  }
+
+  completeCheckout() {
+    // 👇 هنا ممكن تضيف منطق إكمال الشراء
+    // مثلاً: إرسال الطلب للسيرفر، مسح الكارت، توجيه لصفحة الشكر
+    this.completedCheckout = true;
+    sessionStorage.removeItem('buyNowItem'); // مسح من sessionStorage بعد إكمال الشراء
+    this.router.navigate(['/thank-you']); // توجيه لصفحة الشكر
+  }
+
+  ngOnDestroy(): void {
+    if (!this.completedCheckout) {
+      sessionStorage.removeItem('buyNowItem');
+    }
   }
 }
