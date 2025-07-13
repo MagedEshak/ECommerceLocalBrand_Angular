@@ -44,7 +44,7 @@ export class ProductDetails implements OnInit {
           this.isLoading = false;
         },
         error: (err) => {
-          console.error('Error fetching product details', err);
+          console.error('Failed to fetch product details', err);
           this.isLoading = false;
         },
       });
@@ -55,24 +55,11 @@ export class ProductDetails implements OnInit {
     return this.product?.productSizes?.map((s) => s.size) || [];
   }
 
-  get imageUrl(): string {
-    const imagePath =
-      this.product?.productImagesPaths?.[0]?.imagePath ||
-      'assets/images/images.jpeg';
-    if (imagePath.startsWith('http')) return imagePath;
-    if (imagePath.startsWith('/uploads'))
-      return `${environment.baseServerUrl}${imagePath}`;
-    if (imagePath.startsWith('/assets')) return imagePath;
-    return `/assets/images/${imagePath}`;
-  }
-
   get sortedImageUrls(): string[] {
-    if (
-      !this.product?.productImagesPaths ||
-      this.product.productImagesPaths.length === 0
-    ) {
+    if (!this.product?.productImagesPaths?.length) {
       return ['/assets/images/default.png'];
     }
+
     return this.product.productImagesPaths
       .slice()
       .sort((a, b) => a.priority - b.priority)
@@ -80,7 +67,6 @@ export class ProductDetails implements OnInit {
         if (img.imagePath.startsWith('http')) return img.imagePath;
         if (img.imagePath.startsWith('/uploads'))
           return `${environment.baseServerUrl}${img.imagePath}`;
-        if (img.imagePath.startsWith('/assets')) return img.imagePath;
         return `/assets/images/${img.imagePath}`;
       });
   }
@@ -92,19 +78,13 @@ export class ProductDetails implements OnInit {
   }
 
   nextSlide() {
-    if (this.currentSlide < this.sortedImageUrls.length - 1) {
-      this.currentSlide++;
-    } else {
-      this.currentSlide = 0;
-    }
+    this.currentSlide = (this.currentSlide + 1) % this.sortedImageUrls.length;
   }
 
   prevSlide() {
-    if (this.currentSlide > 0) {
-      this.currentSlide--;
-    } else {
-      this.currentSlide = this.sortedImageUrls.length - 1;
-    }
+    this.currentSlide =
+      (this.currentSlide - 1 + this.sortedImageUrls.length) %
+      this.sortedImageUrls.length;
   }
 
   goToSlide(index: number) {
@@ -113,7 +93,7 @@ export class ProductDetails implements OnInit {
 
   getStockQuantity(size: string): number {
     const sizeObj = this.product?.productSizes?.find((s) => s.size === size);
-    return sizeObj ? sizeObj.stockQuantity : 0;
+    return sizeObj?.stockQuantity || 0;
   }
 
   increaseQuantity(): void {
@@ -121,6 +101,7 @@ export class ProductDetails implements OnInit {
     if (this.quantity < stock) {
       this.quantity++;
     } else {
+
       Swal.fire({
         icon: 'error',
         title: 'Insufficient quantity available',
@@ -128,6 +109,7 @@ export class ProductDetails implements OnInit {
         showConfirmButton: false,
         timer: 2500,
       });
+
     }
   }
 
@@ -137,12 +119,30 @@ export class ProductDetails implements OnInit {
     }
   }
 
-  showAlert(msg: string) {
-    Swal.fire({
-      icon: 'success',
-      title: msg,
-      showConfirmButton: false,
-      timer: 2000,
+  addToCart() {
+    if (!this.product || !this.selectedSize) {
+      this.showWarning('Please select a size first.');
+      return;
+    }
+
+    this.authService.isLoggedIn().subscribe((isAuthenticated) => {
+      if (isAuthenticated) {
+        this.cartItemService
+          .addToCart(this.product!, this.selectedSize!, this.quantity)
+          .subscribe({
+            next: () => this.showSuccess('✅ Product added to your cart.'),
+            error: (err) =>
+              this.showError(
+                err?.error?.message || 'Failed to add product to cart.'
+              ),
+          });
+      } else {
+        this.addToLocalStorageCart(
+          this.product!,
+          this.selectedSize!,
+          this.quantity
+        );
+      }
     });
   }
 
@@ -151,6 +151,7 @@ export class ProductDetails implements OnInit {
     selectedSize: string,
     quantity: number
   ) {
+
     const sizeObj = product.productSizes?.find((s) => s.size === selectedSize);
     if (!sizeObj) {
       Swal.fire({
@@ -175,13 +176,14 @@ export class ProductDetails implements OnInit {
       productName: product.name,
     };
 
+
     const existingCart = JSON.parse(localStorage.getItem('guestCart') || '[]');
     const foundItem = existingCart.find(
-      (item: any) =>
-        item.productId === product.id && item.productSizeId === sizeObj.id
+      (item: any) => item.id === product.id && item.size === selectedSize
     );
 
     if (foundItem) {
+
       const totalQuantity = foundItem.quantity + quantity;
       if (totalQuantity > sizeObj.stockQuantity) {
         Swal.fire({
@@ -211,6 +213,7 @@ export class ProductDetails implements OnInit {
 
       existingCart.push(cartItem);
       this.showAlert('✅ Product added to cart successfully');
+
     }
 
     localStorage.setItem('guestCart', JSON.stringify(existingCart));
@@ -248,6 +251,7 @@ export class ProductDetails implements OnInit {
           this.quantity
         );
       }
+
     });
   }
 

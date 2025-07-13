@@ -1,7 +1,7 @@
 <h2 class="font-bold text-2xl ms-4 mt-15">All Product</h2>
 
 <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 px-8 mt-6">
-    @for (prd of filteredProducts; track $index;) {
+    @for (prd of filteredProducts; track prd.id;) {
     <section class="rounded-lg overflow-hidden flex flex-col" data-aos="zoom-in" data-aos-duration="500"
         data-aos-offset="100">
         <a [routerLink]="['/product-details', prd.id]" class="flex flex-col items-center mb-20">
