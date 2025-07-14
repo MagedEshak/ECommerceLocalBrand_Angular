@@ -2,14 +2,17 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { CartItemService } from '../../shared/services/cart/cart.service';
 import { AuthService } from '../../shared/services/Auth/auth.service';
+import { IOrder } from '../../models/IOrder';
 import { ICartItem } from '../../models/ICartItem';
 import { environment } from '../../../environments/environment.development';
 import { Router, RouterModule } from '@angular/router';
+import { PaymentMethods } from '../../models/IOrder';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-order',
   standalone: true,
-  imports: [CommonModule, DecimalPipe, RouterModule],
+  imports: [CommonModule, DecimalPipe, RouterModule,FormsModule],
   templateUrl: './order.html',
   styleUrl: './order.css',
 })
@@ -22,7 +25,19 @@ export class Order implements OnInit, OnDestroy {
     private cartService: CartItemService,
     private authService: AuthService,
     private router: Router
-  ) {}
+  ) {
+
+
+  }
+  orderForm = {
+  paymentMethod: null
+};
+
+paymentMethods = [
+  { value: PaymentMethods.OnlineCard, label: 'Credit Card' },
+  { value: PaymentMethods.MobileWallet, label: 'Mobile Wallet' },
+  { value: PaymentMethods.COD, label: 'Cash on Delivery' }
+];
 
   ngOnInit(): void {
     // 👇 جرب تجيب من router state

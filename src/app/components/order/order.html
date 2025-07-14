@@ -84,12 +84,16 @@
     </div>
 
     <!-- Payment Method -->
-    <h2 class="font-bold text-2xl my-4">Payment Method</h2>
-    <select class="h-auto w-80 rounded-md border border-neutral-400 sm:text-sm p-4 mb-5">
-      <option value="2" selected>Cash on Delivery</option>
-      <option value="0">Credit Card</option>
-      <option value="1">Mobile Wallet</option>
-    </select>
+<h2 class="font-bold text-2xl my-4">Payment Method</h2>
+<select [(ngModel)]="orderForm.paymentMethod"
+        class="h-auto w-80 rounded-md border border-neutral-400 sm:text-sm p-4 mb-5">
+  <option [ngValue]="null" disabled>Select Payment Method</option>
+  <option *ngFor="let method of paymentMethods" [ngValue]="method.value">
+    {{ method.label }}
+  </option>
+</select>
+
+
 
     <!-- Shipping Cost -->
     <div class="flex items-center justify-between w-full px-4">
