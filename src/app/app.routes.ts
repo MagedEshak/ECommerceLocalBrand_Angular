@@ -6,7 +6,7 @@ import { Order } from './components/order/order';
 import { MainLayout } from './components/main-layout/main-layout';
 import { AllProducts } from './components/all-products/all-products';
 import { Login } from './components/login/login';
-import { authGuard } from './shared/guards/auth-guard';
+import { authGuard } from './guards/auth-guard';
 
 export const routes: Routes = [
   {
@@ -39,6 +39,16 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./components/profile/profile').then((m) => m.Profile),
         canActivate: [authGuard],
+        title: 'Profile',
+      },
+      {
+        path: 'previous-orders',
+        loadComponent: () =>
+          import('./components/previous-orders/previous-orders').then(
+            (m) => m.PreviousOrders
+          ),
+        // canActivate: [authGuard],
+        title: 'Previous Orders',
       },
       {
         path: 'order',

@@ -101,7 +101,6 @@ export class ProductDetails implements OnInit {
     if (this.quantity < stock) {
       this.quantity++;
     } else {
-
       Swal.fire({
         icon: 'error',
         title: 'Insufficient quantity available',
@@ -109,7 +108,6 @@ export class ProductDetails implements OnInit {
         showConfirmButton: false,
         timer: 2500,
       });
-
     }
   }
 
@@ -119,39 +117,38 @@ export class ProductDetails implements OnInit {
     }
   }
 
-  addToCart() {
-    if (!this.product || !this.selectedSize) {
-      this.showWarning('Please select a size first.');
-      return;
-    }
+  // addToCart() {
+  //   if (!this.product || !this.selectedSize) {
+  //     this.showWarning('Please select a size first.');
+  //     return;
+  //   }
 
-    this.authService.isLoggedIn().subscribe((isAuthenticated) => {
-      if (isAuthenticated) {
-        this.cartItemService
-          .addToCart(this.product!, this.selectedSize!, this.quantity)
-          .subscribe({
-            next: () => this.showSuccess('✅ Product added to your cart.'),
-            error: (err) =>
-              this.showError(
-                err?.error?.message || 'Failed to add product to cart.'
-              ),
-          });
-      } else {
-        this.addToLocalStorageCart(
-          this.product!,
-          this.selectedSize!,
-          this.quantity
-        );
-      }
-    });
-  }
+  //   this.authService.isLoggedIn().subscribe((isAuthenticated) => {
+  //     if (isAuthenticated) {
+  //       this.cartItemService
+  //         .addToCart(this.product!, this.selectedSize!, this.quantity)
+  //         .subscribe({
+  //           next: () => this.showSuccess('✅ Product added to your cart.'),
+  //           error: (err) =>
+  //             this.showError(
+  //               err?.error?.message || 'Failed to add product to cart.'
+  //             ),
+  //         });
+  //     } else {
+  //       this.addToLocalStorageCart(
+  //         this.product!,
+  //         this.selectedSize!,
+  //         this.quantity
+  //       );
+  //     }
+  //   });
+  // }
 
   addToLocalStorageCart(
     product: IProduct,
     selectedSize: string,
     quantity: number
   ) {
-
     const sizeObj = product.productSizes?.find((s) => s.size === selectedSize);
     if (!sizeObj) {
       Swal.fire({
@@ -176,14 +173,12 @@ export class ProductDetails implements OnInit {
       productName: product.name,
     };
 
-
     const existingCart = JSON.parse(localStorage.getItem('guestCart') || '[]');
     const foundItem = existingCart.find(
       (item: any) => item.id === product.id && item.size === selectedSize
     );
 
     if (foundItem) {
-
       const totalQuantity = foundItem.quantity + quantity;
       if (totalQuantity > sizeObj.stockQuantity) {
         Swal.fire({
@@ -197,7 +192,7 @@ export class ProductDetails implements OnInit {
       }
 
       foundItem.quantity = totalQuantity;
-      this.showAlert('✅ Product quantity updated in cart');
+      this.showSuccess('✅ Product quantity updated in cart');
     } else {
       if (quantity > sizeObj.stockQuantity) {
         Swal.fire({
@@ -212,8 +207,7 @@ export class ProductDetails implements OnInit {
       }
 
       existingCart.push(cartItem);
-      this.showAlert('✅ Product added to cart successfully');
-
+      this.showSuccess('✅ Product added to cart successfully');
     }
 
     localStorage.setItem('guestCart', JSON.stringify(existingCart));
@@ -234,7 +228,7 @@ export class ProductDetails implements OnInit {
         this.cartItemService
           .addToCart(this.product!, this.selectedSize!, this.quantity)
           .subscribe({
-            next: () => this.showAlert('✅ Product added to cart'),
+            next: () => this.showSuccess('✅ Product added to cart'),
             error: (err) =>
               Swal.fire({
                 icon: 'error',
@@ -251,7 +245,6 @@ export class ProductDetails implements OnInit {
           this.quantity
         );
       }
-
     });
   }
 
@@ -298,5 +291,30 @@ export class ProductDetails implements OnInit {
     sessionStorage.setItem('buyNowItem', JSON.stringify(buyNowItem));
 
     this.router.navigate(['/order']);
-      }
+  }
+
+  showSuccess(message: string) {
+    Swal.fire({
+      icon: 'success',
+      title: message,
+      showConfirmButton: false,
+      timer: 2000,
+    });
+  }
+
+  showError(message: string) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: message,
+    });
+  }
+
+  showWarning(message: string) {
+    Swal.fire({
+      icon: 'warning',
+      title: message,
+      confirmButtonText: 'Ok',
+    });
+  }
 }

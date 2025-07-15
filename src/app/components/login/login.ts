@@ -3,7 +3,7 @@ import { RouterLink } from '@angular/router';
 import { RouterStateService } from '../../shared/services/Router-State/router-state.service';
 import { LoginService } from '../../shared/services/login/login.service';
 import { CartItemService } from '../../shared/services/cart/cart.service';
-import Swal from 'sweetalert2';
+
 import {
   ReactiveFormsModule,
   FormGroup,
@@ -18,8 +18,8 @@ import { AuthService } from './../../shared/services/Auth/auth.service';
 import { MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ICartItem } from '../../models/ICartItem';
-
 import Swal from 'sweetalert2';
+
 
 @Component({
   selector: 'app-login',
@@ -30,20 +30,18 @@ import Swal from 'sweetalert2';
 })
 export class Login {
   form!: FormGroup;
-
   CartItemService: any;
-
-
-
+  isVerificationPopupVisible = false;
+  verificationCode = '';
+  countdown = 120;
+  private timer: any = null;
+  countdownDisplay = '02:00';
 
   constructor(
     public routerState: RouterStateService,
     private _loginService: LoginService,
     private fb: FormBuilder,
-    private cookieService: CookieService,
-
-    private dialogRef: MatDialogRef<Login> ,// ✅ بدل التنقل على الراوتر
-
+    private dialogRef: MatDialogRef<Login>, // ✅ بدل التنقل على الراوتر
     private router: Router,
     private _authService: AuthService,
     private _cartItemService: CartItemService // ✅ أضف السطر ده
@@ -52,12 +50,6 @@ export class Login {
       email: ['', [Validators.email, Validators.required]],
     });
   }
-  isVerificationPopupVisible = false;
-  verificationCode = '';
-  countdown = 120;
-  private timer: any = null;
-  countdownDisplay = '02:00';
-
 
   sendCode() {
     const email = this.form.get('email')?.value;
@@ -78,7 +70,6 @@ export class Login {
       },
     });
   }
-
 
   startCountdown() {
     this.countdown = 120;
@@ -123,7 +114,6 @@ export class Login {
     const code = this.verificationCode;
 
     this._loginService.loginAfterGetCode(email, code).subscribe({
-
       next: async (res) => {
         Swal.fire({
           icon: 'success',
@@ -132,7 +122,6 @@ export class Login {
           timer: 2000,
           showConfirmButton: false,
         });
-
 
         this.isVerificationPopupVisible = false;
         this._authService.setLogin(res.token);
@@ -174,7 +163,6 @@ export class Login {
           text: '❌ Please enter the correct verification code.',
         });
       },
-
     });
   }
 
