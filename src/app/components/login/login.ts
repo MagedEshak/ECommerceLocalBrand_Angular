@@ -1,5 +1,3 @@
-import { AuthService } from './../../shared/services/Auth/auth.service';
-
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { RouterStateService } from '../../shared/services/Router-State/router-state.service';
@@ -15,9 +13,12 @@ import {
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { CookieService } from 'ngx-cookie-service';
-import { Router } from '@angular/router';
+import { AuthService } from './../../shared/services/Auth/auth.service';
+import { MatDialogRef } from '@angular/material/dialog';
+
 @Component({
   selector: 'app-login',
+  standalone: true,
   imports: [CommonModule, RouterLink, ReactiveFormsModule, FormsModule],
   templateUrl: './login.html',
   styleUrl: './login.css',
@@ -29,9 +30,9 @@ export class Login {
     public routerState: RouterStateService,
     private _loginService: LoginService,
     private fb: FormBuilder,
-    private cookieService: CookieService, // ✅
-    private router: Router,
-    private _authService: AuthService
+    private cookieService: CookieService,
+    private _authService: AuthService,
+    private dialogRef: MatDialogRef<Login> // ✅ بدل التنقل على الراوتر
   ) {
     this.form = this.fb.group({
       email: ['', [Validators.email, Validators.required]],
@@ -42,6 +43,7 @@ export class Login {
   verificationCode = '';
   countdown = 120;
   private timer: any = null;
+  countdownDisplay = '02:00';
 
   sendCode() {
     const email = this.form.get('email')?.value;
@@ -53,7 +55,7 @@ export class Login {
 
     this._loginService.getVerifyingCodeToLogin(email).subscribe({
       next: () => {
-        this.startCountdown(); // يبدأ العد التنازلي
+        this.startCountdown();
         this.isVerificationPopupVisible = true;
       },
       error: (err) => {
@@ -63,17 +65,14 @@ export class Login {
     });
   }
 
-  countdownDisplay = '02:00'; // 👈 إضافة متغير لعرض النص
-
   startCountdown() {
     this.countdown = 120;
-    this.updateCountdownDisplay(); // أول تحديث
+    this.updateCountdownDisplay();
     clearInterval(this.timer);
 
     this.timer = setInterval(() => {
       this.countdown--;
-
-      this.updateCountdownDisplay(); // كل ثانية
+      this.updateCountdownDisplay();
 
       if (this.countdown <= 0) {
         clearInterval(this.timer);
@@ -106,7 +105,7 @@ export class Login {
   verifyCode() {
     const email = this.form.get('email')?.value;
     const code = this.verificationCode;
-  
+
     this._loginService.loginAfterGetCode(email, code).subscribe({
       next: (res) => {
         Swal.fire({
@@ -114,12 +113,14 @@ export class Login {
           title: 'Verification Successful',
           text: '✅ You have been logged in successfully!',
           timer: 2000,
-          showConfirmButton: false
+          showConfirmButton: false,
         });
-  
+
         this.isVerificationPopupVisible = false;
         this._authService.setLogin(res.token);
-        this.router.navigate(['/home']);
+
+        // ✅ رجّع القيمة بدل التنقل
+        this.dialogRef.close('logged-in');
       },
       error: () => {
         Swal.fire({
@@ -127,10 +128,10 @@ export class Login {
           title: 'Invalid Code',
           text: '❌ Please enter the correct verification code.',
         });
-      }
+      },
     });
   }
-  
+
   get isHome(): boolean {
     return this.routerState.isHome;
   }
