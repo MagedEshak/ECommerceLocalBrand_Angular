@@ -2,8 +2,8 @@
     <section *ngIf="!isLoading && product" class="flex flex-col md:flex-row gap-10">
         <!-- 👈 Left Column: Carousel -->
         <div class="w-full md:w-1/2 flex flex-col items-center">
-            <div class="relative w-full rounded shadow">
-                <img [src]="currentImage" [alt]="product.name" class="w-full h-64 md:h-[400px] object-cover rounded" />
+            <div class="relative w-full rounded ">
+                <img [src]="currentImage" [alt]="product.name" class="w-full h-full object-cover rounded" />
                 <button class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white px-3 py-1 rounded-full"
                     (click)="prevSlide()">‹</button>
                 <button class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white px-3 py-1 rounded-full"
@@ -31,7 +31,7 @@
             </div>
 
             <!-- Size + Quantity in same row -->
-            <div class="flex flex-wrap items-center gap-6 mt-6">
+            <div class="flex flex-col gap-6 mt-6">
                 <!-- Sizes -->
                 <div class="flex items-center justify-start gap-4 flex-wrap">
                     <div *ngFor="let size of getSizes(); let i = index"
@@ -65,12 +65,12 @@
                         <button type="button" class="size-10 leading-10 text-black text-lg transition hover:opacity-75"
                             (click)="decreaseQuantity()">&minus;</button>
 
-                        <input type="number" id="Quantity" [value]="quantity" readonly class="h-10 w-16 border-transparent text-center text-base 
-                  [-moz-appearance:_textfield] sm:text-sm 
-                  [&::-webkit-inner-spin-button]:m-0 
-                  [&::-webkit-inner-spin-button]:appearance-none 
-                  [&::-webkit-outer-spin-button]:m-0 
-                  [&::-webkit-outer-spin-button]:appearance-none" />
+                        <input type="number" id="Quantity" [value]="quantity" readonly class="h-10 w-16 border-transparent text-center text-base
+                            [-moz-appearance:_textfield] sm:text-sm
+                            [&::-webkit-inner-spin-button]:m-0
+                            [&::-webkit-inner-spin-button]:appearance-none
+                            [&::-webkit-outer-spin-button]:m-0
+                            [&::-webkit-outer-spin-button]:appearance-none" />
 
                         <button type="button" class="size-10 leading-10 text-black text-lg transition hover:opacity-75"
                             (click)="increaseQuantity()">&plus;</button>
@@ -91,7 +91,7 @@
             </div>
 
             <!-- Sizes Table + Description Accordion (side by side) -->
-            <div class="flex flex-col md:flex-row gap-4 mt-4">
+            <div class="flex flex-col gap-4 mt-4">
                 <!-- Size Details Accordion -->
                 <div class="flex-1">
                     <details open class="rounded overflow-hidden group">
