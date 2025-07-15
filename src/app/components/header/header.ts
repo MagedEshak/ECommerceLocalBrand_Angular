@@ -38,6 +38,8 @@ export class Header {
   logout() {
     this.authService.logout();
     this.router.navigate(['/home']);
+    //clear local storage
+    localStorage.removeItem('guestCart');
   }
 
   toggleProfile() {

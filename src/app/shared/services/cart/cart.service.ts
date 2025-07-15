@@ -89,6 +89,10 @@ export class CartItemService {
     });
   }
 
+  addToCartFromLocalStorageAfterLogin(items: ICartItem[]): Observable<any> {
+    return this.http.post('/api/cart/add', items); 
+  }
+
   /**
    * تحميل كارت المستخدم من السيرفر
    */

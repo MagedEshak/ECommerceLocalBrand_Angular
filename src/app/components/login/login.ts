@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { RouterStateService } from '../../shared/services/Router-State/router-state.service';
 import { LoginService } from '../../shared/services/login/login.service';
+import { CartItemService } from '../../shared/services/cart/cart.service';
 import Swal from 'sweetalert2';
 import {
   ReactiveFormsModule,
@@ -16,6 +17,8 @@ import { CookieService } from 'ngx-cookie-service';
 import { AuthService } from './../../shared/services/Auth/auth.service';
 import { MatDialogRef } from '@angular/material/dialog';
 
+import { Router } from '@angular/router';
+import { ICartItem } from '../../models/ICartItem';
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -25,20 +28,22 @@ import { MatDialogRef } from '@angular/material/dialog';
 })
 export class Login {
   form!: FormGroup;
+  CartItemService: any;
 
   constructor(
     public routerState: RouterStateService,
     private _loginService: LoginService,
     private fb: FormBuilder,
     private cookieService: CookieService,
+    private dialogRef: MatDialogRef<Login> ,// ✅ بدل التنقل على الراوتر
+    private router: Router,
     private _authService: AuthService,
-    private dialogRef: MatDialogRef<Login> // ✅ بدل التنقل على الراوتر
+    private _cartItemService: CartItemService // ✅ أضف السطر ده
   ) {
     this.form = this.fb.group({
       email: ['', [Validators.email, Validators.required]],
     });
   }
-
   isVerificationPopupVisible = false;
   verificationCode = '';
   countdown = 120;
@@ -107,7 +112,7 @@ export class Login {
     const code = this.verificationCode;
 
     this._loginService.loginAfterGetCode(email, code).subscribe({
-      next: (res) => {
+      next: async (res) => {
         Swal.fire({
           icon: 'success',
           title: 'Verification Successful',
@@ -121,6 +126,32 @@ export class Login {
 
         // ✅ رجّع القيمة بدل التنقل
         this.dialogRef.close('logged-in');
+        // ✅ 1. خزّن التوكن
+        this._authService.setLogin(res.token);
+
+        // ✅ 2. شيّك على الجست كارت
+        const guestCartRaw = localStorage.getItem('guestCart');
+        if (guestCartRaw) {
+          try {
+            const guestCartItems: ICartItem[] = JSON.parse(guestCartRaw);
+
+            // ✅ 3. بعت الجست كارت للسيرفر
+            await this.CartItemService.addToCart(guestCartItems).toPromise();
+
+            // ✅ 4. مسحه من الـ localStorage بعد نجاح الترحيل
+            localStorage.removeItem('guestCart');
+          } catch (err) {
+            // ❌ لو حصل Error في الترحيل
+            console.error('❌ Failed to sync guest cart to DB', err);
+
+            // ✅ نمسحه برضو علشان منسيبش داتا بايظة
+            localStorage.removeItem('guestCart');
+          }
+        }
+
+        // ✅ 5. إخفاء البوب آب والتنقل
+        this.isVerificationPopupVisible = false;
+        this.router.navigate(['/home']);
       },
       error: () => {
         Swal.fire({
