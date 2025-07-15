@@ -41,6 +41,15 @@ export const routes: Routes = [
         canActivate: [authGuard],
       },
       {
+        path: 'previous-orders',
+        loadComponent: () =>
+          import('./components/previous-orders/previous-orders').then(
+            (m) => m.PreviousOrders
+          ),
+        canActivate: [authGuard],
+        title: 'Previous Orders',
+      },
+      {
         path: 'order',
         component: Order,
         title: 'Checkout',
