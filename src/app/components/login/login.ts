@@ -4,6 +4,7 @@ import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { RouterStateService } from '../../shared/services/Router-State/router-state.service';
 import { LoginService } from '../../shared/services/login/login.service';
+import { CartItemService } from '../../shared/services/cart/cart.service';
 import Swal from 'sweetalert2';
 import {
   ReactiveFormsModule,
@@ -16,6 +17,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { CookieService } from 'ngx-cookie-service';
 import { Router } from '@angular/router';
+import { ICartItem } from '../../models/ICartItem';
 @Component({
   selector: 'app-login',
   imports: [CommonModule, RouterLink, ReactiveFormsModule, FormsModule],
@@ -24,20 +26,21 @@ import { Router } from '@angular/router';
 })
 export class Login {
   form!: FormGroup;
+  CartItemService: any;
 
   constructor(
     public routerState: RouterStateService,
     private _loginService: LoginService,
     private fb: FormBuilder,
-    private cookieService: CookieService, // ✅
+    private cookieService: CookieService,
     private router: Router,
-    private _authService: AuthService
+    private _authService: AuthService,
+    private _cartItemService: CartItemService // ✅ أضف السطر ده
   ) {
     this.form = this.fb.group({
       email: ['', [Validators.email, Validators.required]],
     });
   }
-
   isVerificationPopupVisible = false;
   verificationCode = '';
   countdown = 120;
@@ -106,19 +109,42 @@ export class Login {
   verifyCode() {
     const email = this.form.get('email')?.value;
     const code = this.verificationCode;
-  
+
     this._loginService.loginAfterGetCode(email, code).subscribe({
-      next: (res) => {
+      next: async (res) => {
         Swal.fire({
           icon: 'success',
           title: 'Verification Successful',
           text: '✅ You have been logged in successfully!',
           timer: 2000,
-          showConfirmButton: false
+          showConfirmButton: false,
         });
-  
-        this.isVerificationPopupVisible = false;
+
+        // ✅ 1. خزّن التوكن
         this._authService.setLogin(res.token);
+
+        // ✅ 2. شيّك على الجست كارت
+        const guestCartRaw = localStorage.getItem('guestCart');
+        if (guestCartRaw) {
+          try {
+            const guestCartItems: ICartItem[] = JSON.parse(guestCartRaw);
+
+            // ✅ 3. بعت الجست كارت للسيرفر
+            await this.CartItemService.addToCart(guestCartItems).toPromise();
+
+            // ✅ 4. مسحه من الـ localStorage بعد نجاح الترحيل
+            localStorage.removeItem('guestCart');
+          } catch (err) {
+            // ❌ لو حصل Error في الترحيل
+            console.error('❌ Failed to sync guest cart to DB', err);
+
+            // ✅ نمسحه برضو علشان منسيبش داتا بايظة
+            localStorage.removeItem('guestCart');
+          }
+        }
+
+        // ✅ 5. إخفاء البوب آب والتنقل
+        this.isVerificationPopupVisible = false;
         this.router.navigate(['/home']);
       },
       error: () => {
@@ -127,10 +153,10 @@ export class Login {
           title: 'Invalid Code',
           text: '❌ Please enter the correct verification code.',
         });
-      }
+      },
     });
   }
-  
+
   get isHome(): boolean {
     return this.routerState.isHome;
   }
