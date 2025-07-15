@@ -2,49 +2,68 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { CartItemService } from '../../shared/services/cart/cart.service';
 import { AuthService } from '../../shared/services/Auth/auth.service';
-import { IOrder } from '../../models/IOrder';
+import { IOrder, IOrderItem, PaymentMethods, OrderStatus } from '../../models/IOrder';
 import { ICartItem } from '../../models/ICartItem';
 import { environment } from '../../../environments/environment.development';
 import { Router, RouterModule } from '@angular/router';
-import { PaymentMethods } from '../../models/IOrder';
 import { FormsModule } from '@angular/forms';
+import { ICustomer } from '../../models/IOrder';
+import { IAddress } from '../../models/IOrder';
+import { OrderService } from '../services/Order/order.service';
 
 @Component({
   selector: 'app-order',
   standalone: true,
-  imports: [CommonModule, DecimalPipe, RouterModule,FormsModule],
+  imports: [CommonModule, DecimalPipe, RouterModule, FormsModule],
   templateUrl: './order.html',
   styleUrl: './order.css',
 })
 export class Order implements OnInit, OnDestroy {
   cartItems: ICartItem[] = [];
+governorates: { id: number; name: string }[] = [];
+
+  order: IOrder = {
+    orderId: 0,
+    orderNumber: '',
+    createdAt: new Date(),
+    deliveredAt: undefined,
+    customerId: '',
+    shippingCost: 100,
+    discountValue: 0,
+    totalOrderPrice: 0,
+    paymentMethod: PaymentMethods.OnlineCard,
+    orderStatus: OrderStatus.Created,
+    orderItems: [],
+    customerInfo: {} as ICustomer,
+    addressInfo: {} as IAddress
+  };
+
+  shippingCost: number = 100;
   estimatedTotal: number = 0;
   private completedCheckout: boolean = false;
 
   constructor(
     private cartService: CartItemService,
     private authService: AuthService,
+    private orderService: OrderService,
     private router: Router
-  ) {
+  ) {}
 
-
-  }
   orderForm = {
-  paymentMethod: null
-};
+    paymentMethod: null
+  };
 
-paymentMethods = [
-  { value: PaymentMethods.OnlineCard, label: 'Credit Card' },
-  { value: PaymentMethods.MobileWallet, label: 'Mobile Wallet' },
-  { value: PaymentMethods.COD, label: 'Cash on Delivery' }
-];
+  paymentMethods = [
+    { value: PaymentMethods.OnlineCard, label: 'Credit Card' },
+    { value: PaymentMethods.MobileWallet, label: 'Mobile Wallet' },
+    { value: PaymentMethods.COD, label: 'Cash on Delivery' }
+  ];
 
   ngOnInit(): void {
-    // 👇 جرب تجيب من router state
     const nav = this.router.getCurrentNavigation();
     let buyNowItem = nav?.extras?.state?.['buyNowItem'];
-
-    // 👇 fallback من sessionStorage لو مش موجود
+      this.loadUserAddresses();
+  this.loadGovernorates();
     if (!buyNowItem) {
       const stored = sessionStorage.getItem('buyNowItem');
       if (stored) {
@@ -52,9 +71,11 @@ paymentMethods = [
           buyNowItem = JSON.parse(stored);
         } catch {}
       }
+
+
+
     }
 
-    // ✅ حالة Buy Now
     if (buyNowItem) {
       this.cartItems = [
         {
@@ -75,7 +96,6 @@ paymentMethods = [
       return;
     }
 
-    // ✅ الحالة العادية
     const token = this.authService.getToken();
     if (token) {
       this.loadServerCart();
@@ -83,6 +103,61 @@ paymentMethods = [
       this.loadLocalCart();
     }
   }
+
+loadGovernorates(): void {
+  this.orderService.getGovernorates().subscribe({
+    next: (res) => {
+      this.governorates = res;
+    },
+    error: (err) => {
+      console.error('❌ Error loading governorates:', err);
+    }
+  });
+}
+savedAddresses: any[] = []; // أو اعملها interface لو حابب
+useNewAddress: boolean = false;
+selectedAddressId: string | null = null;
+
+loadUserAddresses() {
+  this.orderService.getUserAddresses().subscribe({
+    next: (addresses) => {
+      this.savedAddresses = addresses;
+    },
+    error: (err) => {
+      console.error("❌ Error loading addresses", err);
+    }
+  });
+}
+onAddressChange() {
+  const selected = this.savedAddresses.find(a => a.id == this.selectedAddressId);
+  if (selected) {
+    this.order.addressInfo = {
+      street: selected.street,
+      apartment: selected.apartment,
+      building: selected.building,
+      floor: selected.floor,
+      city: selected.city,
+      country: selected.country,
+      governrateShippingCostId: selected.governrateShippingCostId
+    };
+  }
+}
+
+onToggleNewAddress() {
+  if (this.useNewAddress) {
+    this.selectedAddressId = null;
+    this.order.addressInfo = {
+      street: '',
+      apartment: '',
+      building: '',
+      floor: '',
+      city: '',
+      country: '',
+      governrateShippingCostId: 0,
+    };
+  }
+}
+
 
   loadServerCart(): void {
     this.cartService.getCurrentUserCart().subscribe({
@@ -117,6 +192,7 @@ paymentMethods = [
       try {
         const rawItems = JSON.parse(storedCart);
         this.cartItems = rawItems.map((item: any) => ({
+          id: 0,
           productId: item.productId,
           productSizeId: item.productSizeId,
           productName: item.name ?? 'Unknown',
@@ -143,12 +219,42 @@ paymentMethods = [
     );
   }
 
-  completeCheckout() {
-    // 👇 هنا ممكن تضيف منطق إكمال الشراء
-    // مثلاً: إرسال الطلب للسيرفر، مسح الكارت، توجيه لصفحة الشكر
+  completeCheckout(): void {
+    if (!this.orderForm.paymentMethod) {
+      alert('Please select a payment method');
+      return;
+    }
+
+    this.order.paymentMethod = this.orderForm.paymentMethod;
+    this.order.orderItems = this.cartItems.map((item) => ({
+      orderItemId: 0,
+      productId: item.productId,
+      productSizeId: item.productSizeId,
+      quantity: item.quantity,
+      unitPrice: item.unitPrice,
+      totalPrice: item.totalPriceForOneItemType
+    }));
+    this.order.totalOrderPrice = this.estimatedTotal + this.shippingCost;
+
+    const user = this.authService.getToken() ? this.decodeUserFromToken(this.authService.getToken()!) : null;
+    if (user) {
+      this.order.customerId = user.id;
+    }
+
+    console.log('🚀 Order ready to send:', this.order);
+
     this.completedCheckout = true;
-    sessionStorage.removeItem('buyNowItem'); // مسح من sessionStorage بعد إكمال الشراء
-    this.router.navigate(['/thank-you']); // توجيه لصفحة الشكر
+    sessionStorage.removeItem('buyNowItem');
+    this.router.navigate(['/thank-you']);
+  }
+
+  decodeUserFromToken(token: string): { id: string } | null {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return { id: payload?.sub || payload?.userId || '' };
+    } catch {
+      return null;
+    }
   }
 
   ngOnDestroy(): void {
