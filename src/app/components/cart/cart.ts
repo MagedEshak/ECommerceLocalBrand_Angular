@@ -188,7 +188,7 @@ export class Cart implements OnInit {
           ci.productId !== item.productId ||
           ci.productSizeId !== item.productSizeId
       );
-      localStorage.setItem('cart', JSON.stringify(this.cartItems));
+      localStorage.setItem('guestCart', JSON.stringify(this.cartItems));
       this.calculateTotal();
     }
   }
