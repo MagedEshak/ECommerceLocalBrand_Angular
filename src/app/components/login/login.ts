@@ -16,9 +16,11 @@ import { CommonModule } from '@angular/common';
 import { CookieService } from 'ngx-cookie-service';
 import { AuthService } from './../../shared/services/Auth/auth.service';
 import { MatDialogRef } from '@angular/material/dialog';
-
 import { Router } from '@angular/router';
 import { ICartItem } from '../../models/ICartItem';
+
+import Swal from 'sweetalert2';
+
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -28,14 +30,20 @@ import { ICartItem } from '../../models/ICartItem';
 })
 export class Login {
   form!: FormGroup;
+
   CartItemService: any;
+
+
+
 
   constructor(
     public routerState: RouterStateService,
     private _loginService: LoginService,
     private fb: FormBuilder,
     private cookieService: CookieService,
+
     private dialogRef: MatDialogRef<Login> ,// ✅ بدل التنقل على الراوتر
+
     private router: Router,
     private _authService: AuthService,
     private _cartItemService: CartItemService // ✅ أضف السطر ده
@@ -50,14 +58,15 @@ export class Login {
   private timer: any = null;
   countdownDisplay = '02:00';
 
+
   sendCode() {
     const email = this.form.get('email')?.value;
 
     if (this.form.invalid) {
-      alert('Please enter a valid email.');
+      this.showWarning('Please enter a valid email.');
       return;
     }
-
+    this.showWarning('Waiting');
     this._loginService.getVerifyingCodeToLogin(email).subscribe({
       next: () => {
         this.startCountdown();
@@ -65,10 +74,11 @@ export class Login {
       },
       error: (err) => {
         console.error(err);
-        alert('Failed to send verification code.');
+        this.showError('Failed to send verification code.');
       },
     });
   }
+
 
   startCountdown() {
     this.countdown = 120;
@@ -77,6 +87,7 @@ export class Login {
 
     this.timer = setInterval(() => {
       this.countdown--;
+
       this.updateCountdownDisplay();
 
       if (this.countdown <= 0) {
@@ -103,7 +114,7 @@ export class Login {
       next: () => {
         this.startCountdown();
       },
-      error: () => alert('Failed to resend code.'),
+      error: () => this.showError('Failed to resend code.'),
     });
   }
 
@@ -112,6 +123,7 @@ export class Login {
     const code = this.verificationCode;
 
     this._loginService.loginAfterGetCode(email, code).subscribe({
+
       next: async (res) => {
         Swal.fire({
           icon: 'success',
@@ -120,6 +132,7 @@ export class Login {
           timer: 2000,
           showConfirmButton: false,
         });
+
 
         this.isVerificationPopupVisible = false;
         this._authService.setLogin(res.token);
@@ -153,6 +166,7 @@ export class Login {
         this.isVerificationPopupVisible = false;
         this.router.navigate(['/home']);
       },
+
       error: () => {
         Swal.fire({
           icon: 'error',
@@ -160,10 +174,36 @@ export class Login {
           text: '❌ Please enter the correct verification code.',
         });
       },
+
     });
   }
 
   get isHome(): boolean {
     return this.routerState.isHome;
+  }
+
+  showSuccess(message: string) {
+    Swal.fire({
+      icon: 'success',
+      title: message,
+      showConfirmButton: false,
+      timer: 2000,
+    });
+  }
+
+  showError(message: string) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: message,
+    });
+  }
+
+  showWarning(message: string) {
+    Swal.fire({
+      icon: 'warning',
+      title: message,
+      confirmButtonText: 'Ok',
+    });
   }
 }
