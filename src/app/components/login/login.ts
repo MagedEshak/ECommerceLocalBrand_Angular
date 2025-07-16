@@ -20,7 +20,6 @@ import { Router } from '@angular/router';
 import { ICartItem } from '../../models/ICartItem';
 import Swal from 'sweetalert2';
 
-
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -123,8 +122,8 @@ export class Login {
           showConfirmButton: false,
         });
 
-        this.isVerificationPopupVisible = false;
-        this._authService.setLogin(res.token);
+        //this.isVerificationPopupVisible = false;
+        //this._authService.setLogin(res.token);
 
         // ✅ رجّع القيمة بدل التنقل
         this.dialogRef.close('logged-in');

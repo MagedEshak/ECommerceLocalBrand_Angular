@@ -7,7 +7,7 @@ import { ICartItem } from '../../models/ICartItem';
 import { environment } from '../../../environments/environment.development';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { OrderService } from '../services/Order/order.service';
+import { OrderService } from '../../shared/services/Order/order.service';
 import { Login } from '../login/login';
 import { MatDialog } from '@angular/material/dialog';
 

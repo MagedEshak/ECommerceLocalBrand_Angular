@@ -19,11 +19,8 @@
             </ul>
             <div class="flex max-sm:flex-col items-center justify-end gap-2 max-lg:mt-5">
                 <div class="flex items-center gap-3 max-md:mt-5">
-                    <button
-                        class="rounded-full px-7 py-3 bg-white text-gray-900 border border-gray-300 font-semibold text-sm shadow-sm shadow-transparent transition-all duration-500 hover:shadow-gray-200 hover:bg-gray-50 hover:border-gray-400">Show
-                        Invoice</button>
                     <a [routerLink]="['/allProducts']"
-                        class="rounded-full px-7 py-3 bg-indigo-600 shadow-sm shadow-transparent text-white font-semibold text-sm transition-all duration-500 hover:shadow-indigo-400 hover:bg-indigo-700">Buy
+                        class="rounded-full px-7 py-3 bg-black shadow-sm shadow-transparent text-white font-semibold text-sm transition-all duration-500 hover:shadow-gray-500 hover:bg-gray-700">Shop
                         Now
                     </a>
 
@@ -69,6 +66,11 @@
                     </div>
                 </div>
 
+                <div class="mt-4 text-center">
+                    <p *ngIf="refundStatus() === 'loading'" class="text-yellow-600">Processing refund...</p>
+                    <p *ngIf="refundStatus() === 'success'" class="text-green-600 font-medium">{{ refundMessage() }}</p>
+                    <p *ngIf="refundStatus() === 'error'" class="text-red-600 font-medium">{{ refundMessage() }}</p>
+                </div>
 
             </div>
             <svg class="my-9 w-full" xmlns="http://www.w3.org/2000/svg" width="1216" height="2" viewBox="0 0 1216 2"
@@ -177,7 +179,7 @@
 
             <div class="px-3 md:px-11 flex items-center justify-between max-sm:flex-col-reverse">
                 <div class="flex max-sm:flex-col-reverse items-center">
-                    <button
+                    <button (click)="openRefundForm(1)"
                         class="flex items-center gap-3 py-10 pr-8 sm:border-r border-gray-300 font-normal text-xl leading-8 text-gray-500 group transition-all duration-500 hover:text-indigo-600">
                         <svg width="40" height="41" viewBox="0 0 40 41" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path class="stroke-gray-600 transition-all duration-500 group-hover:stroke-indigo-600"
@@ -186,11 +188,40 @@
                         </svg>
                         cancel order
                     </button>
+
+
                     <p class="font-normal text-xl leading-8 text-gray-500 sm:pl-8">Payment Is Succesfull</p>
                 </div>
                 <p class="font-medium text-xl leading-8 text-black max-sm:py-4"> <span class="text-gray-500">Total
-                        Price: </span> &nbsp;$200.00</p>
+                        Price: </span> &nbsp;$200.00
+                </p>
             </div>
+            <!-- Refund Reason Form -->
+            <div *ngIf="showRefundForm" class="bg-gray-100 p-4 rounded mt-4 border border-gray-300 max-w-lg mx-auto">
+                <h3 class="text-lg font-semibold mb-2 text-black">Why are you cancelling the order?</h3>
+
+                <textarea [(ngModel)]="refundReason"
+                    class="w-full h-24 p-3 border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    placeholder="Enter your reason here..."></textarea>
+
+                <div class="mt-3 flex gap-2">
+                    <button (click)="submitRefund()"
+                        class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition-all text-sm font-medium">
+                        Submit
+                    </button>
+                    <button (click)="showRefundForm = false"
+                        class="text-gray-500 hover:text-black text-sm font-medium underline">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+
         </div>
+
+
     </div>
+
+
+
+
 </section>
