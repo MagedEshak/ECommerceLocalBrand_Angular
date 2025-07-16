@@ -5,11 +5,14 @@ import { RouterLink, Router, NavigationEnd } from '@angular/router';
 import { AuthService } from '../../shared/services/Auth/auth.service';
 import { Cart } from '../cart/cart';
 import { filter } from 'rxjs/operators';
+import { MatDialog } from '@angular/material/dialog';
+import { Login } from '../login/login';
+import { MatDialogModule } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, RouterLink, Cart],
+  imports: [CommonModule, RouterLink, Cart, MatDialogModule], // ✅ أضف هنا
   templateUrl: './header.html',
   styleUrls: ['./header.css'],
 })
@@ -21,7 +24,8 @@ export class Header {
   constructor(
     public routerState: RouterStateService,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private dialog: MatDialog
   ) {
     this.authService.isLoggedIn().subscribe((status) => {
       this.isLoggedIn = status;
@@ -60,5 +64,19 @@ export class Header {
 
   get isHome(): boolean {
     return this.routerState.isHome;
+  }
+
+  openLoginDialog() {
+    const dialogRef = this.dialog.open(Login, {
+      width: '400px',
+      disableClose: true,
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result === 'logged-in') {
+        // ✅ المستخدم سجل دخول فعلاً
+        this.isLoggedIn = true;
+      }
+    });
   }
 }
