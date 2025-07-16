@@ -48,7 +48,7 @@ export const routes: Routes = [
             (m) => m.PreviousOrders
           ),
         // canActivate: [authGuard],
-        title: 'Previous Orders',
+        title: 'Order History',
       },
       {
         path: 'order',
