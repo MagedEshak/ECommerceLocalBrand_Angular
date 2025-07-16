@@ -94,6 +94,12 @@
                 class="block rounded-sm bg-black px-5 py-3 text-sm border text-white transition hover:bg-transparent hover:text-black">
                 Checkout
             </a>
+            <!-- زرار مسح كل العناصر -->
+            <button (click)="clearCart()"
+                class="w-full text-sm border border-red-500 text-red-500 px-5 py-3 rounded-sm transition hover:bg-red-500 hover:text-white">
+                Clear Cart
+            </button>
+
 
             <a href="#" (click)="closeCartBtn()"
                 class="inline-block text-sm text-gray-500 underline underline-offset-4 transition hover:text-gray-600">
