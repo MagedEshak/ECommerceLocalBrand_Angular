@@ -90,10 +90,10 @@
 
                         @if(isLoggedIn == false){
                         <div class="text-center">
-                            <a [routerLink]="['/login']"
+                            <button (click)="openLoginDialog()"
                                 class="block w-full rounded bg-black text-white py-2 text-sm font-medium hover:bg-transparent hover:text-black border border-transparent hover:border-black transition">
                                 Sign in
-                            </a>
+                            </button>
                         </div>
                         }@else{
                         <div class="grid justify-items-center sm:grid-cols-2 gap-2">

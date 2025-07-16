@@ -1,24 +1,24 @@
-import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+// ✅ login.component.ts
+import { Component, Optional, Output, EventEmitter } from '@angular/core';
+import { RouterLink, Router } from '@angular/router';
 import { RouterStateService } from '../../shared/services/Router-State/router-state.service';
 import { LoginService } from '../../shared/services/login/login.service';
 import { CartItemService } from '../../shared/services/cart/cart.service';
+import Swal from 'sweetalert2';
+import { firstValueFrom } from 'rxjs';
 
 import {
   ReactiveFormsModule,
   FormGroup,
-  FormControl,
-  Validators,
   FormBuilder,
+  Validators,
   FormsModule,
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { CookieService } from 'ngx-cookie-service';
 import { AuthService } from './../../shared/services/Auth/auth.service';
 import { MatDialogRef } from '@angular/material/dialog';
-import { Router } from '@angular/router';
 import { ICartItem } from '../../models/ICartItem';
-import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-login',
@@ -29,21 +29,23 @@ import Swal from 'sweetalert2';
 })
 export class Login {
   form!: FormGroup;
-  CartItemService: any;
   isVerificationPopupVisible = false;
   verificationCode = '';
   countdown = 120;
-  private timer: any = null;
   countdownDisplay = '02:00';
+  private timer: any = null;
+
+  @Output() loginSuccess = new EventEmitter<void>();
 
   constructor(
     public routerState: RouterStateService,
     private _loginService: LoginService,
     private fb: FormBuilder,
-    private dialogRef: MatDialogRef<Login>, // ✅ بدل التنقل على الراوتر
+    private cookieService: CookieService,
+    @Optional() private dialogRef: MatDialogRef<Login>,
     private router: Router,
     private _authService: AuthService,
-    private _cartItemService: CartItemService // ✅ أضف السطر ده
+    private _cartItemService: CartItemService
   ) {
     this.form = this.fb.group({
       email: ['', [Validators.email, Validators.required]],
@@ -122,35 +124,55 @@ export class Login {
           showConfirmButton: false,
         });
 
-        //this.isVerificationPopupVisible = false;
-        //this._authService.setLogin(res.token);
-
-        // ✅ رجّع القيمة بدل التنقل
-        this.dialogRef.close('logged-in');
-        // ✅ 1. خزّن التوكن
+        // ✅ خزّن التوكن
         this._authService.setLogin(res.token);
 
-        // ✅ 2. شيّك على الجست كارت
+        // ✅ ترحيل الجست كارت دفعة واحدة
         const guestCartRaw = localStorage.getItem('guestCart');
         if (guestCartRaw) {
           try {
-            const guestCartItems: ICartItem[] = JSON.parse(guestCartRaw);
+            const cart = await firstValueFrom(
+              this._cartItemService.getCurrentUserCart()
+            );
+            const cartId = cart?.id; // جيب الـ CartId الصح من الـ API
 
-            // ✅ 3. بعت الجست كارت للسيرفر
-            await this.CartItemService.addToCart(guestCartItems).toPromise();
+            const guestCartItems: ICartItem[] = JSON.parse(guestCartRaw).map(
+              (item: any) => ({
+                ...item,
+                cartId: cartId,
+                unitPrice: parseFloat(item.unitPrice.toString()), // تحويل صريح لـ string ثم عشري
+                totalPriceForOneItemType: parseFloat(
+                  item.totalPriceForOneItemType.toString()
+                ),
+              })
+            );
+            console.log('Modified Guest Cart Items:', guestCartItems); // Log الـ Payload
 
-            // ✅ 4. مسحه من الـ localStorage بعد نجاح الترحيل
+            // ✅ استخدم الفنكشن الجديدة
+            const result = await firstValueFrom(
+              this._cartItemService.addToCartFromLocalStorageAfterLogin(
+                guestCartItems
+              )
+            );
+            console.log('API Response:', result);
+
+            // ✅ بعد الترحيل الناجح، امسح الجست كارت
             localStorage.removeItem('guestCart');
           } catch (err) {
-            // ❌ لو حصل Error في الترحيل
-            console.error('❌ Failed to sync guest cart to DB', err);
-
-            // ✅ نمسحه برضو علشان منسيبش داتا بايظة
+            console.error('❌ Failed to sync guest cart to DB:', err);
             localStorage.removeItem('guestCart');
           }
         }
 
-        // ✅ 5. إخفاء البوب آب والتنقل
+        // ✅ قفل الديالوج لو معمول Dialog
+        if (this.dialogRef) {
+          this.dialogRef.close('logged-in');
+        }
+
+        // ✅ Emit للي فتح الكومبوننت
+        this.loginSuccess.emit();
+
+        // ✅ اختياري: تنقل
         this.isVerificationPopupVisible = false;
         this.router.navigate(['/home']);
       },
@@ -164,7 +186,6 @@ export class Login {
       },
     });
   }
-
   get isHome(): boolean {
     return this.routerState.isHome;
   }
@@ -192,5 +213,11 @@ export class Login {
       title: message,
       confirmButtonText: 'Ok',
     });
+  }
+
+  closeDialog() {
+    if (this.dialogRef) {
+      this.dialogRef.close();
+    }
   }
 }
