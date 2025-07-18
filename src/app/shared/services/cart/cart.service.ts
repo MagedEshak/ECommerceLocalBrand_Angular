@@ -10,14 +10,12 @@ import { ICartItem } from '../../../models/ICartItem';
   providedIn: 'root',
 })
 export class CartItemService {
-  private apiUrl = `${environment.baseServerUrl}/api/CartItem`;
-  private cartUrl = `${environment.baseServerUrl}/api/Cart`;
+  private cartItemApi = `${environment.baseServerUrl}/api/CartItem`;
+  private cartApi = `${environment.baseServerUrl}/api/Cart`;
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 
-  /**
-   * إضافة منتج للكارت
-   */
+  // ✅ إضافة منتج مفرد (single item)
   addToCart(
     product: IProduct,
     selectedSize: string,
@@ -29,20 +27,17 @@ export class CartItemService {
       );
 
       if (!sizeObj) {
-        observer.error(new Error('Selected size not found in product'));
+        observer.error(new Error('Selected size not found'));
         return;
       }
 
       const token = this.authService.getToken();
       let headers = new HttpHeaders();
-      if (token) {
-        headers = headers.set('Authorization', `Bearer ${token}`);
-      }
+      if (token) headers = headers.set('Authorization', `Bearer ${token}`);
 
       this.getCurrentUserCart().subscribe({
         next: (cart: any) => {
           const cartItems = cart?.cartItems || [];
-
           const existingItem = cartItems.find(
             (item: any) =>
               item.productId === product.id && item.productSizeId === sizeObj.id
@@ -60,23 +55,21 @@ export class CartItemService {
             return;
           }
 
-          const unitPrice = product.price;
           const payload = {
-            id: 0, // 👈 لازم موجود حتى لو السيرفر بيهمله في الإضافة
-            cartId: 0, // 👈 كذلك
+            id: 0,
             productId: product.id,
             productSizeId: sizeObj.id,
             quantity: quantity,
             unitPrice: product.price,
             totalPriceForOneItemType: product.price * quantity,
-
-            // خصائص اتضافت في الـ DTO
             productName: product.name,
             productImageUrl: product.productImagesPaths?.[0]?.imagePath ?? '',
             productSizeName: selectedSize,
           };
 
-          this.http.post(this.apiUrl, payload, { headers }).subscribe({
+          const url = `${this.cartItemApi}/add-single`;
+
+          this.http.post(url, payload, { headers }).subscribe({
             next: () => {
               observer.next();
               observer.complete();
@@ -89,29 +82,31 @@ export class CartItemService {
     });
   }
 
-  addToCartFromLocalStorageAfterLogin(items: ICartItem[]): Observable<any> {
-    return this.http.post('/api/cart/add', items); 
-  }
+  // ✅ ترحيل الجست كارت بعد اللوجين
+  addToCartFromLocalStorageAfterLogin(
+    items: ICartItem[]
+  ): Observable<ICartItem[]> {
+    const token = this.authService.getToken();
+    let headers = new HttpHeaders();
+    if (token) headers = headers.set('Authorization', `Bearer ${token}`);
 
-  /**
-   * تحميل كارت المستخدم من السيرفر
-   */
+    const url = `${this.cartItemApi}/add-multiple`;
+    return this.http.post<ICartItem[]>(url, items, { headers });
+  }
+  // ✅ جلب كارت المستخدم الحالي
   getCurrentUserCart(): Observable<any> {
     const token = this.authService.getToken();
     let headers = new HttpHeaders();
-    if (token) {
-      headers = headers.set('Authorization', `Bearer ${token}`);
-    }
+    if (token) headers = headers.set('Authorization', `Bearer ${token}`);
 
     return new Observable((observer) => {
-      this.http.get<any>(this.cartUrl, { headers }).subscribe({
+      this.http.get<any>(this.cartApi, { headers }).subscribe({
         next: (cart) => {
           observer.next(cart);
           observer.complete();
         },
         error: (err) => {
           if (err.status === 404) {
-            // ✅ مفيش كارت، نعتبرها null مش خطأ
             observer.next(null);
             observer.complete();
           } else {
@@ -122,30 +117,20 @@ export class CartItemService {
     });
   }
 
-  /**
-   * تعديل كمية عنصر في الكارت
-   */
   updateCartItemQuantity(item: ICartItem): Observable<any> {
     const token = this.authService.getToken();
     let headers = new HttpHeaders();
-    if (token) {
-      headers = headers.set('Authorization', `Bearer ${token}`);
-    }
+    if (token) headers = headers.set('Authorization', `Bearer ${token}`);
 
-    return this.http.put(this.apiUrl, item, { headers });
+    return this.http.put(this.cartItemApi, item, { headers });
   }
 
-  /**
-   * حذف عنصر من الكارت
-   */
   deleteCartItem(cartItemId: number): Observable<any> {
     const token = this.authService.getToken();
     let headers = new HttpHeaders();
-    if (token) {
-      headers = headers.set('Authorization', `Bearer ${token}`);
-    }
+    if (token) headers = headers.set('Authorization', `Bearer ${token}`);
 
-    return this.http.delete(`${this.apiUrl}?cartItemId=${cartItemId}`, {
+    return this.http.delete(`${this.cartItemApi}?cartItemId=${cartItemId}`, {
       headers,
     });
   }

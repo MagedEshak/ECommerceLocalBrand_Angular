@@ -59,7 +59,7 @@
             <!-- End Logo -->
 
             <!-- Icons group -->
-            <div class="md:flex md:items-center md:justify-between md:gap-6">
+            <div class="flex md:items-center md:justify-between md:gap-6">
                 <div (click)="toggleProfile()">
                     <i [ngClass]="{ 'text-white group-hover:text-black': isHome }"
                         class="fa-solid fa-user me-3 text-xl cursor-pointer transition duration-300"></i>
@@ -90,10 +90,10 @@
 
                         @if(isLoggedIn == false){
                         <div class="text-center">
-                            <a [routerLink]="['/login']"
+                            <button (click)="openLoginDialog()"
                                 class="block w-full rounded bg-black text-white py-2 text-sm font-medium hover:bg-transparent hover:text-black border border-transparent hover:border-black transition">
                                 Sign in
-                            </a>
+                            </button>
                         </div>
                         }@else{
                         <div class="grid justify-items-center sm:grid-cols-2 gap-2">

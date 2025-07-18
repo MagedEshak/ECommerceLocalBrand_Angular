@@ -159,7 +159,6 @@ export class ProductDetails implements OnInit {
     }
 
     const cartItem = {
-      cartId: 0,
       productId: product.id,
       productSizeId: sizeObj.id,
       quantity: quantity,
