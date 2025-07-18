@@ -1,8 +1,10 @@
+import { IPreviousOrder } from './../../models/iprevious-order';
 import { Component, effect, OnInit } from '@angular/core';
 import { RefundOrderService } from './../../shared/services/refund-order/refund-order.service';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { iPreviousOrderItem } from '../../models/iPreviousOrderItem';
 
 @Component({
   selector: 'app-previous-orders',
@@ -15,6 +17,9 @@ export class PreviousOrders implements OnInit {
   selectedOrderId: number | null = null;
   refundReason = '';
   showRefundForm = false;
+
+  IPreviousOrder!: IPreviousOrder;
+  IPreviousOrderitem!: iPreviousOrderItem;
 
   constructor(private refundOrderService: RefundOrderService) {}
 
