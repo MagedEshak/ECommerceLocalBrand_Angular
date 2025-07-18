@@ -134,4 +134,14 @@ export class CartItemService {
       headers,
     });
   }
+
+  clearCurrentUserCart(): Observable<any> {
+    const token = this.authService.getToken();
+    let headers = new HttpHeaders();
+    if (token) headers = headers.set('Authorization', `Bearer ${token}`);
+
+    return this.http.delete(`${this.cartApi}/ClearCurrentUserCart`, {
+      headers,
+    });
+  }
 }
