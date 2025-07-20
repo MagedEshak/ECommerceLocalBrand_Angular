@@ -8,7 +8,6 @@ import { environment } from '../../../environments/environment.development';
 import Swal from 'sweetalert2';
 import { ProductDetailsService } from '../../shared/services/Product/product-details.service';
 
-
 @Component({
   selector: 'app-cart',
   standalone: true,
@@ -71,9 +70,7 @@ export class Cart implements OnInit {
 
         this.cartItems = rawItems.map((item: any) => ({
           ...item,
-          productImageUrl: item.image
-            ? item.image // الصورة جهزناها بالفعل ومعاها baseServerUrl
-            : '/assets/images/default.png',
+          productImageUrl: item.image,
         }));
 
         this.calculateTotal();
@@ -210,47 +207,5 @@ export class Cart implements OnInit {
 
   closeCartBtn(): void {
     this.close.emit();
-  }
-
-  clearCart() {
-    const token = this.authService.getToken();
-
-    if (!token) {
-      // 🧹 امسح الجست كارت من اللوكال ستوريج
-      localStorage.removeItem('guestCart');
-      this.cartItems = [];
-      this.estimatedTotal = 0;
-
-      Swal.fire({
-        icon: 'success',
-        title: 'Cart Cleared',
-        text: '🧹 Your guest cart has been emptied successfully!',
-        timer: 1500,
-        showConfirmButton: false,
-      });
-      return;
-    }
-
-    // ✅ لو في توكن نكلم الـ API
-    this.cartService.clearCurrentUserCart().subscribe({
-      next: () => {
-        this.cartItems = [];
-        this.estimatedTotal = 0;
-        Swal.fire({
-          icon: 'success',
-          title: 'Cart Cleared',
-          text: '🧹 Your cart has been emptied successfully!',
-          timer: 1500,
-          showConfirmButton: false,
-        });
-      },
-      error: () => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Oops!',
-          text: '❌ Failed to clear cart. Try again later.',
-        });
-      },
-    });
   }
 }
