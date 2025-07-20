@@ -23,7 +23,6 @@
                  "src/favicon.ico"
                 ],
             "styles": [
-              "src/custom-theme.scss",
               "node_modules/@fortawesome/fontawesome-free/css/all.min.css",
               "node_modules/aos/dist/aos.css",
               "node_modules/ngx-spinner/animations/ball-scale-multiple.css",
@@ -101,6 +100,7 @@
               "node_modules/aos/dist/aos.css",
               "node_modules/ngx-spinner/animations/ball-scale-multiple.css",
               "src/styles.css"
+
             ],
             "scripts": [
               "node_modules/aos/dist/aos.js"

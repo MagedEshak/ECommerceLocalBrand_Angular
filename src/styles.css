@@ -1,7 +1,5 @@
 /* You can add global styles to this file, and also import other style files */
 @import "tailwindcss";
-
-
 @font-face {
     font-family: 'ArchivoNarrow';
     src: url('assets/fonts/ArchivoNarrow-VariableFont_wght.ttf') format('ttf');
