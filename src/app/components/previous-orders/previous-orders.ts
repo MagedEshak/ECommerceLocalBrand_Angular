@@ -1,14 +1,16 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, effect, OnInit } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { iPreviousOrderItem } from '../../models/iPreviousOrderItem';
 import { PreviousOrder } from '../../shared/services/PreviousOrders/previous-orders';
+import { IPreviousOrder } from '../../models/iprevious-order';
+import { RefundOrderService } from '../../shared/services/refund-order/refund-order.service';
 
 @Component({
   selector: 'app-previous-orders',
-  imports: [RouterLink, CommonModule],
+  imports: [RouterLink, CommonModule, FormsModule],
   templateUrl: './previous-orders.html',
   styleUrl: './previous-orders.css',
 })
@@ -37,6 +39,8 @@ export class PreviousOrders implements OnInit {
   ngOnInit(): void {
     this.previousOrderService.getPreviousOrders().subscribe((res) => {
       this.orders = res;
+
+      console.log('Previous Orders:', res);
     });
     effect(() => {
       const status = this.refundStatus();

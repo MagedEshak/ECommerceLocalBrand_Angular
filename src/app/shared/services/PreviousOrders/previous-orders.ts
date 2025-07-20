@@ -3,19 +3,21 @@ import { Injectable } from '@angular/core';
 import { IPreviousOrder } from '../../../models/iprevious-order';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment.development';
-import { CookieService } from 'ngx-cookie-service';
+
+import { AuthService } from '../Auth/auth.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PreviousOrder {
-  private apiUrl = `${environment.baseServerUrl}Order/with-customer`; // Adjust the URL as needed
-  constructor(private http: HttpClient, private cookieService: CookieService) {}
+  private apiUrl = `${environment.urlPath}Order/with-customer`; // Adjust the URL as needed
+  constructor(private http: HttpClient, private auth: AuthService) {}
 
   getPreviousOrders(): Observable<IPreviousOrder[]> {
     return this.http.get<IPreviousOrder[]>(this.apiUrl, {
       headers: {
-        Authorization: `Bearer ${this.cookieService.get('token')}`,
+        Authorization: `Bearer ${this.auth.getToken()}`,
+
         'Content-Type': 'application/json',
       },
     });
