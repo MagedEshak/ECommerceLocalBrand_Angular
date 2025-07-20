@@ -2,6 +2,9 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { iPreviousOrderItem } from '../../models/iPreviousOrderItem';
+import { PreviousOrder } from '../../shared/services/PreviousOrders/previous-orders';
 
 @Component({
   selector: 'app-previous-orders',
@@ -9,10 +12,60 @@ import { RouterLink } from '@angular/router';
   templateUrl: './previous-orders.html',
   styleUrl: './previous-orders.css',
 })
-export class PreviousOrders {
-  order = {
-    shippingStatus: 'OutForDelivery', // جرب: NotShipped, ReadyToShip, Shipped, OutForDelivery, Delivered
-  };
+export class PreviousOrders implements OnInit {
+  selectedOrderId: number | null = null;
+  refundReason = '';
+  showRefundForm = false;
+
+  IPreviousOrder!: IPreviousOrder;
+  IPreviousOrderitem!: iPreviousOrderItem;
+  orders: IPreviousOrder[] = [];
+
+  constructor(
+    private refundOrderService: RefundOrderService,
+    private previousOrderService: PreviousOrder
+  ) {}
+
+  get refundStatus() {
+    return this.refundOrderService.refundStatus;
+  }
+
+  get refundMessage() {
+    return this.refundOrderService.refundMessage;
+  }
+
+  ngOnInit(): void {
+    this.previousOrderService.getPreviousOrders().subscribe((res) => {
+      this.orders = res;
+    });
+    effect(() => {
+      const status = this.refundStatus();
+      if (status === 'success' || status === 'error') {
+        setTimeout(() => {
+          this.refundOrderService.resetRefundState();
+        }, 4000);
+      }
+    });
+  }
+
+  openRefundForm(orderId: number) {
+    this.selectedOrderId = orderId;
+    this.showRefundForm = true;
+  }
+
+  submitRefund() {
+    if (!this.selectedOrderId || !this.refundReason.trim()) return;
+    this.refundOrderService.refundOrder(
+      this.selectedOrderId,
+      this.refundReason.trim()
+    );
+    this.showRefundForm = false;
+    this.refundReason = '';
+    this.selectedOrderId = null;
+  }
+
+  // Shipping Progress
+  order = { shippingStatus: 'OutForDelivery' };
 
   shippingSteps = [
     'NotShipped',
