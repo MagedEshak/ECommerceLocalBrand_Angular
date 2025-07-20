@@ -20,6 +20,7 @@ export class Header {
   isLoggedIn = false;
   isCartVisible = false;
   isProfileVisible = false;
+  isMobileMenuVisible = false;
 
   constructor(
     public routerState: RouterStateService,
@@ -79,4 +80,12 @@ export class Header {
       }
     });
   }
+  toggleMobileMenu() {
+    this.isMobileMenuVisible = !this.isMobileMenuVisible;
+  }
+
+  closeMobileMenu() {
+    this.isMobileMenuVisible = false;
+  }
+
 }
