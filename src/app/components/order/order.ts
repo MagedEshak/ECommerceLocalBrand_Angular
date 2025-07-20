@@ -2,7 +2,13 @@ import { Component, OnDestroy, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { CartItemService } from '../../shared/services/cart/cart.service';
 import { AuthService } from '../../shared/services/Auth/auth.service';
-import { IOrder, PaymentMethods, OrderStatus, ICustomer, IAddress } from '../../models/IOrder';
+import {
+  IOrder,
+  PaymentMethods,
+  OrderStatus,
+  ICustomer,
+  IAddress,
+} from '../../models/IOrder';
 import { ICartItem } from '../../models/ICartItem';
 import { environment } from '../../../environments/environment.development';
 import { Router, RouterModule } from '@angular/router';
@@ -31,7 +37,7 @@ export class Order implements OnInit, OnDestroy {
 
   paymentMethods = [
     { value: PaymentMethods.Online, label: 'Credit Card Or Mobile Wallet' },
-    { value: PaymentMethods.COD, label: 'Cash on Delivery' }
+    { value: PaymentMethods.COD, label: 'Cash on Delivery' },
   ];
 
   order: IOrder = {
@@ -47,7 +53,7 @@ export class Order implements OnInit, OnDestroy {
     orderStatus: OrderStatus.Created,
     orderItems: [],
     customerInfo: {} as ICustomer,
-    addressInfo: {} as IAddress
+    addressInfo: {} as IAddress,
   };
 
   savedAddresses: any[] = [];
@@ -80,19 +86,21 @@ export class Order implements OnInit, OnDestroy {
     }
 
     if (buyNowItem) {
-      this.cartItems = [{
-        id: 0,
-        productId: buyNowItem.productId,
-        productSizeId: buyNowItem.productSizeId,
-        productName: buyNowItem.productName,
-        productSizeName: buyNowItem.productSizeName ?? '',
-        productImageUrl: buyNowItem.productImageUrl?.startsWith('http')
-          ? buyNowItem.productImageUrl
-          : environment.baseServerUrl + buyNowItem.productImageUrl,
-        quantity: buyNowItem.quantity,
-        unitPrice: buyNowItem.unitPrice,
-        totalPriceForOneItemType: buyNowItem.totalPriceForOneItemType,
-      }];
+      this.cartItems = [
+        {
+          id: 0,
+          productId: buyNowItem.productId,
+          productSizeId: buyNowItem.productSizeId,
+          productName: buyNowItem.productName,
+          productSizeName: buyNowItem.productSizeName ?? '',
+          productImageUrl: buyNowItem.productImageUrl?.startsWith('http')
+            ? buyNowItem.productImageUrl
+            : environment.baseServerUrl + buyNowItem.productImageUrl,
+          quantity: buyNowItem.quantity,
+          unitPrice: buyNowItem.unitPrice,
+          totalPriceForOneItemType: buyNowItem.totalPriceForOneItemType,
+        },
+      ];
       this.calculateTotal();
       return;
     }
@@ -119,7 +127,7 @@ export class Order implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('❌ Failed to fetch customer info.', err);
-        }
+        },
       });
 
       this.loadAddresses(user.id);
@@ -135,7 +143,7 @@ export class Order implements OnInit, OnDestroy {
 
       const dialogRef = this.dialog.open(Login, {
         width: '500px',
-        disableClose: true
+        disableClose: true,
       });
 
       dialogRef.afterClosed().subscribe((result) => {
@@ -157,11 +165,13 @@ export class Order implements OnInit, OnDestroy {
       return;
     }
 
-if (this.orderForm.paymentMethod === null || this.orderForm.paymentMethod === undefined) {
-  alert('Please select a payment method');
-  return;
-}
-
+    if (
+      this.orderForm.paymentMethod === null ||
+      this.orderForm.paymentMethod === undefined
+    ) {
+      alert('Please select a payment method');
+      return;
+    }
 
     if (this.cartItems.length === 0) {
       alert('❌ Your cart is empty.');
@@ -182,8 +192,10 @@ if (this.orderForm.paymentMethod === null || this.orderForm.paymentMethod === un
         this.prepareAndSendOrder();
       },
       error: () => {
-        alert('❌ Could not load your profile. Please complete your account first.');
-      }
+        alert(
+          '❌ Could not load your profile. Please complete your account first.'
+        );
+      },
     });
   }
 
@@ -194,7 +206,7 @@ if (this.orderForm.paymentMethod === null || this.orderForm.paymentMethod === un
       productSizeId: item.productSizeId,
       quantity: item.quantity,
       unitPrice: item.unitPrice,
-      totalPrice: item.totalPriceForOneItemType
+      totalPrice: item.totalPriceForOneItemType,
     }));
 
     this.order.totalOrderPrice = this.estimatedTotal + this.shippingCost;
@@ -213,15 +225,20 @@ if (this.orderForm.paymentMethod === null || this.orderForm.paymentMethod === un
       },
       error: (err) => {
         console.error('❌ Error during checkout:', err);
-      }
+      },
     });
   }
 
   decodeUserFromToken(token: string): { id: string; email: string } {
     const payload = JSON.parse(atob(token.split('.')[1]));
     return {
-      id: payload["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"],
-      email: payload["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"]
+      id: payload[
+        'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'
+      ],
+      email:
+        payload[
+          'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'
+        ],
     };
   }
 
@@ -269,9 +286,7 @@ if (this.orderForm.paymentMethod === null || this.orderForm.paymentMethod === un
           productSizeId: item.productSizeId,
           productName: item.name ?? 'Unknown',
           productSizeName: item.productSizeName ?? '',
-          productImageUrl: item.image
-            ? environment.baseServerUrl + item.image
-            : '/assets/images/default.png',
+          productImageUrl: item.image,
           quantity: item.quantity,
           unitPrice: item.unitPrice,
           totalPriceForOneItemType: item.totalPriceForOneItemType,
@@ -290,13 +305,13 @@ if (this.orderForm.paymentMethod === null || this.orderForm.paymentMethod === un
       },
       error: (err) => {
         console.error('❌ Error loading governorates:', err);
-      }
+      },
     });
   }
 
   onGovernorateChange(): void {
     const selectedGov = this.governorates.find(
-      gov => gov.id === this.order.addressInfo.governrateShippingCostId
+      (gov) => gov.id === this.order.addressInfo.governrateShippingCostId
     );
 
     if (selectedGov) {
@@ -315,22 +330,24 @@ if (this.orderForm.paymentMethod === null || this.orderForm.paymentMethod === un
       },
       error: (err) => {
         console.error('Error fetching addresses:', err);
-      }
+      },
     });
   }
 
   onAddressChange(): void {
-    const selected = this.savedAddresses.find(a => a.id == this.selectedAddressId);
+    const selected = this.savedAddresses.find(
+      (a) => a.id == this.selectedAddressId
+    );
     if (selected) {
       this.order.addressInfo = {
-  id: selected.id,
-  street: selected.street,
-  apartment: selected.apartment,
-  building: selected.building,
-  floor: selected.floor,
-  city: selected.city,
-  country: selected.country,
-  governrateShippingCostId: selected.governrateShippingCostId,
+        id: selected.id,
+        street: selected.street,
+        apartment: selected.apartment,
+        building: selected.building,
+        floor: selected.floor,
+        city: selected.city,
+        country: selected.country,
+        governrateShippingCostId: selected.governrateShippingCostId,
       };
       this.onGovernorateChange();
     }

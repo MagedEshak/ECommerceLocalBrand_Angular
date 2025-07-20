@@ -10,7 +10,7 @@ import { RefundOrderService } from '../../shared/services/refund-order/refund-or
 
 @Component({
   selector: 'app-previous-orders',
-  imports: [RouterLink, CommonModule, FormsModule] ,
+  imports: [RouterLink, CommonModule, FormsModule],
   templateUrl: './previous-orders.html',
   styleUrl: './previous-orders.css',
 })
@@ -39,6 +39,7 @@ export class PreviousOrders implements OnInit {
   ngOnInit(): void {
     this.previousOrderService.getPreviousOrders().subscribe((res) => {
       this.orders = res;
+
       console.log('Previous Orders:', res);
     });
     effect(() => {

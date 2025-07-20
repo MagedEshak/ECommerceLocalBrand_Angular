@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { IPreviousOrder } from '../../../models/iprevious-order';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment.development';
+
 import { AuthService } from '../Auth/auth.service';
 
 @Injectable({
@@ -16,6 +17,7 @@ export class PreviousOrder {
     return this.http.get<IPreviousOrder[]>(this.apiUrl, {
       headers: {
         Authorization: `Bearer ${this.auth.getToken()}`,
+
         'Content-Type': 'application/json',
       },
     });
