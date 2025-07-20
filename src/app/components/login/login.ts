@@ -56,10 +56,10 @@ export class Login {
     const email = this.form.get('email')?.value;
 
     if (this.form.invalid) {
-      this.showWarning('Please enter a valid email.');
+      alert('Please enter a valid email.');
       return;
     }
-    this.showWarning('Waiting');
+
     this._loginService.getVerifyingCodeToLogin(email).subscribe({
       next: () => {
         this.startCountdown();
@@ -67,7 +67,7 @@ export class Login {
       },
       error: (err) => {
         console.error(err);
-        this.showError('Failed to send verification code.');
+        alert('Failed to send verification code.');
       },
     });
   }
@@ -79,7 +79,6 @@ export class Login {
 
     this.timer = setInterval(() => {
       this.countdown--;
-
       this.updateCountdownDisplay();
 
       if (this.countdown <= 0) {
@@ -106,7 +105,7 @@ export class Login {
       next: () => {
         this.startCountdown();
       },
-      error: () => this.showError('Failed to resend code.'),
+      error: () => alert('Failed to resend code.'),
     });
   }
 
@@ -145,8 +144,7 @@ export class Login {
                   item.totalPriceForOneItemType.toString()
                 ),
               })
-            );
-            console.log('Modified Guest Cart Items:', guestCartItems); // Log الـ Payload
+            );            console.log('Modified Guest Cart Items:', guestCartItems); // Log الـ Payload
 
             // ✅ استخدم الفنكشن الجديدة
             const result = await firstValueFrom(
@@ -176,7 +174,6 @@ export class Login {
         this.isVerificationPopupVisible = false;
         this.router.navigate(['/home']);
       },
-
       error: () => {
         Swal.fire({
           icon: 'error',
@@ -188,31 +185,6 @@ export class Login {
   }
   get isHome(): boolean {
     return this.routerState.isHome;
-  }
-
-  showSuccess(message: string) {
-    Swal.fire({
-      icon: 'success',
-      title: message,
-      showConfirmButton: false,
-      timer: 2000,
-    });
-  }
-
-  showError(message: string) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: message,
-    });
-  }
-
-  showWarning(message: string) {
-    Swal.fire({
-      icon: 'warning',
-      title: message,
-      confirmButtonText: 'Ok',
-    });
   }
 
   closeDialog() {

@@ -2,27 +2,24 @@
 <!-- <app-splash *ngIf="isLoading"></app-splash> -->
 
 <div>
-        <section
-            class="bg-[url('/assets/images/images.jpeg')] bg-cover bg-center bg-no-repeat h-[32rem] grid place-items-end">
-            <div class="w-full bg-black/50 backdrop-brightness-90">
-                <div class="mx-auto max-w-screen-xl px-4 py-16 sm:px-6 sm:py-24 md:grid md:items-center text-white">
+  <section
+  class="h-screen w-screen bg-[url('/assets/images/images.jpeg')] bg-cover bg-center bg-no-repeat grid place-items-center">
+  <div class="w-full h-full bg-black/50 flex items-center justify-center">
+    <div class="text-center text-white px-4">
+      <!-- content -->
+      <h1 class="capitalize text-3xl sm:text-5xl font-bold leading-tight">
+        Go To Casholic Collection
+      </h1>
+      <div class="mt-6">
+        <a [routerLink]="['/allProducts']"
+          class="inline-block rounded border border-white bg-transparent px-5 py-3 font-bold text-white shadow-sm transition hover:bg-white hover:text-black">
+          Shop now
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
 
-                    <!-- content -->
-                    <div class="max-w-prose text-left">
-                        <h1 class="capitalize text-2xl sm:text-5xl font-bold leading-tight">
-                            Go Teba Collection
-                        </h1>
-                        <div class="mt-6">
-                            <a [routerLink]="['/allProducts']"
-                                class="inline-block rounded border border-white bg-transparent px-5 py-3 font-bold text-white shadow-sm transition hover:bg-white hover:text-black">
-                                Shop now
-                            </a>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </section>
 
     <app-new-arrival></app-new-arrival>
 </div>

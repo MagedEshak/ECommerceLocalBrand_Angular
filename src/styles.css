@@ -11,7 +11,7 @@
 
 body {
     font-family: 'ArchivoNarrow', sans-serif !important;
-    background-color: #e0e0e0;
+    background-color: #ffffff;
 }
 
 html,
@@ -61,8 +61,5 @@ body {
 button {
     cursor: pointer;
 }
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
-
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
