@@ -71,8 +71,8 @@
 
         <form
           class="p-6 space-y-6"
+          [formGroup]="orderForm"
           (ngSubmit)="completeCheckout()"
-          #checkoutForm="ngForm"
           novalidate
         >
           <!-- Contact Section -->
@@ -82,19 +82,21 @@
             </div>
 
             <div class="space-y-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2"
-                  >Email</label
-                >
-                <input
-                  type="email"
-                  [(ngModel)]="order.customerInfo.email"
-                  name="email"
-                  placeholder="Email"
-                  required
-                  class="w-full h-12 rounded-md border border-neutral-400 focus:border-gray-600 focus:ring-2 focus:ring-gray-200 transition-all duration-200 px-4 text-sm placeholder:text-neutral-400"
-                />
-              </div>
+             <div>
+    <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+    <input
+      type="email"
+      formControlName="email"
+      placeholder="Email"
+      class="w-full h-12 rounded-md border border-neutral-400 focus:border-gray-600 focus:ring-2 focus:ring-gray-200 transition-all duration-200 px-4 text-sm placeholder:text-neutral-400"
+    />
+    <p *ngIf="orderForm.get('email')?.touched && orderForm.get('email')?.errors?.['required']" class="text-red-500 text-sm mt-1">
+      Email is required.
+    </p>
+    <p *ngIf="orderForm.get('email')?.touched && orderForm.get('email')?.errors?.['email']" class="text-red-500 text-sm mt-1">
+      Please enter a valid email address.
+    </p>
+  </div>
 
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2"
@@ -102,12 +104,14 @@
                 >
                 <input
                   type="text"
-                  [(ngModel)]="order.customerInfo.firstName"
-                  name="firstName"
+                  formControlName="firstName"
                   placeholder="First Name"
-                  required
                   class="w-full h-12 rounded-md border border-neutral-400 focus:border-gray-600 focus:ring-2 focus:ring-gray-200 transition-all duration-200 px-4 text-sm placeholder:text-neutral-400"
                 />
+                <p *ngIf="orderForm.get('firstName')?.touched && orderForm.get('firstName')?.errors?.['required']" class="text-red-500 text-sm mt-1">
+                  First Name is required.
+                </p>
+
               </div>
 
               <div>
@@ -116,12 +120,13 @@
                 >
                 <input
                   type="text"
-                  [(ngModel)]="order.customerInfo.lastName"
-                  name="lastName"
+                  formControlName="lastName"
                   placeholder="Last Name"
-                  required
                   class="w-full h-12 rounded-md border border-neutral-400 focus:border-gray-600 focus:ring-2 focus:ring-gray-200 transition-all duration-200 px-4 text-sm placeholder:text-neutral-400"
                 />
+                <p *ngIf="orderForm.get('lastName')?.touched && orderForm.get('lastName')?.errors?.['required']" class="text-red-500 text-sm mt-1">
+                  Last Name is required.
+                </p>
               </div>
 
               <div>
@@ -130,14 +135,17 @@
                 >
                 <input
                   type="text"
-                  [(ngModel)]="order.customerInfo.phoneNumber"
-                  name="phone"
+                  formControlName="phoneNumber"
                   placeholder="Phone (e.g., 01012345678)"
-                  pattern="^01[0125][0-9]{8}$"
                   maxlength="11"
-                  required
                   class="w-full h-12 rounded-md border border-neutral-400 focus:border-gray-600 focus:ring-2 focus:ring-gray-200 transition-all duration-200 px-4 text-sm placeholder:text-neutral-400"
                 />
+                <p *ngIf="orderForm.get('phoneNumber')?.touched && orderForm.get('phoneNumber')?.errors?.['required']" class="text-red-500 text-sm mt-1">
+                  Phone number is required.
+                </p>
+                <p *ngIf="orderForm.get('phoneNumber')?.touched && orderForm.get('phoneNumber')?.errors?.['pattern']" class="text-red-500 text-sm mt-1">
+                  Please enter a valid Egyptian phone number.
+                </p>
               </div>
             </div>
           </div>
@@ -164,18 +172,16 @@
                   >Saved Address</label
                 >
                 <select
-                  [(ngModel)]="selectedAddressId"
-                  name="selectedAddressId"
+                  [formControl]="addressSelectControl"
                   (change)="onAddressChange()"
                   class="w-full h-12 rounded-md border border-neutral-400 focus:border-gray-600 focus:ring-2 focus:ring-gray-200 transition-all duration-200 px-4 text-sm"
                 >
-                  <option [ngValue]="null" disabled>Select Address</option>
+                  <option hidden [value]="null" disabled>Select Address</option>
                   <option
                     *ngFor="let addr of savedAddresses"
-                    [ngValue]="addr.id"
+                    [value]="addr.id"
                   >
-                    {{ addr.street }} {{ addr.apartment ? ', Apt ' +
-                    addr.apartment : '' }} {{ addr.city }}
+                    {{ addr.street }} {{ addr.apartment ? ', Apt ' + addr.apartment : '' }} {{ addr.city }}
                   </option>
                 </select>
               </div>
@@ -184,8 +190,7 @@
                 <label class="flex items-center space-x-2 cursor-pointer">
                   <input
                     type="checkbox"
-                    [(ngModel)]="useNewAddress"
-                    name="useNewAddress"
+                    [formControl]="addNewAddressControl"
                     (change)="onToggleNewAddress()"
                     class="w-4 h-4 text-gray-600 rounded focus:ring-gray-500 focus:ring-2"
                   />
@@ -198,114 +203,60 @@
           </div>
 
           <!-- Address Details Section -->
-          <div class="space-y-4" *ngIf="useNewAddress || selectedAddressId">
+          <div class="space-y-4">
+            <h2 class="font-bold text-2xl text-gray-800 my-4">
+          <!-- Address Details Section -->
+          <div *ngIf="useNewAddress || selectedAddressId" class="space-y-4">
             <h2 class="font-bold text-2xl text-gray-800 my-4">
               Address Details
             </h2>
-
             <div class="space-y-4">
+              <!-- ...existing address input fields and shipping cost display... -->
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2"
-                  >Street Address</label
-                >
-                <input
-                  type="text"
-                  [(ngModel)]="order.addressInfo.street"
-                  name="street"
-                  placeholder="Street Address"
-                  required
-                  class="w-full h-12 rounded-md border border-neutral-400 focus:border-gray-600 focus:ring-2 focus:ring-gray-200 transition-all duration-200 px-4 text-sm placeholder:text-neutral-400"
-                />
+                <label class="block text-sm font-medium text-gray-700 mb-2">Street Address</label>
+                <input type="text" formControlName="street" placeholder="Street Address" class="w-full h-12 rounded-md border border-neutral-400 focus:border-gray-600 focus:ring-2 focus:ring-gray-200 transition-all duration-200 px-4 text-sm placeholder:text-neutral-400" />
+                <p *ngIf="orderForm.get('street')?.touched && orderForm.get('street')?.errors?.['required']" class="text-red-500 text-sm mt-1">Street address is required.</p>
               </div>
-
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2"
-                  >Apartment</label
-                >
-                <input
-                  type="text"
-                  [(ngModel)]="order.addressInfo.apartment"
-                  name="apartment"
-                  placeholder="Apartment"
-                  class="w-full h-12 rounded-md border border-neutral-400 focus:border-gray-600 focus:ring-2 focus:ring-gray-200 transition-all duration-200 px-4 text-sm placeholder:text-neutral-400"
-                />
+                <label class="block text-sm font-medium text-gray-700 mb-2">Apartment</label>
+                <input type="text" formControlName="apartment" placeholder="Apartment" class="w-full h-12 rounded-md border border-neutral-400 focus:border-gray-600 focus:ring-2 focus:ring-gray-200 transition-all duration-200 px-4 text-sm placeholder:text-neutral-400" />
               </div>
-
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2"
-                  >Building</label
-                >
-                <input
-                  type="text"
-                  [(ngModel)]="order.addressInfo.building"
-                  name="building"
-                  placeholder="Building"
-                  class="w-full h-12 rounded-md border border-neutral-400 focus:border-gray-600 focus:ring-2 focus:ring-gray-200 transition-all duration-200 px-4 text-sm placeholder:text-neutral-400"
-                />
+                <label class="block text-sm font-medium text-gray-700 mb-2">Building</label>
+                <input type="text" formControlName="building" placeholder="Building" class="w-full h-12 rounded-md border border-neutral-400 focus:border-gray-600 focus:ring-2 focus:ring-gray-200 transition-all duration-200 px-4 text-sm placeholder:text-neutral-400" />
               </div>
-
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2"
-                  >Floor</label
-                >
-                <input
-                  type="text"
-                  [(ngModel)]="order.addressInfo.floor"
-                  name="floor"
-                  placeholder="Floor"
-                  class="w-full h-12 rounded-md border border-neutral-400 focus:border-gray-600 focus:ring-2 focus:ring-gray-200 transition-all duration-200 px-4 text-sm placeholder:text-neutral-400"
-                />
+                <label class="block text-sm font-medium text-gray-700 mb-2">Floor</label>
+                <input type="text" formControlName="floor" placeholder="Floor" class="w-full h-12 rounded-md border border-neutral-400 focus:border-gray-600 focus:ring-2 focus:ring-gray-200 transition-all duration-200 px-4 text-sm placeholder:text-neutral-400" />
               </div>
-
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2"
-                  >Governorate</label
-                >
-                <select
-                  [(ngModel)]="order.addressInfo.governrateShippingCostId"
-                  name="governorate"
-                  (change)="onGovernorateChange()"
-                  required
-                  class="w-full h-12 rounded-md border border-neutral-400 focus:border-gray-600 focus:ring-2 focus:ring-gray-200 transition-all duration-200 px-4 text-sm"
-                >
-                  <option [ngValue]="null" disabled selected>
-                    Please Select Your Governorate
-                  </option>
-                  <option *ngFor="let gov of governorates" [ngValue]="gov.id">
-                    {{ gov.name }}
-                  </option>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Governorate</label>
+                <select formControlName="governrateShippingCostId" (change)="onGovernorateChange()" class="w-full h-12 rounded-md border border-neutral-400 focus:border-gray-600 focus:ring-2 focus:ring-gray-200 transition-all duration-200 px-4 text-sm">
+                  <option [ngValue]="null" disabled selected>Please Select Your Governorate</option>
+                  <option *ngFor="let gov of governorates" [ngValue]="gov.id">{{ gov.name }}</option>
                 </select>
+                <p *ngIf="orderForm.get('governrateShippingCostId')?.touched && orderForm.get('governrateShippingCostId')?.errors?.['required']" class="text-red-500 text-sm mt-1">Governorate is required.</p>
               </div>
-
               <!-- Shipping Cost Display -->
               <div class="bg-gray-100 p-4 rounded-md">
                 <div class="flex items-center justify-between">
                   <h5 class="font-bold text-xl text-gray-800">Shipping Cost</h5>
-                  <span class="font-bold text-2xl text-gray-900"
-                    >{{ shippingCost | number: '1.2-2' }} EGP</span
-                  >
+                  <span class="font-bold text-2xl text-gray-900">{{ shippingCost | number: '1.2-2' }} EGP</span>
                 </div>
               </div>
             </div>
           </div>
-
-          <!-- Payment Section -->
-          <div class="space-y-4">
-            <h2 class="font-bold text-2xl text-gray-800 my-4">
               Payment Method
             </h2>
 
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2"
-                >Select Payment Method</label
-              >
+                >Select Payment Method</label>
               <select
-                [(ngModel)]="orderForm.paymentMethod"
-                name="paymentMethod"
-                required
+                formControlName="paymentMethod"
                 class="w-full h-12 rounded-md border border-neutral-400 focus:border-gray-600 focus:ring-2 focus:ring-gray-200 transition-all duration-200 px-4 text-sm"
               >
-                <option [ngValue]="null" disabled>Select Payment Method</option>
+                <option hidden [ngValue]="null" disabled>Select Payment Method</option>
                 <option
                   *ngFor="let method of paymentMethods"
                   [ngValue]="method.value"
@@ -313,6 +264,9 @@
                   {{ method.label }}
                 </option>
               </select>
+              <p *ngIf="orderForm.get('paymentMethod')?.touched && orderForm.get('paymentMethod')?.errors?.['required']" class="text-red-500 text-sm mt-1">
+                Payment method is required.
+              </p>
             </div>
           </div>
 
