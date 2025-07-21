@@ -1,149 +1,143 @@
 <main class="pt-10 md:pt-20 px-4 md:px-10">
-    <section *ngIf="!isLoading && product" class="flex flex-col md:flex-row gap-10">
-        <!-- 👈 Left Column: Carousel -->
-        <div class="w-full md:w-1/2 flex flex-col items-center">
-            <div class="relative w-full rounded ">
-                <img [src]="currentImage" [alt]="product.name" class="w-full h-full object-cover rounded" />
-                <button class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white px-3 py-1 rounded-full"
-                    (click)="prevSlide()">‹</button>
-                <button class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white px-3 py-1 rounded-full"
-                    (click)="nextSlide()">›</button>
-            </div>
+  <section *ngIf="!isLoading && product" class="flex flex-col md:flex-row gap-10">
+    <!-- Left: Product Image -->
+    <div class="w-full md:w-1/2 flex flex-col items-center md:pl-6">
+      <div class="relative w-full rounded">
+        <img [src]="currentImage" [alt]="product.name" class="w-full h-full object-cover rounded" />
+        <button class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white px-3 py-1 rounded-full" (click)="prevSlide()">‹</button>
+        <button class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white px-3 py-1 rounded-full" (click)="nextSlide()">›</button>
+      </div>
 
-            <!-- Thumbnails -->
-            <div class="flex gap-3 mt-4 overflow-x-auto justify-center w-full">
-                <img *ngFor="let img of sortedImageUrls; let i = index" [src]="img" (click)="goToSlide(i)"
-                    class="h-16 w-16 object-cover cursor-pointer rounded border-2" [ngClass]="{
-              'border-black ring-2 ring-black': i === currentSlide,
-              'border-gray-300': i !== currentSlide
-            }" />
-            </div>
+      <!-- Thumbnails -->
+      <div class="flex gap-3 mt-4 overflow-x-auto justify-center w-full">
+        <img *ngFor="let img of sortedImageUrls; let i = index" [src]="img" (click)="goToSlide(i)"
+          class="h-16 w-16 object-cover cursor-pointer rounded border-2"
+          [ngClass]="{ 'border-black ring-2 ring-black': i === currentSlide, 'border-gray-300': i !== currentSlide }" />
+      </div>
+    </div>
+
+    <!-- Right: Product Info -->
+    <div class="w-full md:w-1/2 flex flex-col gap-6 mx-auto text-center">
+      <!-- Product Name & Price -->
+      <div>
+        <h2 class="text-2xl font-bold mb-1">{{ product.name }}</h2>
+        <p class="text-xl text-black font-semibold">{{ product.price | currency: 'EGP ':'symbol' }}</p>
+      </div>
+
+      <!-- Size & Quantity -->
+      <div class="flex flex-col gap-6 mt-6 justify-content-center items-center">
+        <!-- Size Options -->
+<div class="flex items-center justify-start gap-4 flex-wrap">
+  <div *ngFor="let size of getSizes(); let i = index" class="flex flex-col items-center w-20 min-h-[60px]">
+    <label [attr.for]="'size-' + i"
+      class="relative flex items-center justify-center w-full px-4 py-2 rounded-full border text-sm font-medium transition-colors cursor-pointer text-center"
+      [ngClass]="{
+        'bg-black text-white border-black text-lg': selectedSize === size && getStockQuantity(size) > 0,
+        'bg-gray-300 text-gray-700 cursor-not-allowed': getStockQuantity(size) === 0,
+        'bg-white text-gray-600 border-gray-400': selectedSize !== size && getStockQuantity(size) > 0
+      }">
+      
+      <input type="radio" name="size" [id]="'size-' + i" [value]="size" [(ngModel)]="selectedSize"
+        [disabled]="getStockQuantity(size) === 0" (change)="onSizeChange()" class="sr-only" />
+      
+      <span class="text-base relative"
+        [ngClass]="{ 'line-through-diagonal': getStockQuantity(size) === 0 }">
+        {{ size }}
+      </span>
+    </label>
+  </div>
+</div>
+
+
+        <!-- Quantity Counter -->
+        <div class="flex items-center gap-2">
+          <button type="button" class="size-10 leading-10 text-black text-lg transition hover:opacity-75" (click)="decreaseQuantity()">−</button>
+          <input type="number" [value]="quantity" readonly class="h-10 w-16 text-center text-base bg-transparent border-none" />
+          <button type="button" class="size-10 leading-10 text-black text-lg transition hover:opacity-75" (click)="increaseQuantity()">+</button>
         </div>
+      </div>
 
-        <!-- 👉 Right Column: Product Info -->
-        <div class="w-full md:w-1/2 flex flex-col gap-6">
-            <!-- Product Title & Price -->
-            <div>
-                <h2 class="text-2xl font-bold mb-1">{{ product.name }}</h2>
-                <p class="text-xl text-green-700 font-semibold">
-                    {{ product.price | currency: 'EGP' : 'symbol' }}
-                </p>
-            </div>
+      <!-- Action Buttons -->
+      <div class="flex gap-4">
+        <button (click)="addToCart()"
+          class="w-full text-lg uppercase font-bold bg-black text-white px-8 py-4 rounded hover:bg-white hover:text-black border hover:border-black">
+          <i class="fa-solid fa-cart-plus"></i> Add to Cart
+        </button>
 
-            <!-- Size + Quantity in same row -->
-            <div class="flex flex-col gap-6 mt-6">
-                <!-- Sizes -->
-                <div class="flex items-center justify-start gap-4 flex-wrap">
-                    <div *ngFor="let size of getSizes(); let i = index"
-                        class="flex flex-col items-center w-20 min-h-[60px]">
-                        <label [attr.for]="'size-' + i"
-                            class="flex items-center justify-center w-full px-4 py-2 rounded-full border text-sm font-medium transition-colors cursor-pointer text-center"
-                            [ngClass]="{
-                                                'bg-black text-white border-black': selectedSize === size,
-                                                'bg-white text-black border-gray-400': selectedSize !== size,
-                                                'opacity-50 cursor-not-allowed': getStockQuantity(size) === 0
-                                              }">
-                            <input type="radio" name="size" [id]="'size-' + i" [value]="size" [(ngModel)]="selectedSize"
-                                [disabled]="getStockQuantity(size) === 0" (change)="onSizeChange()" class="sr-only" />
-                            <span class="text-base">{{ size }}</span>
-                        </label>
-                        <span *ngIf="getStockQuantity(size) === 1"
-                            class="text-[10px] text-red-500 font-medium mt-1 leading-none">Only 1
-                            left</span>
-                        <span *ngIf="getStockQuantity(size) === 0"
-                            class="text-[10px] text-red-600 font-medium mt-1 leading-none">Out of
-                            stock</span>
-                    </div>
+        <button (click)="buyNow()"
+          class="w-full text-lg uppercase font-bold bg-white text-black px-8 py-4 rounded border border-black hover:bg-black hover:text-white">
+          Buy it Now
+        </button>
+      </div>
 
-                </div>
+      <!-- Accordions -->
+      <div class="flex flex-col gap-2 mt-4">
 
-                <!-- Quantity -->
-                <div class="flex items-center">
-                    <span class="font-semibold text-base mr-3">Quantity:</span>
-                    <div
-                        class="flex items-center rounded-sm text-black font-bold border border-gray-400 hover:bg-white">
-                        <button type="button" class="size-10 leading-10 text-black text-lg transition hover:opacity-75"
-                            (click)="decreaseQuantity()">&minus;</button>
+        <!-- Product Details -->
+        <details class="group">
+          <summary class="cursor-pointer flex justify-between items-center py-3 text-base font-bold text-gray-800">
+            Product Details
+            <span class="text-xl">
+              <span class="group-open:hidden">+</span>
+              <span class="hidden group-open:inline">−</span>
+            </span>
+          </summary>
+          <div class="pb-4 text-gray-700 leading-relaxed text-left">
+            {{ product.details || 'No product details available.' }}
+          </div>
+        </details>
 
-                        <input type="number" id="Quantity" [value]="quantity" readonly class="h-10 w-16 border-transparent text-center text-base
-                            [-moz-appearance:_textfield] sm:text-sm
-                            [&::-webkit-inner-spin-button]:m-0
-                            [&::-webkit-inner-spin-button]:appearance-none
-                            [&::-webkit-outer-spin-button]:m-0
-                            [&::-webkit-outer-spin-button]:appearance-none" />
+        <!-- Care -->
+        <details class="group">
+          <summary class="cursor-pointer flex justify-between items-center py-3 text-base font-bold text-gray-800">
+            Care & Maintenance
+            <span class="text-xl">
+              <span class="group-open:hidden">+</span>
+              <span class="hidden group-open:inline">−</span>
+            </span>
+          </summary>
+          <div class="pb-4 text-gray-700 leading-relaxed text-left">
+            <p>To preserve the quality and fit of your product:</p>
+            <ul class="list-disc list-inside mt-2 space-y-1">
+              <li>Always iron inside out.</li>
+              <li>Avoid hot water to maintain the elegance of the print and the perfect fit of the fabric.</li>
+            </ul>
+          </div>
+        </details>
 
-                        <button type="button" class="size-10 leading-10 text-black text-lg transition hover:opacity-75"
-                            (click)="increaseQuantity()">&plus;</button>
-                    </div>
-                </div>
-            </div>
+        <!-- Size & Fit -->
+        <details class="group">
+          <summary class="cursor-pointer flex justify-between items-center py-3 text-base font-bold text-gray-800">
+            Size & Fit
+            <span class="text-xl">
+              <span class="group-open:hidden">+</span>
+              <span class="hidden group-open:inline">−</span>
+            </span>
+          </summary>
+          <div class="pb-4 text-gray-700 leading-relaxed text-left">
+            <img src="{{currentImage}}" alt="{{product.name}}" class="w-32 h-32 object-cover rounded mb-4" />
+            <table class="w-full text-sm border border-gray-300 rounded mt-2">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-3 py-2 text-left">Width</th>
+                  <th class="px-3 py-2 text-left">Length</th>
+                  <th class="px-3 py-2 text-left">Size</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let size of product?.productSizes" class="border-t hover:bg-gray-50">
+                  <td class="px-3 py-2">{{ size.width }}</td>
+                  <td class="px-3 py-2">{{ size.height }}</td>
+                  <td class="px-3 py-2">{{ size.size }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
 
-            <!-- Action Buttons -->
-            <div class="flex gap-4">
-                <button (click)="addToCart()"
-                    class="bg-black text-white px-6 py-2 rounded hover:bg-white hover:text-black border hover:border-black">
-                    <i class="fa-solid fa-cart-plus"></i> Add to Cart
-                </button>
-                <button (click)="buyNow()"
-                    class="bg-white text-black px-6 py-2 rounded border border-black hover:bg-black hover:text-white">
-                    Buy it Now
-                </button>
-            </div>
-
-            <!-- Sizes Table + Description Accordion (side by side) -->
-            <div class="flex flex-col gap-4 mt-4">
-                <!-- Size Details Accordion -->
-                <div class="flex-1">
-                    <details open class="rounded overflow-hidden group">
-                        <summary
-                            class="cursor-pointer select-none flex justify-between items-center px-4 py-3 bg-gray-100 text-gray-800 hover:bg-gray-200 transition text-base font-bold">
-                            Size Details
-                            <i class="fa-solid fa-chevron-down group-open:rotate-180 transition-transform"></i>
-                        </summary>
-                        <div class="px-4 pb-4">
-                            <table class="w-full text-sm border border-gray-300 rounded mt-2">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th class="px-3 py-2 text-left">Size</th>
-                                        <th class="px-3 py-2 text-left">Width</th>
-                                        <th class="px-3 py-2 text-left">Height</th>
-                                        <th class="px-3 py-2 text-left">Stock</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr *ngFor="let size of product?.productSizes" class="border-t hover:bg-gray-50">
-                                        <td class="px-3 py-2">{{ size.size }}</td>
-                                        <td class="px-3 py-2">{{ size.width }}</td>
-                                        <td class="px-3 py-2">{{ size.height }}</td>
-                                        <td class="px-3 py-2" [ngClass]="{
-                          'text-red-600 font-bold': size.stockQuantity === 1,
-                          'text-gray-800': size.stockQuantity > 1
-                        }">{{ size.stockQuantity }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </details>
-                </div>
-
-                <!-- Description Accordion -->
-                <div class="flex-1">
-                    <details open class="rounded overflow-hidden group">
-                        <summary
-                            class="cursor-pointer select-none flex justify-between items-center px-4 py-3 bg-gray-100 text-gray-800 hover:bg-gray-200 transition text-base font-bold">
-                            Description
-                            <i class="fa-solid fa-chevron-down group-open:rotate-180 transition-transform"></i>
-                        </summary>
-                        <div class="px-4 pt-3 pb-4 text-gray-700 leading-relaxed">
-                            {{ product.description || 'No description available.' }}
-                        </div>
-                    </details>
-                </div>
-            </div>
-
-        </div>
-    </section>
-
-    <!-- Loading -->
-    <div *ngIf="isLoading" class="p-20 text-center text-lg font-bold">Loading product...</div>
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="p-20 text-center text-lg font-bold">Loading product...</div>
 </main>
