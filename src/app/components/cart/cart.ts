@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output,ChangeDetectorRef } from '@angular/core';
 import { DecimalPipe, CommonModule } from '@angular/common';
 import { CartItemService } from '../../shared/services/cart/cart.service';
 import { AuthService } from '../../shared/services/Auth/auth.service';
@@ -7,23 +7,32 @@ import { RouterModule } from '@angular/router';
 import { environment } from '../../../environments/environment.development';
 import Swal from 'sweetalert2';
 import { ProductDetailsService } from '../../shared/services/Product/product-details.service';
+import { MatDialog } from '@angular/material/dialog';
+import { Login } from '../login/login';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+
 
 @Component({
   selector: 'app-cart',
   standalone: true,
   templateUrl: './cart.html',
   styleUrls: ['./cart.css'],
-  imports: [CommonModule, DecimalPipe, RouterModule], // <-- أضف RouterModule هنا
+  imports: [CommonModule, DecimalPipe, RouterModule, FormsModule], // <-- أضف RouterModule هنا
 })
 export class Cart implements OnInit {
   @Output() close = new EventEmitter<void>();
 
   cartItems: ICartItem[] = [];
   estimatedTotal = 0;
+  isLoggedInNow = false;
 
   constructor(
     private cartService: CartItemService,
     private authService: AuthService, // ⬅️ نستخدمه بدل ما نعتمد على cartService.getToken()
+    private dialog: MatDialog,
+    private cdr: ChangeDetectorRef,
+    private router: Router,
     private productDetailsService: ProductDetailsService // ⬅️ ضفنا السيرفيس هنا
   ) {}
 
@@ -208,4 +217,26 @@ export class Cart implements OnInit {
   closeCartBtn(): void {
     this.close.emit();
   }
+  completeCheckout(): void {
+  const token = this.authService.getToken();
+  const isLoggedIn = !!token;
+
+  if (!isLoggedIn) {
+    this.isLoggedInNow = true;
+
+    const dialogRef = this.dialog.open(Login, {
+      width: '500px',
+      disableClose: true,
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result?.token) {
+        this.router.navigate(['/order']);
+      }
+    });
+  } else {
+    this.router.navigate(['/order']);
+  }
+}
+
 }
