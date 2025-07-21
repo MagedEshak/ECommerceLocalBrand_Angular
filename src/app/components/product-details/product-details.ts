@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit ,ChangeDetectorRef} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ProductDetailsService } from '../../shared/services/Product/product-details.service';
 import { IProduct } from '../../models/iproduct';
@@ -9,6 +9,8 @@ import { environment } from '../../../environments/environment.development';
 import { CartItemService } from '../../shared/services/cart/cart.service';
 import { AuthService } from '../../shared/services/Auth/auth.service';
 import { Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
+import { Login } from '../login/login';
 
 // جوه الـ constructor
 
@@ -25,13 +27,16 @@ export class ProductDetails implements OnInit {
   selectedSize: string | null = null;
   quantity: number = 1;
   currentSlide = 0;
+  isLoggedInNow = false;
 
   constructor(
     private route: ActivatedRoute,
     private productDetailsService: ProductDetailsService,
     private cartItemService: CartItemService,
     private authService: AuthService,
-    private router: Router // ✅ أضف ده
+    private dialog: MatDialog,
+    private cdr: ChangeDetectorRef,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -253,45 +258,83 @@ export class ProductDetails implements OnInit {
   onSizeChange(): void {
     this.quantity = 1;
   }
-
-  buyNow() {
-    if (!this.product || !this.selectedSize) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Please select a size first.',
-        confirmButtonText: 'OK',
-      });
-      return;
-    }
-
-    const sizeObj = this.product.productSizes?.find(
-      (s) => s.size === this.selectedSize
-    );
-
-    if (!sizeObj) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Selected size is not valid.',
-      });
-      return;
-    }
-
-    const buyNowItem = {
-      productId: this.product.id,
-      productSizeId: sizeObj.id,
-      productName: this.product.name,
-      productSizeName: sizeObj.size,
-      productImageUrl: this.product.productImagesPaths?.[0]
-        ? environment.baseServerUrl +
-          this.product.productImagesPaths[0].imagePath
-        : '/assets/images/default.png',
-      quantity: this.quantity,
-      unitPrice: this.product.price,
-      totalPriceForOneItemType: this.product.price * this.quantity,
+  decodeUserFromToken(token: string): { id: string; email: string } {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return {
+      id: payload[
+        'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'
+      ],
+      email:
+        payload[
+          'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'
+        ],
     };
+  }
+  buyNow() {
+  const token = this.authService.getToken();
+  const isLoggedIn = !!token;
 
-    sessionStorage.setItem('buyNowItem', JSON.stringify(buyNowItem));
+  // التحقق من وجود منتج ومقاس
+  if (!this.product || !this.selectedSize) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Please select a size first.',
+      confirmButtonText: 'OK',
+    });
+    return;
+  }
 
-    this.router.navigate(['/order']);
+  const sizeObj = this.product.productSizes?.find(
+    (s) => s.size === this.selectedSize
+  );
+
+  if (!sizeObj) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Selected size is not valid.',
+    });
+    return;
+  }
+
+  const buyNowItem = {
+    productId: this.product.id,
+    productSizeId: sizeObj.id,
+    productName: this.product.name,
+    productSizeName: sizeObj.size,
+    productImageUrl: this.product.productImagesPaths?.[0]
+      ? environment.baseServerUrl + this.product.productImagesPaths[0].imagePath
+      : '/assets/images/default.png',
+    quantity: this.quantity,
+    unitPrice: this.product.price,
+    totalPriceForOneItemType: this.product.price * this.quantity,
+  };
+
+  sessionStorage.setItem('buyNowItem', JSON.stringify(buyNowItem));
+
+  if (!isLoggedIn) {
+    const dialogRef = this.dialog.open(Login, {
+      width: '500px',
+      disableClose: true,
+    });
+
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result?.token) {
+        this.authService.setLogin(result.token);
+        this.isLoggedInNow = true;
+        setTimeout(() => this.cdr.detectChanges(), 0);
+
+        // بعد تسجيل الدخول نروح على صفحة الأوردر
+        this.router.navigate(['/order']);
+      } else {
+        alert('❌ You must log in before placing an order.');
       }
+    });
+
+    return;
+  }
+
+  // لو مسجل بالفعل، نروح على صفحة الأوردر
+  this.router.navigate(['/order']);
+}
 }
