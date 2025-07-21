@@ -1,0 +1,12 @@
+.line-through-diagonal::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 120%;
+  height: 2px;
+  background-color: black;
+  transform: rotate(-25deg);
+  transform-origin: center;
+  pointer-events: none;
+}

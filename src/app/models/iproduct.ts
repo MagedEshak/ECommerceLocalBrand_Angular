@@ -28,4 +28,7 @@ export interface IProduct {
   productSizes?: IProductSizes[];
   productImagesPaths: IProductImagesPaths[];
   NewArrival: INewArrivals;
+  details?: string;
+  care?: string;
+  fit?: string;
 }
