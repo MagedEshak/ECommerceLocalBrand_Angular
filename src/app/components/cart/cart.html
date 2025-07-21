@@ -120,12 +120,13 @@
 
     <!-- Action Buttons -->
     <div class="space-y-4 text-center">
-      <a
-        [routerLink]="['/order']"
-        class="block rounded-sm bg-black px-5 py-3 text-sm border text-white transition hover:bg-transparent hover:text-black"
-      >
-        Checkout
-      </a>
+ <a
+  (click)="completeCheckout()"
+  class="block rounded-sm bg-black px-5 py-3 text-sm border text-white transition hover:bg-transparent hover:text-black"
+>
+  Checkout
+</a>
+
 
       <a
         href="#"
