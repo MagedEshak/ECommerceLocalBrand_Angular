@@ -142,8 +142,10 @@ export class Order implements OnInit, OnDestroy {
       this.shouldContinueCheckout = true;
 
       const dialogRef = this.dialog.open(Login, {
-        width: '500px',
-        disableClose: true,
+  panelClass: 'no-padding-dialog',
+  backdropClass: 'custom-backdrop',
+  width: '100%',
+  maxWidth: 'none'
       });
 
       dialogRef.afterClosed().subscribe((result) => {
