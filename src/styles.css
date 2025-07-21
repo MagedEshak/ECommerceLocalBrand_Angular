@@ -6,6 +6,18 @@
     font-weight: normal;
     font-style: normal;
 }
+/* تخلي خلفية الديالوج شفافة وتشيل الحافة */
+::ng-deep .no-padding-dialog .mat-dialog-container {
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+/* اختيار إضافي لو عايز تخفف الخلفية اللي ورا البوب أب */
+::ng-deep .custom-backdrop {
+  background: rgba(0, 0, 0, 0.2);
+}
 
 body {
     font-family: 'ArchivoNarrow', sans-serif !important;
@@ -61,3 +73,15 @@ button {
 }
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+/* ✅ يشيل الخلفية البيضا والـ shadow والـ padding من الدايلوج */
+.no-padding-dialog .mat-dialog-container {
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+}
+
+/* ✅ يخلي الخلفية اللي ورا البوب أب شفافة */
+.custom-backdrop {
+  background-color: rgba(0, 0, 0, 0.3) !important; /* زوّد أو قلل حسب مزاجك */
+}

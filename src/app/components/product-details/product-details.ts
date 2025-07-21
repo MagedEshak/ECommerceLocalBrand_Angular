@@ -313,8 +313,10 @@ export class ProductDetails implements OnInit {
 
   if (!isLoggedIn) {
     const dialogRef = this.dialog.open(Login, {
-      width: '500px',
-      disableClose: true,
+     panelClass: 'no-padding-dialog',
+  backdropClass: 'custom-backdrop',
+  width: '60%',
+  maxWidth: 'none'
     });
 
 

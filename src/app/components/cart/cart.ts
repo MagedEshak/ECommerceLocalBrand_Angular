@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output,ChangeDetectorRef } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output,ChangeDetectorRef, ViewEncapsulation } from '@angular/core';
 import { DecimalPipe, CommonModule } from '@angular/common';
 import { CartItemService } from '../../shared/services/cart/cart.service';
 import { AuthService } from '../../shared/services/Auth/auth.service';
@@ -19,6 +19,8 @@ import { Router } from '@angular/router';
   templateUrl: './cart.html',
   styleUrls: ['./cart.css'],
   imports: [CommonModule, DecimalPipe, RouterModule, FormsModule], // <-- أضف RouterModule هنا
+  encapsulation: ViewEncapsulation.None
+
 })
 export class Cart implements OnInit {
   @Output() close = new EventEmitter<void>();
@@ -225,8 +227,10 @@ export class Cart implements OnInit {
     this.isLoggedInNow = true;
 
     const dialogRef = this.dialog.open(Login, {
-      width: '500px',
-      disableClose: true,
+       panelClass: 'no-padding-dialog',
+  backdropClass: 'custom-backdrop',
+  width: '60%',
+  maxWidth: 'none'
     });
 
     dialogRef.afterClosed().subscribe((result) => {
