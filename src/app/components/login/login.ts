@@ -164,7 +164,10 @@ export class Login {
 
         // ✅ قفل الديالوج لو معمول Dialog
         if (this.dialogRef) {
-          this.dialogRef.close('logged-in');
+this.dialogRef.close({
+  token: res.token,
+  customerInfo: res.customerInfo, // أو أي property اسمها في الـ API response
+});
         }
 
         // ✅ Emit للي فتح الكومبوننت
