@@ -1,88 +1,152 @@
 <main class="pt-10 md:pt-20 px-4 md:px-10">
-  <section *ngIf="!isLoading && product" class="flex flex-col md:flex-row gap-10">
+  <section
+    *ngIf="!isLoading && product"
+    class="flex flex-col md:flex-row gap-10"
+  >
     <!-- Left: Product Image -->
 
     <div class="w-full md:w-2/3 flex flex-col items-center md:pl-6">
-
       <div class="relative w-full rounded">
-        <img [src]="currentImage" [alt]="product.name" class="w-full h-full object-cover rounded" />
-        <button class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white px-3 py-1 rounded-full" (click)="prevSlide()">‹</button>
-        <button class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white px-3 py-1 rounded-full" (click)="nextSlide()">›</button>
+        <img
+          [src]="currentImage"
+          [alt]="product.name"
+          class="w-full h-full object-cover rounded"
+        />
+        <button
+          class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white px-3 py-1 rounded-full"
+          (click)="prevSlide()"
+        >
+          ‹
+        </button>
+        <button
+          class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white px-3 py-1 rounded-full"
+          (click)="nextSlide()"
+        >
+          ›
+        </button>
       </div>
 
       <!-- Thumbnails -->
       <div class="flex gap-3 mt-4 overflow-x-auto justify-center w-full">
-        <img *ngFor="let img of sortedImageUrls; let i = index" [src]="img" (click)="goToSlide(i)"
+        <img
+          *ngFor="let img of sortedImageUrls; let i = index"
+          [src]="img"
+          (click)="goToSlide(i)"
           class="h-16 w-16 object-cover cursor-pointer rounded border-2"
-          [ngClass]="{ 'border-black ring-2 ring-black': i === currentSlide, 'border-gray-300': i !== currentSlide }" />
+          [ngClass]="{ 'border-black ring-2 ring-black': i === currentSlide, 'border-gray-300': i !== currentSlide }"
+        />
       </div>
     </div>
 
     <!-- Right: Product Info -->
 
     <div class="w-full md:w-1/2 flex flex-col gap-6 mx-auto text-center">
-
       <!-- Product Name & Price -->
       <div>
         <h2 class="text-4xl font-bold mb-1">{{ product.name }}</h2>
-        <p class="text-2xl text-black font-semibold">{{ product.price | currency: 'EGP ':'symbol' }}</p>
+        @if(product.discountPercentage > 0) {
+        <p class="text-2xl text-gray-100 font-semibold line-through">
+          {{ product.price | currency: 'EGP ' : 'symbol' }}
+        </p>
+
+        <p class="text-2xl text-black font-semibold">
+          {{ product.priceAfterDiscount| currency: 'EGP ':'symbol' }}
+        </p>
+        } @else {
+        <p class="text-2xl text-black font-semibold">
+          {{ product.priceAfterDiscount| currency: 'EGP ':'symbol' }}
+        </p>
+        }
       </div>
 
       <!-- Size & Quantity -->
       <div class="flex flex-col gap-6 mt-6 justify-content-center items-center">
         <!-- Size Options -->
-<div class="flex items-center justify-start gap-4 flex-wrap">
-  <div *ngFor="let size of getSizes(); let i = index" class="flex flex-col items-center w-20 min-h-[60px]">
-    <label [attr.for]="'size-' + i"
-      class="relative flex items-center justify-center w-full px-4 py-2 rounded-full border text-sm font-medium transition-colors cursor-pointer text-center"
-      [ngClass]="{
+        <div class="flex items-center justify-start gap-4 flex-wrap">
+          <div
+            *ngFor="let size of getSizes(); let i = index"
+            class="flex flex-col items-center w-20 min-h-[60px]"
+          >
+            <label
+              [attr.for]="'size-' + i"
+              class="relative flex items-center justify-center w-full px-4 py-2 rounded-full border text-sm font-medium transition-colors cursor-pointer text-center"
+              [ngClass]="{
         'bg-black text-white border-black text-lg': selectedSize === size && getStockQuantity(size) > 0,
         'bg-gray-300 text-gray-700 cursor-not-allowed': getStockQuantity(size) === 0,
         'bg-white text-gray-600 border-gray-400': selectedSize !== size && getStockQuantity(size) > 0
-      }">
-      
-      <input type="radio" name="size" [id]="'size-' + i" [value]="size" [(ngModel)]="selectedSize"
-        [disabled]="getStockQuantity(size) === 0" (change)="onSizeChange()" class="sr-only" />
-      
-      <span class="text-base relative"
-        [ngClass]="{ 'line-through-diagonal': getStockQuantity(size) === 0 }">
-        {{ size }}
-      </span>
-    </label>
-  </div>
-</div>
+      }"
+            >
+              <input
+                type="radio"
+                name="size"
+                [id]="'size-' + i"
+                [value]="size"
+                [(ngModel)]="selectedSize"
+                [disabled]="getStockQuantity(size) === 0"
+                (change)="onSizeChange()"
+                class="sr-only"
+              />
 
+              <span
+                class="text-base relative"
+                [ngClass]="{ 'line-through-diagonal': getStockQuantity(size) === 0 }"
+              >
+                {{ size }}
+              </span>
+            </label>
+          </div>
+        </div>
 
         <!-- Quantity Counter -->
         <div class="flex items-center gap-2">
-          <button type="button" class="size-10 leading-10 text-black text-lg transition hover:opacity-75" (click)="decreaseQuantity()">−</button>
-          <input type="number" [value]="quantity" readonly class="h-10 w-16 text-center text-base bg-transparent border-none" />
-          <button type="button" class="size-10 leading-10 text-black text-lg transition hover:opacity-75" (click)="increaseQuantity()">+</button>
+          <button
+            type="button"
+            class="size-10 leading-10 text-black text-lg transition hover:opacity-75"
+            (click)="decreaseQuantity()"
+          >
+            −
+          </button>
+          <input
+            type="number"
+            [value]="quantity"
+            readonly
+            class="h-10 w-16 text-center text-base bg-transparent border-none"
+          />
+          <button
+            type="button"
+            class="size-10 leading-10 text-black text-lg transition hover:opacity-75"
+            (click)="increaseQuantity()"
+          >
+            +
+          </button>
         </div>
       </div>
 
       <!-- Action Buttons -->
 
-
       <div class="flex flex-col gap-4">
-
-        <button (click)="addToCart()"
-          class="w-full text-lg uppercase font-bold bg-black text-white px-8 py-4 rounded hover:bg-white hover:text-black border hover:border-black">
+        <button
+          (click)="addToCart()"
+          class="w-full text-lg uppercase font-bold bg-black text-white px-8 py-4 rounded hover:bg-white hover:text-black border hover:border-black"
+        >
           <i class="fa-solid fa-cart-plus"></i> Add to Cart
         </button>
 
-        <button (click)="buyNow()"
-          class="w-full text-lg uppercase font-bold bg-white text-black px-8 py-4 rounded border border-black hover:bg-black hover:text-white">
+        <button
+          (click)="buyNow()"
+          class="w-full text-lg uppercase font-bold bg-white text-black px-8 py-4 rounded border border-black hover:bg-black hover:text-white"
+        >
           Buy it Now
         </button>
       </div>
 
       <!-- Accordions -->
       <div class="flex flex-col gap-2 mt-4">
-
         <!-- Product Details -->
         <details class="group">
-          <summary class="cursor-pointer flex justify-between items-center py-3 text-base font-bold text-gray-800">
+          <summary
+            class="cursor-pointer flex justify-between items-center py-3 text-base font-bold text-gray-800"
+          >
             Product Details
             <span class="text-xl">
               <span class="group-open:hidden">+</span>
@@ -96,7 +160,9 @@
 
         <!-- Care -->
         <details class="group">
-          <summary class="cursor-pointer flex justify-between items-center py-3 text-base font-bold text-gray-800">
+          <summary
+            class="cursor-pointer flex justify-between items-center py-3 text-base font-bold text-gray-800"
+          >
             Care & Maintenance
             <span class="text-xl">
               <span class="group-open:hidden">+</span>
@@ -107,14 +173,19 @@
             <p>To preserve the quality and fit of your product:</p>
             <ul class="list-disc list-inside mt-2 space-y-1">
               <li>Always iron inside out.</li>
-              <li>Avoid hot water to maintain the elegance of the print and the perfect fit of the fabric.</li>
+              <li>
+                Avoid hot water to maintain the elegance of the print and the
+                perfect fit of the fabric.
+              </li>
             </ul>
           </div>
         </details>
 
         <!-- Size & Fit -->
         <details class="group">
-          <summary class="cursor-pointer flex justify-between items-center py-3 text-base font-bold text-gray-800">
+          <summary
+            class="cursor-pointer flex justify-between items-center py-3 text-base font-bold text-gray-800"
+          >
             Size & Fit
             <span class="text-xl">
               <span class="group-open:hidden">+</span>
@@ -122,7 +193,11 @@
             </span>
           </summary>
           <div class="pb-4 text-gray-700 leading-relaxed text-left">
-            <img src="{{currentImage}}" alt="{{product.name}}" class="w-32 h-32 object-cover rounded mb-4" />
+            <img
+              src="{{currentImage}}"
+              alt="{{product.name}}"
+              class="w-32 h-32 object-cover rounded mb-4"
+            />
             <table class="w-full text-sm border border-gray-300 rounded mt-2">
               <thead class="bg-gray-50">
                 <tr>
@@ -132,7 +207,10 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let size of product?.productSizes" class="border-t hover:bg-gray-50">
+                <tr
+                  *ngFor="let size of product?.productSizes"
+                  class="border-t hover:bg-gray-50"
+                >
                   <td class="px-3 py-2">{{ size.size }}</td>
                   <td class="px-3 py-2">{{ size.width }}</td>
                   <td class="px-3 py-2">{{ size.height }}</td>
@@ -146,8 +224,7 @@
   </section>
 
   <!-- Loading -->
-  <div *ngIf="isLoading" class="p-20 text-center text-lg font-bold">Loading product...</div>
-
-
+  <div *ngIf="isLoading" class="p-20 text-center text-lg font-bold">
+    Loading product...
+  </div>
 </main>
-
