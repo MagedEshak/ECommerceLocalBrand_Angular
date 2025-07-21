@@ -12,7 +12,7 @@ import {
 import { ICartItem } from '../../models/ICartItem';
 import { environment } from '../../../environments/environment.development';
 import { Router, RouterModule } from '@angular/router';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { OrderService } from '../services/Order/order.service';
 import { Login } from '../login/login';
 import { MatDialog } from '@angular/material/dialog';
@@ -20,19 +20,23 @@ import { MatDialog } from '@angular/material/dialog';
 @Component({
   selector: 'app-order',
   standalone: true,
-  imports: [CommonModule, DecimalPipe, RouterModule, FormsModule],
+  imports: [CommonModule, DecimalPipe, RouterModule, FormsModule, ReactiveFormsModule],
   templateUrl: './order.html',
   styleUrl: './order.css',
 })
 export class Order implements OnInit, OnDestroy {
+  addressSelectControl: any;
+  addNewAddressControl: any;
   cartItems: ICartItem[] = [];
   governorates: { id: number; name: string; shippingCost: number }[] = [];
   shippingCost: number = 0;
   estimatedTotal: number = 0;
   private completedCheckout: boolean = false;
   private shouldContinueCheckout: boolean = false;
+  validationErrors: { [key: string]: string[] } = {};
 
-  orderForm = { paymentMethod: PaymentMethods.Online };
+
+  orderForm: FormGroup;
   isLoggedInNow = false;
 
   paymentMethods = [
@@ -66,12 +70,49 @@ export class Order implements OnInit, OnDestroy {
     private orderService: OrderService,
     private router: Router,
     private dialog: MatDialog,
-    private cdr: ChangeDetectorRef
-  ) {}
+    private cdr: ChangeDetectorRef,
+    private fb: FormBuilder
+  ) {
+    this.orderForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      firstName: ['', Validators.required],
+      lastName: ['', Validators.required],
+      phoneNumber: ['', [Validators.required, Validators.pattern(/^01[0125][0-9]{8}$/)]],
+      paymentMethod: [null, Validators.required],
+      street: ['', Validators.required],
+      apartment: [''],
+      building: [''],
+      floor: [''],
+      governrateShippingCostId: [null, Validators.required]
+    });
+    this.addressSelectControl = this.fb.control(null);
+    this.addNewAddressControl = this.fb.control(false);
+  }
 
   ngOnInit(): void {
+    // Synchronize controls with component state
+    this.addressSelectControl.valueChanges.subscribe((val: string | null) => {
+      this.selectedAddressId = val;
+      if (!this.useNewAddress) {
+        this.onAddressChange();
+      }
+    });
+    this.addNewAddressControl.valueChanges.subscribe((val: boolean | null) => {
+      this.useNewAddress = !!val;
+      this.onToggleNewAddress();
+    });
     this.loadUserDataIfLoggedIn();
     this.loadGovernorates();
+
+    // Pre-fill form if customerInfo is available
+    if (this.order.customerInfo) {
+      this.orderForm.patchValue({
+        email: this.order.customerInfo.email || '',
+        firstName: this.order.customerInfo.firstName || '',
+        lastName: this.order.customerInfo.lastName || '',
+        phoneNumber: this.order.customerInfo.phoneNumber || ''
+      });
+    }
 
     const nav = this.router.getCurrentNavigation();
     let buyNowItem = nav?.extras?.state?.['buyNowItem'];
@@ -123,6 +164,13 @@ export class Order implements OnInit, OnDestroy {
       this.orderService.getCustomerById(user.id).subscribe({
         next: (customerData) => {
           this.order.customerInfo = { ...customerData };
+          // Patch form values when customer data is loaded
+          this.orderForm.patchValue({
+            email: customerData.email || '',
+            firstName: customerData.firstName || '',
+            lastName: customerData.lastName || '',
+            phoneNumber: customerData.phoneNumber || ''
+          });
           this.cdr.detectChanges();
         },
         error: (err) => {
@@ -135,26 +183,28 @@ export class Order implements OnInit, OnDestroy {
   }
 
   completeCheckout(): void {
+    if (this.orderForm.invalid) {
+      this.orderForm.markAllAsTouched();
+      alert('❌ Please complete all required fields correctly.');
+      return;
+    }
     const token = this.authService.getToken();
     const user = token ? this.decodeUserFromToken(token) : null;
 
     if (!user) {
       this.shouldContinueCheckout = true;
-
       const dialogRef = this.dialog.open(Login, {
-  panelClass: 'no-padding-dialog',
-  backdropClass: 'custom-backdrop',
-  width: '100%',
-  maxWidth: 'none'
+        panelClass: 'no-padding-dialog',
+        backdropClass: 'custom-backdrop',
+        width: '100%',
+        maxWidth: 'none'
       });
-
       dialogRef.afterClosed().subscribe((result) => {
         if (result?.token && result?.customerInfo) {
           this.authService.setLogin(result.token);
           this.loadUserDataIfLoggedIn();
           this.isLoggedInNow = true;
           setTimeout(() => this.cdr.detectChanges(), 0);
-
           if (this.shouldContinueCheckout) {
             this.shouldContinueCheckout = false;
             this.completeCheckout();
@@ -163,15 +213,6 @@ export class Order implements OnInit, OnDestroy {
           alert('❌ You must log in before placing an order.');
         }
       });
-
-      return;
-    }
-
-    if (
-      this.orderForm.paymentMethod === null ||
-      this.orderForm.paymentMethod === undefined
-    ) {
-      alert('Please select a payment method');
       return;
     }
 
@@ -182,15 +223,30 @@ export class Order implements OnInit, OnDestroy {
 
     this.order.customerId = user.id;
 
+    this.order.customerInfo = {
+      email: this.orderForm.value.email,
+      firstName: this.orderForm.value.firstName,
+      lastName: this.orderForm.value.lastName,
+      phoneNumber: this.orderForm.value.phoneNumber,
+      dateOfBirth: new Date() // not used in form, set to default date
+    };
+    this.order.addressInfo = {
+      street: this.orderForm.value.street,
+      apartment: this.orderForm.value.apartment,
+      building: this.orderForm.value.building,
+      floor: this.orderForm.value.floor,
+      governrateShippingCostId: this.orderForm.value.governrateShippingCostId,
+      city: '', // can be set from governorate selection logic
+      country: 'Egypt' // default value
+    };
+    this.order.paymentMethod = this.orderForm.value.paymentMethod;
+
     this.orderService.getCustomerById(user.id).subscribe({
       next: (customerData) => {
         if (!customerData?.email || !customerData?.phoneNumber) {
           alert('❌ Please complete your profile before placing an order.');
           return;
         }
-
-        this.order.customerInfo = { ...customerData };
-        this.order.paymentMethod = this.orderForm.paymentMethod!;
         this.prepareAndSendOrder();
       },
       error: () => {
@@ -212,6 +268,15 @@ export class Order implements OnInit, OnDestroy {
     }));
 
     this.order.totalOrderPrice = this.estimatedTotal + this.shippingCost;
+
+    // Ensure city is set before sending order
+    if (!this.order.addressInfo.city || this.order.addressInfo.city.trim() === '') {
+      const govId = this.order.addressInfo.governrateShippingCostId;
+      const selectedGov = this.governorates.find((gov) => gov.id === govId);
+      if (selectedGov) {
+        this.order.addressInfo.city = selectedGov.name;
+      }
+    }
 
     this.orderService.checkoutOrder(this.order).subscribe({
       next: (res) => {
@@ -312,11 +377,14 @@ export class Order implements OnInit, OnDestroy {
   }
 
   onGovernorateChange(): void {
+    // Always use the value from the form, not just addressInfo
+    const govId = this.orderForm.value.governrateShippingCostId;
     const selectedGov = this.governorates.find(
-      (gov) => gov.id === this.order.addressInfo.governrateShippingCostId
+      (gov) => gov.id === govId
     );
 
     if (selectedGov) {
+      this.order.addressInfo.governrateShippingCostId = selectedGov.id;
       this.order.addressInfo.city = selectedGov.name;
       this.shippingCost = selectedGov.shippingCost;
     } else {
@@ -337,21 +405,43 @@ export class Order implements OnInit, OnDestroy {
   }
 
   onAddressChange(): void {
-    const selected = this.savedAddresses.find(
-      (a) => a.id == this.selectedAddressId
-    );
-    if (selected) {
-      this.order.addressInfo = {
-        id: selected.id,
-        street: selected.street,
-        apartment: selected.apartment,
-        building: selected.building,
-        floor: selected.floor,
-        city: selected.city,
-        country: selected.country,
-        governrateShippingCostId: selected.governrateShippingCostId,
-      };
-      this.onGovernorateChange();
+    if (!this.useNewAddress && this.selectedAddressId) {
+      const selected = this.savedAddresses.find(
+        (a) => a.id == this.selectedAddressId
+      );
+      if (selected) {
+        const selectedGovForCity = this.governorates.find(
+          (gov) => gov.id === selected.governrateShippingCostId
+        );
+        this.order.addressInfo = {
+          id: selected.id,
+          street: selected.street,
+          apartment: selected.apartment,
+          building: selected.building,
+          floor: selected.floor,
+          city: selectedGovForCity ? selectedGovForCity.name : selected.city,
+          country: selected.country,
+          governrateShippingCostId: selected.governrateShippingCostId,
+        };
+        // Patch form fields to match selected address
+        this.orderForm.patchValue({
+          street: selected.street || '',
+          apartment: selected.apartment || '',
+          building: selected.building || '',
+          floor: selected.floor || '',
+          governrateShippingCostId: selected.governrateShippingCostId ?? null
+        });
+        // Update shipping cost immediately based on governorate
+        const selectedGov = this.governorates.find(
+          (gov) => gov.id === selected.governrateShippingCostId
+        );
+        if (selectedGov) {
+          this.shippingCost = selectedGov.shippingCost;
+        } else {
+          this.shippingCost = 0;
+        }
+        this.cdr.detectChanges();
+      }
     }
   }
 
@@ -367,6 +457,18 @@ export class Order implements OnInit, OnDestroy {
         country: '',
         governrateShippingCostId: 0,
       };
+      // Clear address fields in the form
+      this.orderForm.patchValue({
+        street: '',
+        apartment: '',
+        building: '',
+        floor: '',
+        governrateShippingCostId: null
+      });
+      this.cdr.detectChanges();
+    } else {
+      // If switching back, repopulate from selected address
+      this.onAddressChange();
     }
   }
 
