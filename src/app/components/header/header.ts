@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RouterStateService } from '../../shared/services/Router-State/router-state.service';
 import { RouterLink, Router, NavigationEnd } from '@angular/router';
 import { AuthService } from '../../shared/services/Auth/auth.service';
@@ -87,5 +87,4 @@ export class Header {
   closeMobileMenu() {
     this.isMobileMenuVisible = false;
   }
-
 }
