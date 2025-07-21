@@ -1,54 +1,61 @@
 <h2 class="font-bold text-2xl ms-4 mt-15 text-center">New Arrivals</h2>
-
-<section
-  class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8 px-8 mt-6"
->
-  @for (prd of filteredProducts; track $index) {
+<div class="d-flex justify-center px-8 mt-6">
   <section
-    class="rounded-lg overflow-hidden flex flex-col"
-    data-aos="zoom-in"
-    data-aos-duration="500"
-    data-aos-offset="150"
+    class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-8 px-8 mt-6"
   >
-    <a
-      [routerLink]="['/product-details', prd.id]"
-      class="flex flex-col items-center mb-20"
+    @for (prd of filteredProducts; track $index) {
+    <section
+      class="rounded-lg overflow-hidden flex flex-col"
+      data-aos="zoom-in"
+      data-aos-duration="500"
+      data-aos-offset="150"
     >
-      <div class="relative h-96 w-full overflow-hidden group">
-        <!-- الصورة الأساسية -->
-        <img
-          [src]="getImageUrl(prd, 0)"
-          [alt]="prd.name"
-          class="absolute inset-0 w-full h-full object-cover transition-opacity duration-500 opacity-100 group-hover:opacity-0"
-        />
+      <a
+        [routerLink]="['/product-details', prd.id]"
+        class="flex flex-col items-center mb-20"
+      >
+        <div class="relative h-96 w-full overflow-hidden group">
+          <!-- الصورة الأساسية -->
+          <img
+            [src]="getImageUrl(prd, 0)"
+            [alt]="prd.name"
+            class="absolute inset-0 w-full h-full object-cover transition-opacity duration-500 opacity-100 group-hover:opacity-0"
+          />
 
-        <!-- الصورة الثانية تظهر مع الهوفر -->
-        <img
-          [src]="getImageUrl(prd, 1)"
-          [alt]="prd.name + ' alt'"
-          class="absolute inset-0 w-full h-full object-cover transition-opacity duration-500 opacity-0 group-hover:opacity-100"
-        />
-      </div>
+          <!-- الصورة الثانية تظهر مع الهوفر -->
+          <img
+            [src]="getImageUrl(prd, 1)"
+            [alt]="prd.name + ' alt'"
+            class="absolute inset-0 w-full h-full object-cover transition-opacity duration-500 opacity-0 group-hover:opacity-100"
+          />
+        </div>
 
+        <h3 class="mt-4 text-lg font-bold text-gray-900 sm:text-xl">
+          {{prd.name}}
+        </h3>
+        @if(prd.discountPercentage > 0) {
+        <p class="text-gray-700 mt-1 line-through">
+          {{prd.price | currency : 'EGP ' : 'code'}}
+        </p>
+        <p class="text-gray-600 font-bold mt-1">
+          {{prd.priceAfterDiscount | currency : 'EGP ' : 'code'}}
+        </p>
+        } @else {
+        <p class="mt-2 max-w-sm text-black">
+          {{prd.priceAfterDiscount | currency : 'EGP ' : 'code'}}
+        </p>
+        }
+      </a>
+    </section>
+    }@empty {
+    <section class="grid justify-items-center px-8 mt-6">
       <h3 class="mt-4 text-lg font-bold text-gray-900 sm:text-xl">
-        {{prd.name}}
+        No Products.
       </h3>
-      <p class="text-gray-700 mt-1">Size: {{getProductSizesDisplay(prd) }}</p>
-
-      <p class="mt-2 max-w-sm text-black">
-        {{prd.price| currency : 'EGP ' : 'code'}}
-      </p>
-    </a>
+    </section>
+    }
   </section>
-  }@empty {
-  <section class="grid justify-items-center px-8 mt-6">
-    <h3 class="mt-4 text-lg font-bold text-gray-900 sm:text-xl">
-      No Products.
-    </h3>
-  </section>
-  }
-</section>
-
+</div>
 @if(filteredProducts.length !== 0){
 <app-pagination
   [currentPageIndex]="currentPageIndex"

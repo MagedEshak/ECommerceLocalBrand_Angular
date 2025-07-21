@@ -1,23 +1,22 @@
 import { Component, OnInit } from '@angular/core';
 import { ProductService } from '../../shared/services/Product/product.service';
 import { IProduct } from '../../models/iproduct';
-import { CurrencyPipe } from '@angular/common';
+import { CommonModule, CurrencyPipe } from '@angular/common';
 import { Pagination } from '../pagination/pagination';
 import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-all-products',
-  imports: [CurrencyPipe, Pagination, RouterModule],
+  imports: [CurrencyPipe, Pagination, RouterModule, CommonModule],
   templateUrl: './all-products.html',
   styleUrl: './all-products.css',
 })
-
 export class AllProducts implements OnInit {
   filteredProducts: IProduct[] = [] as IProduct[];
   currentPageIndex = 1;
   totalPages = 1;
 
-  constructor(private _ProductService: ProductService) { }
+  constructor(private _ProductService: ProductService) {}
 
   ngOnInit(): void {
     this.loadProducts();
@@ -33,8 +32,8 @@ export class AllProducts implements OnInit {
    * * loadProducts(1); // Loads the first page of products
    * * @example
    * * loadProducts(); // Loads the first page of products by default
-   * @param {number} [pageIndex=1] 
-   * @memberof AllProducts 
+   * @param {number} [pageIndex=1]
+   * @memberof AllProducts
    */
   loadProducts(pageIndex: number = 1): void {
     this._ProductService.getAllProductsByPaginate(pageIndex).subscribe({
@@ -62,7 +61,7 @@ export class AllProducts implements OnInit {
    * @param {number} page - The page number to change to.
    * * This method checks if the page number is within the valid range
    * * (between 1 and the total number of pages) before proceeding.
-   * * @returns {void} 
+   * * @returns {void}
    * * @throws {Error} If the page number is out of bounds.
    * * @description
    * * This method is used to navigate through paginated product listings.
@@ -71,7 +70,7 @@ export class AllProducts implements OnInit {
    * * It also scrolls the window to the top for better user experience.
    * * @example
    * * changePage(3); // Navigates to page 3 and loads the products for
-   * @memberof AllProducts  
+   * @memberof AllProducts
    */
   changePage(page: number): void {
     if (page >= 1 && page <= this.totalPages) {
@@ -100,5 +99,4 @@ export class AllProducts implements OnInit {
 
     return `${baseUrl}${images[index].imagePath}`;
   }
-
 }

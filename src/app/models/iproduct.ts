@@ -21,7 +21,7 @@ export interface IProduct {
   description: string;
   price: number;
   discountPercentage: number;
-  priceAfterDiscount?: number; // 👈 ممكن تضيفه لو محتاجه
+  priceAfterDiscount: number; // 👈 ممكن تضيفه لو محتاجه
   averageRating?: number;
   categoryId: number;
   isDeleted: boolean;
