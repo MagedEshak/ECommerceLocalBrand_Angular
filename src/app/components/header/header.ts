@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ElementRef, HostListener } from '@angular/core';
 import { RouterStateService } from '../../shared/services/Router-State/router-state.service';
 import { RouterLink, Router, NavigationEnd } from '@angular/router';
 import { AuthService } from '../../shared/services/Auth/auth.service';
@@ -26,7 +26,8 @@ export class Header {
     public routerState: RouterStateService,
     private router: Router,
     private authService: AuthService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private eRef: ElementRef
   ) {
     this.authService.isLoggedIn().subscribe((status) => {
       this.isLoggedIn = status;
@@ -86,5 +87,16 @@ export class Header {
 
   closeMobileMenu() {
     this.isMobileMenuVisible = false;
+  }
+  @HostListener('document:click', ['$event'])
+  handleClickOutside(event: Event) {
+    const targetElement = event.target as HTMLElement;
+
+    // لو مش جزء من الكومبوننت
+    if (!this.eRef.nativeElement.contains(targetElement)) {
+      this.isCartVisible = false;
+      this.isProfileVisible = false;
+      this.isMobileMenuVisible = false;
+    }
   }
 }
