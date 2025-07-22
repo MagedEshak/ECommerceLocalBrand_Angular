@@ -17,14 +17,14 @@
         <img
           [src]="getImageUrl(prd, 0)"
           [alt]="prd.name"
-          class="absolute inset-0 w-full h-full object-cover transition-opacity duration-500 opacity-100 group-hover:opacity-0"
+          class="absolute inset-0 w-full object-cover transition-opacity duration-500 opacity-100 group-hover:opacity-0"
         />
 
         <!-- الصورة الثانية تظهر مع الهوفر -->
         <img
           [src]="getImageUrl(prd, 1)"
           [alt]="prd.name + ' alt'"
-          class="absolute inset-0 w-full h-full object-cover transition-opacity duration-500 opacity-0 group-hover:opacity-100"
+          class="absolute inset-0 w-full object-cover transition-opacity duration-500 opacity-0 group-hover:opacity-100"
         />
       </div>
 
@@ -40,7 +40,7 @@
           {{prd.priceAfterDiscount | currency : 'EGP ' : 'code'}}
         </p>
         } @else {
-        <p class="mt-2 max-w-sm text-black">
+        <p class="mt-2 font-bold text-black">
           {{prd.priceAfterDiscount | currency : 'EGP ' : 'code'}}
         </p>
         }
