@@ -4,6 +4,7 @@ import { IProduct } from '../../models/iproduct';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { Pagination } from '../pagination/pagination';
 import { RouterModule } from '@angular/router';
+import { RealTimeService } from '../../shared/services/RealTime/real-time-service';
 
 @Component({
   selector: 'app-all-products',
@@ -16,10 +17,23 @@ export class AllProducts implements OnInit {
   currentPageIndex = 1;
   totalPages = 1;
 
-  constructor(private _ProductService: ProductService) {}
+  constructor(
+    private _ProductService: ProductService,
+    private realTimeService: RealTimeService
+  ) {}
 
   ngOnInit(): void {
     this.loadProducts();
+    this.realTimeService.onNewProductsArrived((newProducts) => {
+      // بس لو المستخدم في أول صفحة
+      if (this.currentPageIndex === 1) {
+        const totalPerPage = 12; // أو العدد اللي عندك لكل صفحة
+        const updatedProducts = [...newProducts, ...this.filteredProducts];
+
+        // قلل العدد عشان يفضل ثابت
+        this.filteredProducts = updatedProducts.slice(0, totalPerPage);
+      }
+    });
   }
 
   /**

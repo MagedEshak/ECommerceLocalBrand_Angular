@@ -5,6 +5,7 @@ import { IProduct } from '../../models/iproduct';
 import { Pagination } from '../pagination/pagination';
 import { RouterLink } from '@angular/router';
 import { environment } from '../../../environments/environment.development';
+import { RealTimeService } from '../../shared/services/RealTime/real-time-service';
 
 @Component({
   selector: 'app-new-arrival',
@@ -17,10 +18,23 @@ export class NewArrival implements OnInit {
   currentPageIndex = 1;
   totalPages = 1;
 
-  constructor(private _NewArrivalsService: NewArrivalsService) {}
+  constructor(
+    private _NewArrivalsService: NewArrivalsService,
+    private realTimeService: RealTimeService
+  ) {}
 
   ngOnInit() {
     this.loadNewArrivals();
+    this.realTimeService.onNewProductsArrived((newProducts) => {
+      // بس لو المستخدم في أول صفحة
+      if (this.currentPageIndex === 1) {
+        const totalPerPage = 12; // أو العدد اللي عندك لكل صفحة
+        const updatedProducts = [...newProducts, ...this.filteredProducts];
+
+        // قلل العدد عشان يفضل ثابت
+        this.filteredProducts = updatedProducts.slice(0, totalPerPage);
+      }
+    });
   }
 
   loadNewArrivals(pageIndex: number = 1): void {
