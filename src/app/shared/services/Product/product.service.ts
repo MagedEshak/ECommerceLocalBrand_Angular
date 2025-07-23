@@ -13,7 +13,7 @@ export class ProductService {
   constructor(private _httpClient: HttpClient) { }
 
   getAllProductsByPaginate(pageIndex: number): Observable<IPaginate<IProduct>> {
-    const url = `${environment.urlPath}Products/paginated?PageIndex=${pageIndex}`;
+    const url = `${environment.urlPath}Products/Custpaginated?PageIndex=${pageIndex}`;
     console.log('Requesting:', url);
     return this._httpClient.get<IPaginate<IProduct>>(url);
   }
