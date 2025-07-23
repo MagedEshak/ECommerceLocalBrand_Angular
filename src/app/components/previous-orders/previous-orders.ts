@@ -11,7 +11,7 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-previous-orders',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule],
   templateUrl: './previous-orders.html',
   styleUrls: ['./previous-orders.css'],
 })
@@ -147,9 +147,9 @@ export class PreviousOrders implements OnInit {
               title: 'Success!',
               text: '✅ Product refund request sent successfully.',
               icon: 'success',
-              background: '#000',
-              color: '#fff',
-              confirmButtonColor: '#fff',
+              background: '#fff',
+              color: '#000',
+              confirmButtonColor: '#000',
             });
             this.closeRefundForms();
           },
@@ -160,9 +160,9 @@ export class PreviousOrders implements OnInit {
                 err?.error?.message ||
                 '❌ Failed to send product refund request.',
               icon: 'error',
-              background: '#000',
-              color: '#fff',
-              confirmButtonColor: '#fff',
+              background: '#fff',
+              color: '#000',
+              confirmButtonColor: '#000',
             });
           },
         });

@@ -1,9 +1,9 @@
-import { AfterViewInit, Component } from '@angular/core';
+import { AfterViewInit, Component, Inject, PLATFORM_ID } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
 import { RouterStateService } from './shared/services/Router-State/router-state.service';
 import * as AOS from 'aos';
-
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-root',
@@ -15,10 +15,15 @@ import * as AOS from 'aos';
 export class App implements AfterViewInit {
   protected title = 'E-Commerce CashLook';
 
-  constructor(public routerState: RouterStateService) { }
+  constructor(
+    public routerState: RouterStateService,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {}
 
   ngAfterViewInit(): void {
-    AOS.init();
-    AOS.refresh();
+    if (isPlatformBrowser(this.platformId)) {
+      AOS.init();
+      AOS.refresh();
+    }
   }
 }
