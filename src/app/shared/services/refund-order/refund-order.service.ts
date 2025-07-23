@@ -1,40 +1,46 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable, signal } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { environment } from '../../../../environments/environment.development';
+import { Observable } from 'rxjs';
+import { AuthService } from '../Auth/auth.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class RefundOrderService {
-  refundStatus = signal<'idle' | 'loading' | 'success' | 'error'>('idle');
-  refundMessage = signal<string | null>(null);
+  constructor(private _httpClient: HttpClient, private auth: AuthService) {}
 
-  constructor(private _httpClient: HttpClient) {}
-
-  refundOrder(orderId: number, reason: string) {
-    this.refundStatus.set('loading');
-    this.refundMessage.set(null);
-
-    return this._httpClient
-      .post(`${environment.urlPath}payment/Request-order-refund`, {
+  refundOrder(orderId: number, reason: string): Observable<any> {
+    return this._httpClient.post(
+      `${environment.urlPath}payment/Request-order-refund`,
+      {
         orderId,
         reason,
-      })
-      .subscribe({
-        next: () => {
-          this.refundStatus.set('success');
-          this.refundMessage.set('✅ Refund request submitted successfully.');
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${this.auth.getToken()}`,
+
+          'Content-Type': 'application/json',
         },
-        error: (err) => {
-          this.refundStatus.set('error');
-          this.refundMessage.set(err?.error?.message || '❌ Refund failed.');
-        },
-      });
+      }
+    );
   }
 
-  // ✅ دالة لإعادة تعيين الحالة
-  resetRefundState() {
-    this.refundStatus.set('idle');
-    this.refundMessage.set(null);
+  refundProduct(orderItemId: number, reason: string): Observable<any> {
+    return this._httpClient.post(
+      `${environment.urlPath}payment/Request-product-refund`,
+      {
+        orderItemId,
+        reason,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${this.auth.getToken()}`,
+
+          'Content-Type': 'application/json',
+        },
+      }
+    );
   }
 }

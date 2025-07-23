@@ -10,7 +10,7 @@ import { AuthService } from '../Auth/auth.service';
   providedIn: 'root',
 })
 export class PreviousOrder {
-  private apiUrl = `${environment.urlPath}Order/with-customer`; // Adjust the URL as needed
+  private apiUrl = `${environment.urlPath}Order/previous-orders`; // Adjust the URL as needed
   constructor(private http: HttpClient, private auth: AuthService) {}
 
   getPreviousOrders(): Observable<IPreviousOrder[]> {

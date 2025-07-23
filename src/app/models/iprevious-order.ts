@@ -1,4 +1,4 @@
-import { iPreviousOrderItem } from "./iPreviousOrderItem";
+import { iPreviousOrderItem } from './iPreviousOrderItem';
 
 export interface IPreviousOrder {
   orderId: number; // [BindNever]

@@ -12,15 +12,28 @@ import {
 import { ICartItem } from '../../models/ICartItem';
 import { environment } from '../../../environments/environment.development';
 import { Router, RouterModule } from '@angular/router';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  FormsModule,
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
 import { OrderService } from '../services/Order/order.service';
 import { Login } from '../login/login';
 import { MatDialog } from '@angular/material/dialog';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-order',
   standalone: true,
-  imports: [CommonModule, DecimalPipe, RouterModule, FormsModule, ReactiveFormsModule],
+  imports: [
+    CommonModule,
+    DecimalPipe,
+    RouterModule,
+    FormsModule,
+    ReactiveFormsModule,
+  ],
   templateUrl: './order.html',
   styleUrl: './order.css',
 })
@@ -34,7 +47,6 @@ export class Order implements OnInit, OnDestroy {
   private completedCheckout: boolean = false;
   private shouldContinueCheckout: boolean = false;
   validationErrors: { [key: string]: string[] } = {};
-
 
   orderForm: FormGroup;
   isLoggedInNow = false;
@@ -77,13 +89,16 @@ export class Order implements OnInit, OnDestroy {
       email: ['', [Validators.required, Validators.email]],
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
-      phoneNumber: ['', [Validators.required, Validators.pattern(/^01[0125][0-9]{8}$/)]],
+      phoneNumber: [
+        '',
+        [Validators.required, Validators.pattern(/^01[0125][0-9]{8}$/)],
+      ],
       paymentMethod: [null, Validators.required],
       street: ['', Validators.required],
       apartment: [''],
       building: [''],
       floor: [''],
-      governrateShippingCostId: [null, Validators.required]
+      governrateShippingCostId: [null, Validators.required],
     });
     this.addressSelectControl = this.fb.control(null);
     this.addNewAddressControl = this.fb.control(false);
@@ -110,7 +125,7 @@ export class Order implements OnInit, OnDestroy {
         email: this.order.customerInfo.email || '',
         firstName: this.order.customerInfo.firstName || '',
         lastName: this.order.customerInfo.lastName || '',
-        phoneNumber: this.order.customerInfo.phoneNumber || ''
+        phoneNumber: this.order.customerInfo.phoneNumber || '',
       });
     }
 
@@ -169,7 +184,7 @@ export class Order implements OnInit, OnDestroy {
             email: customerData.email || '',
             firstName: customerData.firstName || '',
             lastName: customerData.lastName || '',
-            phoneNumber: customerData.phoneNumber || ''
+            phoneNumber: customerData.phoneNumber || '',
           });
           this.cdr.detectChanges();
         },
@@ -197,7 +212,7 @@ export class Order implements OnInit, OnDestroy {
         panelClass: 'no-padding-dialog',
         backdropClass: 'custom-backdrop',
         width: '100%',
-        maxWidth: 'none'
+        maxWidth: 'none',
       });
       dialogRef.afterClosed().subscribe((result) => {
         if (result?.token && result?.customerInfo) {
@@ -228,7 +243,7 @@ export class Order implements OnInit, OnDestroy {
       firstName: this.orderForm.value.firstName,
       lastName: this.orderForm.value.lastName,
       phoneNumber: this.orderForm.value.phoneNumber,
-      dateOfBirth: new Date() // not used in form, set to default date
+      dateOfBirth: new Date(), // not used in form, set to default date
     };
     this.order.addressInfo = {
       street: this.orderForm.value.street,
@@ -237,7 +252,7 @@ export class Order implements OnInit, OnDestroy {
       floor: this.orderForm.value.floor,
       governrateShippingCostId: this.orderForm.value.governrateShippingCostId,
       city: '', // can be set from governorate selection logic
-      country: 'Egypt' // default value
+      country: 'Egypt', // default value
     };
     this.order.paymentMethod = this.orderForm.value.paymentMethod;
 
@@ -270,7 +285,10 @@ export class Order implements OnInit, OnDestroy {
     this.order.totalOrderPrice = this.estimatedTotal + this.shippingCost;
 
     // Ensure city is set before sending order
-    if (!this.order.addressInfo.city || this.order.addressInfo.city.trim() === '') {
+    if (
+      !this.order.addressInfo.city ||
+      this.order.addressInfo.city.trim() === ''
+    ) {
       const govId = this.order.addressInfo.governrateShippingCostId;
       const selectedGov = this.governorates.find((gov) => gov.id === govId);
       if (selectedGov) {
@@ -289,9 +307,21 @@ export class Order implements OnInit, OnDestroy {
         }
 
         this.router.navigate(['/thank-you']);
+        Swal.fire({
+          title: 'Order Placed Successfully',
+          text: 'Your order has been placed successfully.',
+          icon: 'success',
+          confirmButtonText: 'OK',
+        });
       },
       error: (err) => {
         console.error('❌ Error during checkout:', err);
+        Swal.fire({
+          title: 'Error',
+          text: 'An error occurred while placing your order. Please try again later.',
+          icon: 'error',
+          confirmButtonText: 'OK',
+        });
       },
     });
   }
@@ -379,9 +409,7 @@ export class Order implements OnInit, OnDestroy {
   onGovernorateChange(): void {
     // Always use the value from the form, not just addressInfo
     const govId = this.orderForm.value.governrateShippingCostId;
-    const selectedGov = this.governorates.find(
-      (gov) => gov.id === govId
-    );
+    const selectedGov = this.governorates.find((gov) => gov.id === govId);
 
     if (selectedGov) {
       this.order.addressInfo.governrateShippingCostId = selectedGov.id;
@@ -429,7 +457,7 @@ export class Order implements OnInit, OnDestroy {
           apartment: selected.apartment || '',
           building: selected.building || '',
           floor: selected.floor || '',
-          governrateShippingCostId: selected.governrateShippingCostId ?? null
+          governrateShippingCostId: selected.governrateShippingCostId ?? null,
         });
         // Update shipping cost immediately based on governorate
         const selectedGov = this.governorates.find(
@@ -463,7 +491,7 @@ export class Order implements OnInit, OnDestroy {
         apartment: '',
         building: '',
         floor: '',
-        governrateShippingCostId: null
+        governrateShippingCostId: null,
       });
       this.cdr.detectChanges();
     } else {

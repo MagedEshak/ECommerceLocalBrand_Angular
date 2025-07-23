@@ -1,102 +1,201 @@
+import { Component, OnInit, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Component, effect, OnInit } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { iPreviousOrderItem } from '../../models/iPreviousOrderItem';
+import { RouterLink } from '@angular/router';
+import { RefundOrderService } from '../../shared/services/refund-order/refund-order.service';
 import { PreviousOrder } from '../../shared/services/PreviousOrders/previous-orders';
 import { IPreviousOrder } from '../../models/iprevious-order';
-import { RefundOrderService } from '../../shared/services/refund-order/refund-order.service';
+import { environment } from '../../../environments/environment.development';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-previous-orders',
-  imports: [RouterLink, CommonModule, FormsModule],
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './previous-orders.html',
-  styleUrl: './previous-orders.css',
+  styleUrls: ['./previous-orders.css'],
 })
 export class PreviousOrders implements OnInit {
-  selectedOrderId: number | null = null;
-  refundReason = '';
-  showRefundForm = false;
-
-  IPreviousOrder!: IPreviousOrder;
-  IPreviousOrderitem!: iPreviousOrderItem;
   orders: IPreviousOrder[] = [];
+  // filteredOrders: IPreviousOrder[] = [];
+  imagePath = `${environment.baseServerUrl}`;
 
+  selectedOrderId: number | null = null;
+  selectedProductId: number | null = null;
+  refundReason: string = '';
+
+  showRefundForm = false;
+  showProductRefundForm = false;
+  statusBar = [
+    'Pending',
+    'Processing',
+    'Shipped',
+    'Delivered',
+    'Cancelled',
+    'Rejected',
+  ];
+  filterOptions = ['All Orders', 'Completed', 'Cancelled', 'Pending'];
+  selectedFilter = 'All Orders';
   constructor(
     private refundOrderService: RefundOrderService,
     private previousOrderService: PreviousOrder
   ) {}
 
-  get refundStatus() {
-    return this.refundOrderService.refundStatus;
-  }
-
-  get refundMessage() {
-    return this.refundOrderService.refundMessage;
-  }
-
   ngOnInit(): void {
-    this.previousOrderService.getPreviousOrders().subscribe((res) => {
-      this.orders = res;
-
-      console.log('Previous Orders:', res);
+    this.previousOrderService.getPreviousOrders().subscribe({
+      next: (response) => {
+        this.orders = response;
+      },
+      error: () => {
+        Swal.fire({
+          title: 'Error',
+          text: 'An error occurred while fetching previous orders.',
+          icon: 'error',
+          confirmButtonText: 'OK',
+        });
+      },
     });
-    effect(() => {
-      const status = this.refundStatus();
-      if (status === 'success' || status === 'error') {
-        setTimeout(() => {
-          this.refundOrderService.resetRefundState();
-        }, 4000);
-      }
-    });
   }
 
-  openRefundForm(orderId: number) {
-    this.selectedOrderId = orderId;
-    this.showRefundForm = true;
+  // ===== Filtering
+
+  // applyFilter() {
+  //   if (!this.activeFilter) {
+  //     this.filteredOrders = [...this.orders];
+  //   } else {
+  //     this.filteredOrders = this.orders.filter(
+  //       (order) => order.shippingStatus === this.activeFilter
+  //     );
+  //   }
+  // }
+  // الدالة لتغيير الفلتر
+  filterByStatus(status: string) {
+    this.selectedFilter = status;
   }
 
-  submitRefund() {
-    if (!this.selectedOrderId || !this.refundReason.trim()) return;
-    this.refundOrderService.refundOrder(
-      this.selectedOrderId,
-      this.refundReason.trim()
-    );
-    this.showRefundForm = false;
-    this.refundReason = '';
-    this.selectedOrderId = null;
-  }
-
-  // Shipping Progress
-  order = { shippingStatus: 'OutForDelivery' };
-
-  shippingSteps = [
-    'NotShipped',
-    'ReadyToShip',
-    'Shipped',
-    'OutForDelivery',
-    'Delivered',
-  ];
-
-  getCurrentStep(): number {
-    return this.shippingSteps.indexOf(this.order.shippingStatus);
-  }
-
-  getStepLabel(step: string): string {
-    switch (step) {
-      case 'NotShipped':
-        return 'Not Shipped';
-      case 'ReadyToShip':
-        return 'Ready To Ship';
-      case 'Shipped':
-        return 'Shipped';
-      case 'OutForDelivery':
-        return 'Out For Delivery';
-      case 'Delivered':
-        return 'Delivered';
+  // دالة ترجمة التسمية في الزر
+  getStepLabel(status: string): string {
+    switch (status) {
+      case 'All Orders':
+        return 'All Orders';
+      case 'Completed':
+        return 'Completed';
+      case 'Cancelled':
+        return 'Cancelled';
+      case 'Pending':
+        return 'Pending';
       default:
-        return 'Unknown';
+        return status;
     }
   }
+
+  // الطلبات المفلترة
+  get filteredOrders() {
+    if (this.selectedFilter === 'All') {
+      return this.orders;
+    } else if (this.selectedFilter === 'Completed') {
+      return this.orders.filter(
+        (order) => order.shippingStatus === 'Delivered'
+      );
+    } else if (this.selectedFilter === 'Cancelled') {
+      return this.orders.filter(
+        (order) => order.shippingStatus === 'Cancelled'
+      );
+    }
+    return this.orders;
+  }
+
+  // ===== Refund Forms
+  openRefundForm(orderId: number) {
+    this.selectedOrderId = orderId;
+    this.selectedProductId = null;
+    this.refundReason = '';
+    this.showRefundForm = true;
+    this.showProductRefundForm = false;
+  }
+
+  openProductRefundForm(orderId: number, productId: number) {
+    this.selectedOrderId = orderId;
+    this.selectedProductId = productId;
+    this.refundReason = '';
+    this.showProductRefundForm = true;
+    this.showRefundForm = false;
+  }
+
+  closeRefundForms() {
+    this.showRefundForm = false;
+    this.showProductRefundForm = false;
+    this.selectedOrderId = null;
+    this.selectedProductId = null;
+    this.refundReason = '';
+  }
+
+  // Submit Refund
+  submitRefund(isProductRefund: boolean) {
+    if (!this.refundReason.trim()) return;
+
+    if (
+      isProductRefund &&
+      this.selectedOrderId &&
+      this.selectedProductId !== null
+    ) {
+      this.refundOrderService
+        .refundProduct(this.selectedProductId, this.refundReason.trim())
+        .subscribe({
+          next: () => {
+            Swal.fire({
+              title: 'Success!',
+              text: '✅ Product refund request sent successfully.',
+              icon: 'success',
+              background: '#000',
+              color: '#fff',
+              confirmButtonColor: '#fff',
+            });
+            this.closeRefundForms();
+          },
+          error: (err) => {
+            Swal.fire({
+              title: 'Failed!',
+              text:
+                err?.error?.message ||
+                '❌ Failed to send product refund request.',
+              icon: 'error',
+              background: '#000',
+              color: '#fff',
+              confirmButtonColor: '#fff',
+            });
+          },
+        });
+    } else if (!isProductRefund && this.selectedOrderId !== null) {
+      this.refundOrderService
+        .refundOrder(this.selectedOrderId, this.refundReason.trim())
+        .subscribe({
+          next: () => {
+            Swal.fire({
+              title: 'Success!',
+              text: '✅ Order refund request sent successfully.',
+              icon: 'success',
+              background: '#000',
+              color: '#fff',
+              confirmButtonColor: '#fff',
+            });
+            this.closeRefundForms();
+          },
+          error: (err) => {
+            Swal.fire({
+              title: 'Failed!',
+              text:
+                err?.error?.message ||
+                '❌ Failed to send order refund request.',
+              icon: 'error',
+              background: '#000',
+              color: '#fff',
+              confirmButtonColor: '#fff',
+            });
+          },
+        });
+    }
+  }
+
+  // Progress labels
 }
