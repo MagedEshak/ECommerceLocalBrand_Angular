@@ -19,16 +19,14 @@ export class App implements AfterViewInit {
   constructor(
     public routerState: RouterStateService,
     @Inject(PLATFORM_ID) private platformId: Object,
-      private realTimeService: RealTimeService
-
+    private realTimeService: RealTimeService
   ) {}
 
   ngAfterViewInit(): void {
     if (isPlatformBrowser(this.platformId)) {
       AOS.init();
       AOS.refresh();
-          this.realTimeService.startConnection();
-
+      this.realTimeService.startConnection();
     }
   }
 }

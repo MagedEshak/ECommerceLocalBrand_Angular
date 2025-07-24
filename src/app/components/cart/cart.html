@@ -32,11 +32,7 @@
         *ngFor="let item of cartItems"
         class="flex items-center gap-4 p-2 rounded-md hover:bg-neutral-400 transition-all ease-in duration-200"
       >
-        <img
-          [src]="item.productImageUrl"
-          alt=""
-          class="size-16 rounded-sm object-cover"
-        />
+        <img [src]="ImageUrl" alt="" class="size-16 rounded-sm object-cover" />
 
         <div class="flex flex-col justify-between flex-1">
           <div>
@@ -120,13 +116,12 @@
 
     <!-- Action Buttons -->
     <div class="space-y-4 text-center">
- <a
-  (click)="completeCheckout()"
-  class="block rounded-sm bg-black px-5 py-3 text-sm border text-white transition hover:bg-transparent hover:text-black"
->
-  Checkout
-</a>
-
+      <a
+        (click)="completeCheckout()"
+        class="block rounded-sm bg-black px-5 py-3 text-sm border text-white transition hover:bg-transparent hover:text-black"
+      >
+        Checkout
+      </a>
 
       <a
         href="#"
