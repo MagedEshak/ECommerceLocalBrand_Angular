@@ -12,7 +12,7 @@ import { RealTimeService } from '../../shared/services/RealTime/real-time-servic
   templateUrl: './all-products.html',
   styleUrl: './all-products.css',
 })
-export class AllProducts implements OnInit {
+export class AllProducts implements OnInit  {
   filteredProducts: IProduct[] = [] as IProduct[];
   currentPageIndex = 1;
   totalPages = 1;
@@ -32,6 +32,8 @@ export class AllProducts implements OnInit {
 
         // قلل العدد عشان يفضل ثابت
         this.filteredProducts = updatedProducts.slice(0, totalPerPage);
+        console.log('🟡 Real-time products:', newProducts);
+
       }
     });
   }
