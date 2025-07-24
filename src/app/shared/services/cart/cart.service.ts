@@ -106,6 +106,7 @@ export class CartItemService {
     return new Observable((observer) => {
       this.http.get<any>(this.cartUrl, { headers }).subscribe({
         next: (cart) => {
+          console.log('✅ Cart loaded successfully:', cart);
           observer.next(cart);
           observer.complete();
         },

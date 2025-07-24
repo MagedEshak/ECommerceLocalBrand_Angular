@@ -7,20 +7,25 @@ import { ICustomer, IOrder } from '../../../models/IOrder';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
-
+import { AuthService } from '../Auth/auth.service';
 
 
 @Injectable({
   providedIn: 'root',
 })
 export class OrderService {
-  constructor(private _httpClient: HttpClient) {}
+  constructor(private _httpClient: HttpClient , private auth:AuthService) {}
 
 
   // 1. Get addresses for specific user (by ID)
   getAddressesByUserId(userId: string): Observable<any[]> {
     return this._httpClient.get<any[]>(
-      `${environment.baseServerUrl}/api/Account/${userId}/addresses`
+      `${environment.baseServerUrl}/api/Account/addresses`,
+            {    headers: {
+        Authorization: `Bearer ${this.auth.getToken()}`,
+
+        'Content-Type': 'application/json',
+      },}
     );
   }
 
@@ -40,9 +45,14 @@ getGovernorateShippingCosts(): Observable<{ id: number; name: string; shippingCo
     );
   }
   // 4. Post  getCustomerById
-getCustomerById(customerId: string): Observable<ICustomer> {
+getCustomerById(): Observable<ICustomer> {
   return this._httpClient.get<ICustomer>(
-    `${environment.baseServerUrl}/api/Account/${customerId}`
+    `${environment.baseServerUrl}/api/Account`,
+              {    headers: {
+        Authorization: `Bearer ${this.auth.getToken()}`,
+
+        'Content-Type': 'application/json',
+      },}
   ).pipe(
     catchError((error: HttpErrorResponse) => {
       let errorMessage = 'Something went wrong';

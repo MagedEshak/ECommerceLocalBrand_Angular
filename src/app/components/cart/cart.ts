@@ -52,20 +52,18 @@ export class Cart implements OnInit {
     this.cartService.getCurrentUserCart().subscribe({
       next: (res: any) => {
         const items = res?.cartItems ?? [];
+        console.log(items)
 
         this.cartItems = items.map((item: any) => ({
           id: item.id, // ✅ خد الآي دي هنا
           productId: item.productId,
           productName: item.productName ?? 'Unknown',
-          productImageUrl: item.productImageUrl
-            ? environment.baseServerUrl + item.productImageUrl
-            : '',
+          productImageUrl: item.productImageUrl,
           productSizeName: item.productSizeName ?? '',
           quantity: item.quantity,
           unitPrice: item.unitPrice,
           totalPriceForOneItemType: item.totalPriceForOneItemType,
         }));
-
         this.calculateTotal();
       },
       error: (err) => {
@@ -81,7 +79,7 @@ export class Cart implements OnInit {
 
         this.cartItems = rawItems.map((item: any) => ({
           ...item,
-          productImageUrl: item.image,
+          productImageUrl: +item.image,
         }));
 
         this.calculateTotal();

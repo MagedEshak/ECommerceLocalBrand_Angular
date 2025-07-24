@@ -176,7 +176,7 @@ export class Order implements OnInit, OnDestroy {
     if (user?.id) {
       this.order.customerId = user.id;
 
-      this.orderService.getCustomerById(user.id).subscribe({
+      this.orderService.getCustomerById().subscribe({
         next: (customerData) => {
           this.order.customerInfo = { ...customerData };
           // Patch form values when customer data is loaded
@@ -256,7 +256,7 @@ export class Order implements OnInit, OnDestroy {
     };
     this.order.paymentMethod = this.orderForm.value.paymentMethod;
 
-    this.orderService.getCustomerById(user.id).subscribe({
+    this.orderService.getCustomerById().subscribe({
       next: (customerData) => {
         if (!customerData?.email || !customerData?.phoneNumber) {
           alert('❌ Please complete your profile before placing an order.');
@@ -424,6 +424,7 @@ export class Order implements OnInit, OnDestroy {
   loadAddresses(userId: string): void {
     this.orderService.getAddressesByUserId(userId).subscribe({
       next: (addresses) => {
+        console.log('Addresses loaded:', addresses);
         this.savedAddresses = addresses;
       },
       error: (err) => {
