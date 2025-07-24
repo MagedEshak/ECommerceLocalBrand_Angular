@@ -7,6 +7,8 @@ import { MainLayout } from './components/main-layout/main-layout';
 import { AllProducts } from './components/all-products/all-products';
 import { Login } from './components/login/login';
 import { authGuard } from './shared/guards/auth-guard';
+import { ContactUs } from './components/contact-us/contact-us';
+import { Policy } from './components/policy/policy';
 
 export const routes: Routes = [
   {
@@ -37,7 +39,9 @@ export const routes: Routes = [
       {
         path: 'profile',
         loadComponent: () =>
-          import('./components/profile/profile').then((m) => m.ProfileComponent),
+          import('./components/profile/profile').then(
+            (m) => m.ProfileComponent
+          ),
         canActivate: [authGuard],
       },
       {
@@ -53,6 +57,16 @@ export const routes: Routes = [
         path: 'order',
         component: Order,
         title: 'Checkout',
+      },
+      {
+        path: 'contact-us',
+        component: ContactUs,
+        title: 'Contact-us',
+      },
+      {
+        path: 'policy',
+        component: Policy,
+        title: 'Policy',
       },
     ],
   },
