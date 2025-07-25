@@ -12,7 +12,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, RouterLink, Cart, MatDialogModule], // ✅ أضف هنا
+  imports: [CommonModule, RouterLink, MatDialogModule], // ✅ أضف هنا
   templateUrl: './header.html',
   styleUrls: ['./header.css'],
 })

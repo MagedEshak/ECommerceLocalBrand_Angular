@@ -79,7 +79,7 @@ export class Cart implements OnInit {
 
         this.cartItems = rawItems.map((item: any) => ({
           ...item,
-          productImageUrl:item.image , 
+          productImageUrl:item.image ,
         }));
 
         this.calculateTotal();

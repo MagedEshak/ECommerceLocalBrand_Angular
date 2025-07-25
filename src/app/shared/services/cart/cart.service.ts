@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { IProduct } from '../../../models/iproduct';
 import { environment } from '../../../../environments/environment.development';
 import { AuthService } from '../Auth/auth.service';
@@ -149,5 +149,12 @@ export class CartItemService {
     return this.http.delete(`${this.apiUrl}?cartItemId=${cartItemId}`, {
       headers,
     });
+  }
+
+    private cartCountSubject = new BehaviorSubject<number>(0);
+  cartCount$ = this.cartCountSubject.asObservable();
+
+  updateCartCount(count: number) {
+    this.cartCountSubject.next(count);
   }
 }
