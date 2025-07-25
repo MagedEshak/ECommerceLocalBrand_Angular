@@ -5,11 +5,12 @@ import { RealTimeService } from './shared/services/RealTime/real-time-service';
 import { RouterStateService } from './shared/services/Router-State/router-state.service';
 import * as AOS from 'aos';
 import { isPlatformBrowser } from '@angular/common';
+import { Spinner } from './components/spinner/spinner';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, Spinner],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
