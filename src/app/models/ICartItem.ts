@@ -1,11 +1,12 @@
 export interface ICartItem {
-  id: number;
+  id?: number;
+  cartId?: number;
   productId: number;
-  productName?: string; // اختياري
-  productImageUrl: string; // اختياري
   productSizeId: number;
-  productSizeName?: string; // اختياري
   quantity: number;
   unitPrice: number;
   totalPriceForOneItemType: number;
+  productName?: string;
+  productImageUrl?: string;
+  productSizeName?: string;
 }

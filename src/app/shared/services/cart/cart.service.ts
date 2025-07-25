@@ -10,7 +10,10 @@ import { ICartItem } from '../../../models/ICartItem';
   providedIn: 'root',
 })
 export class CartItemService {
-  private apiUrl = `${environment.baseServerUrl}/api/CartItem`;
+  private apiUrl = `${environment.baseServerUrl}/api/CartItem/add-single`;
+  private updateUrl = `${environment.baseServerUrl}/api/CartItem/`;
+  private DeleteUrl = `${environment.baseServerUrl}/api/CartItem/`;
+
   private cartUrl = `${environment.baseServerUrl}/api/Cart`;
 
   constructor(private http: HttpClient, private authService: AuthService) {}
@@ -89,13 +92,14 @@ export class CartItemService {
     });
   }
 
-  addToCartFromLocalStorageAfterLogin(items: ICartItem[]): Observable<any> {
-    return this.http.post('/api/cart/add', items);
-  }
+  addToCartFromLocalStorageAfterLogin(cartItems: ICartItem[]) {
 
-  /**
-   * تحميل كارت المستخدم من السيرفر
-   */
+    return this.http.post('/api/cart/add-multiple', cartItems);
+
+}
+
+
+
   getCurrentUserCart(): Observable<any> {
     const token = this.authService.getToken();
     let headers = new HttpHeaders();
@@ -133,7 +137,7 @@ export class CartItemService {
       headers = headers.set('Authorization', `Bearer ${token}`);
     }
 
-    return this.http.put(this.apiUrl, item, { headers });
+    return this.http.put(this.updateUrl, item, { headers });
   }
 
   /**
@@ -146,7 +150,7 @@ export class CartItemService {
       headers = headers.set('Authorization', `Bearer ${token}`);
     }
 
-    return this.http.delete(`${this.apiUrl}?cartItemId=${cartItemId}`, {
+    return this.http.delete(`${this.DeleteUrl}?cartItemId=${cartItemId}`, {
       headers,
     });
   }

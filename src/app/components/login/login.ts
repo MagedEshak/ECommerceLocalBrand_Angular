@@ -109,7 +109,7 @@ export class Login {
     });
   }
 
-  verifyCode() {
+  async verifyCode() {
     const email = this.form.get('email')?.value;
     const code = this.verificationCode;
 
@@ -130,50 +130,49 @@ export class Login {
         const guestCartRaw = localStorage.getItem('guestCart');
         if (guestCartRaw) {
           try {
-            const cart = await firstValueFrom(
-              this._cartItemService.getCurrentUserCart()
-            );
-            const cartId = cart?.id; // جيب الـ CartId الصح من الـ API
+            const cart = await firstValueFrom(this._cartItemService.getCurrentUserCart());
+            const cartId = cart?.id;
 
-            const guestCartItems: ICartItem[] = JSON.parse(guestCartRaw).map(
-              (item: any) => ({
-                ...item,
-                cartId: cartId,
-                unitPrice: parseFloat(item.unitPrice.toString()), // تحويل صريح لـ string ثم عشري
-                totalPriceForOneItemType: parseFloat(
-                  item.totalPriceForOneItemType.toString()
-                ),
-              })
-            );            console.log('Modified Guest Cart Items:', guestCartItems); // Log الـ Payload
+            // ✅ جهّز الـ Payload النهائي بشكل صحيح
+            const guestCartItems: ICartItem[] = JSON.parse(guestCartRaw).map((item: any) => ({
+              id: 0,
+              productId: item.productId,
+              productSizeId: item.productSizeId,
+              quantity: item.quantity,
+              unitPrice: item.unitPrice,
+              totalPriceForOneItemType: item.totalPriceForOneItemType,
+              productName: item.productName || item.name || 'Unknown',
+              productImageUrl: item.productImageUrl || item.image || '',
+              productSizeName: item.productSizeName || '',
+            }));
 
-            // ✅ استخدم الفنكشن الجديدة
+            console.log('📦 Payload to /add-multiple:', guestCartItems);
+
             const result = await firstValueFrom(
-              this._cartItemService.addToCartFromLocalStorageAfterLogin(
-                guestCartItems
-              )
+              this._cartItemService.addToCartFromLocalStorageAfterLogin(guestCartItems)
             );
-            console.log('API Response:', result);
 
-            // ✅ بعد الترحيل الناجح، امسح الجست كارت
-            localStorage.removeItem('guestCart');
+            console.log('✅ API Response from /add-multiple:', result);
+
+            localStorage.removeItem('guestCart'); // ✅ تنظيف الجست كارت بعد النجاح
           } catch (err) {
             console.error('❌ Failed to sync guest cart to DB:', err);
-            localStorage.removeItem('guestCart');
+            localStorage.removeItem('guestCart'); // حتى لو حصل خطأ
           }
         }
 
         // ✅ قفل الديالوج لو معمول Dialog
         if (this.dialogRef) {
-this.dialogRef.close({
-  token: res.token,
-  customerInfo: res.customerInfo, // أو أي property اسمها في الـ API response
-});
+          this.dialogRef.close({
+            token: res.token,
+            customerInfo: res.customerInfo,
+          });
         }
 
         // ✅ Emit للي فتح الكومبوننت
         this.loginSuccess.emit();
 
-        // ✅ اختياري: تنقل
+        // ✅ تنقل للصفحة الرئيسية
         this.isVerificationPopupVisible = false;
         this.router.navigate(['/home']);
       },
@@ -186,6 +185,7 @@ this.dialogRef.close({
       },
     });
   }
+
   get isHome(): boolean {
     return this.routerState.isHome;
   }
@@ -196,3 +196,4 @@ this.dialogRef.close({
     }
   }
 }
+// 
