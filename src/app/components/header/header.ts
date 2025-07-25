@@ -8,21 +8,24 @@ import { filter } from 'rxjs/operators';
 import { MatDialog } from '@angular/material/dialog';
 import { Login } from '../login/login';
 import { MatDialogModule } from '@angular/material/dialog';
+import { CartItemService } from '../../shared/services/cart/cart.service';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, RouterLink, MatDialogModule], // ✅ أضف هنا
+  imports: [CommonModule, RouterLink, MatDialogModule, Cart], // ✅ أضف هنا
   templateUrl: './header.html',
   styleUrls: ['./header.css'],
 })
-export class Header {
+export class Header implements OnInit {
   isLoggedIn = false;
   isCartVisible = false;
   isProfileVisible = false;
   isMobileMenuVisible = false;
+  cartCount = 0; // عداد السلة
 
   constructor(
+    private cartservice: CartItemService,
     public routerState: RouterStateService,
     private router: Router,
     private authService: AuthService,
@@ -40,7 +43,12 @@ export class Header {
         this.closeProfile();
       });
   }
-
+  ngOnInit(): void {
+    this.cartservice.cartCount$.subscribe((count) => {
+      console.log('Cart Count:', count);
+      this.cartCount = count;
+    });
+  }
   logout() {
     this.authService.logout();
     this.router.navigate(['/home']);
