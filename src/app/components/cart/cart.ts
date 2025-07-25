@@ -1,11 +1,4 @@
-import {
-  Component,
-  EventEmitter,
-  OnInit,
-  Output,
-  ChangeDetectorRef,
-  ViewEncapsulation,
-} from '@angular/core';
+import { Component, EventEmitter, OnInit, Output,ChangeDetectorRef, ViewEncapsulation } from '@angular/core';
 import { DecimalPipe, CommonModule } from '@angular/common';
 import { CartItemService } from '../../shared/services/cart/cart.service';
 import { AuthService } from '../../shared/services/Auth/auth.service';
@@ -19,13 +12,15 @@ import { Login } from '../login/login';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
+
 @Component({
   selector: 'app-cart',
   standalone: true,
   templateUrl: './cart.html',
   styleUrls: ['./cart.css'],
   imports: [CommonModule, DecimalPipe, RouterModule, FormsModule], // <-- أضف RouterModule هنا
-  encapsulation: ViewEncapsulation.None,
+  encapsulation: ViewEncapsulation.None
+
 })
 export class Cart implements OnInit {
   @Output() close = new EventEmitter<void>();
@@ -33,7 +28,7 @@ export class Cart implements OnInit {
   cartItems: ICartItem[] = [];
   estimatedTotal = 0;
   isLoggedInNow = false;
-  ImageUrl!: string;
+
   constructor(
     private cartService: CartItemService,
     private authService: AuthService, // ⬅️ نستخدمه بدل ما نعتمد على cartService.getToken()
@@ -57,13 +52,13 @@ export class Cart implements OnInit {
     this.cartService.getCurrentUserCart().subscribe({
       next: (res: any) => {
         const items = res?.cartItems ?? [];
-        console.log(items);
+        console.log(items)
 
         this.cartItems = items.map((item: any) => ({
           id: item.id, // ✅ خد الآي دي هنا
           productId: item.productId,
           productName: item.productName ?? 'Unknown',
-          productImageUrl: `${(this.ImageUrl = item.productImageUrl)}`,
+          productImageUrl: environment.baseServerUrl + item.productImageUrl,
           productSizeName: item.productSizeName ?? '',
           quantity: item.quantity,
           unitPrice: item.unitPrice,
@@ -82,11 +77,10 @@ export class Cart implements OnInit {
       try {
         const rawItems = JSON.parse(storedCart);
 
-        this.cartItems = rawItems.map((item: any) => {
-          console.log(`cart image
-             ${(this.ImageUrl = item.image)}`);
-          ({ ...item, productImageUrl: `${(this.ImageUrl = item.image)}` });
-        });
+        this.cartItems = rawItems.map((item: any) => ({
+          ...item,
+          productImageUrl:item.image , 
+        }));
 
         this.calculateTotal();
       } catch (e) {
@@ -224,26 +218,27 @@ export class Cart implements OnInit {
     this.close.emit();
   }
   completeCheckout(): void {
-    const token = this.authService.getToken();
-    const isLoggedIn = !!token;
+  const token = this.authService.getToken();
+  const isLoggedIn = !!token;
 
-    if (!isLoggedIn) {
-      this.isLoggedInNow = true;
+  if (!isLoggedIn) {
+    this.isLoggedInNow = true;
 
-      const dialogRef = this.dialog.open(Login, {
-        panelClass: 'no-padding-dialog',
-        backdropClass: 'custom-backdrop',
-        width: '60%',
-        maxWidth: 'none',
-      });
+    const dialogRef = this.dialog.open(Login, {
+       panelClass: 'no-padding-dialog',
+  backdropClass: 'custom-backdrop',
+  width: '60%',
+  maxWidth: 'none'
+    });
 
-      dialogRef.afterClosed().subscribe((result) => {
-        if (result?.token) {
-          this.router.navigate(['/order']);
-        }
-      });
-    } else {
-      this.router.navigate(['/order']);
-    }
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result?.token) {
+        this.router.navigate(['/order']);
+      }
+    });
+  } else {
+    this.router.navigate(['/order']);
   }
+}
+
 }
