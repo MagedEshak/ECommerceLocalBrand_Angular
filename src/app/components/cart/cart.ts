@@ -86,20 +86,20 @@ export class Cart implements OnInit {
     const storedCart = localStorage.getItem('guestCart');
     if (storedCart) {
       try {
-     const rawItems = JSON.parse(storedCart);
-      this.cartItems = rawItems.map((item: any) => {
-        return {
-          id: 0, // id مش موجود في local cart
-          productId: item.productId,
-          productSizeId: item.productSizeId,
-          quantity: item.quantity,
-          unitPrice: item.unitPrice,
-          totalPriceForOneItemType: item.totalPriceForOneItemType,
-          productName: item.productName || item.name || 'Unknown',
-          productImageUrl: item.productImageUrl || item.image || '',
-          productSizeName: item.productSizeName || '',
-        } as ICartItem;
-      });
+        const rawItems = JSON.parse(storedCart);
+        this.cartItems = rawItems.map((item: any) => {
+          return {
+            id: 0, // id مش موجود في local cart
+            productId: item.productId,
+            productSizeId: item.productSizeId,
+            quantity: item.quantity,
+            unitPrice: item.unitPrice,
+            totalPriceForOneItemType: item.totalPriceForOneItemType,
+            productName: item.productName || item.name || 'Unknown',
+            productImageUrl: item.productImageUrl || item.image || '',
+            productSizeName: item.productSizeName || '',
+          } as ICartItem;
+        });
 
         this.calculateTotal();
       } catch (e) {

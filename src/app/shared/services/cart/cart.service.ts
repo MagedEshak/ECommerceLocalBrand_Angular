@@ -151,10 +151,14 @@ export class CartItemService {
     });
   }
 
-    private cartCountSubject = new BehaviorSubject<number>(0);
+  private cartCountSubject = new BehaviorSubject<number>(0);
   cartCount$ = this.cartCountSubject.asObservable();
 
   updateCartCount(count: number) {
     this.cartCountSubject.next(count);
+  }
+  loadCartCountFromLocalStorage() {
+    const cart = JSON.parse(localStorage.getItem('guestCart') || '[]');
+    this.updateCartCount(cart.length);
   }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit ,ChangeDetectorRef} from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ProductDetailsService } from '../../shared/services/Product/product-details.service';
 import { IProduct } from '../../models/iproduct';
@@ -215,9 +215,14 @@ export class ProductDetails implements OnInit {
 
       existingCart.push(cartItem);
       this.showAlert('✅ Product added to cart successfully');
+      this.cartItemService.getCurrentUserCart().subscribe((cart) => {
+        const count = cart?.cartItems?.length || 0;
+        this.cartItemService.updateCartCount(count);
+      });
     }
 
     localStorage.setItem('guestCart', JSON.stringify(existingCart));
+    this.cartItemService.updateCartCount(existingCart.length);
   }
 
   addToCart() {
@@ -235,7 +240,13 @@ export class ProductDetails implements OnInit {
         this.cartItemService
           .addToCart(this.product!, this.selectedSize!, this.quantity)
           .subscribe({
-            next: () => this.showAlert('✅ Product added to cart'),
+            next: () => {
+              this.showAlert('✅ Product added to cart');
+              this.cartItemService.getCurrentUserCart().subscribe((cart) => {
+                const count = cart?.cartItems?.length || 0;
+                this.cartItemService.updateCartCount(count);
+              });
+            },
             error: (err) =>
               Swal.fire({
                 icon: 'error',
@@ -271,72 +282,72 @@ export class ProductDetails implements OnInit {
     };
   }
   buyNow() {
-  const token = this.authService.getToken();
-  const isLoggedIn = !!token;
+    const token = this.authService.getToken();
+    const isLoggedIn = !!token;
 
-  // التحقق من وجود منتج ومقاس
-  if (!this.product || !this.selectedSize) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Please select a size first.',
-      confirmButtonText: 'OK',
-    });
-    return;
+    // التحقق من وجود منتج ومقاس
+    if (!this.product || !this.selectedSize) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Please select a size first.',
+        confirmButtonText: 'OK',
+      });
+      return;
+    }
+
+    const sizeObj = this.product.productSizes?.find(
+      (s) => s.size === this.selectedSize
+    );
+
+    if (!sizeObj) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Selected size is not valid.',
+      });
+      return;
+    }
+
+    const buyNowItem = {
+      productId: this.product.id,
+      productSizeId: sizeObj.id,
+      productName: this.product.name,
+      productSizeName: sizeObj.size,
+      productImageUrl: this.product.productImagesPaths?.[0]
+        ? environment.baseServerUrl +
+          this.product.productImagesPaths[0].imagePath
+        : '/assets/images/default.png',
+      quantity: this.quantity,
+      unitPrice: this.product.price,
+      totalPriceForOneItemType: this.product.price * this.quantity,
+    };
+
+    sessionStorage.setItem('buyNowItem', JSON.stringify(buyNowItem));
+
+    if (!isLoggedIn) {
+      const dialogRef = this.dialog.open(Login, {
+        panelClass: 'no-padding-dialog',
+        backdropClass: 'custom-backdrop',
+        width: '60%',
+        maxWidth: 'none',
+      });
+
+      dialogRef.afterClosed().subscribe((result) => {
+        if (result?.token) {
+          this.authService.setLogin(result.token);
+          this.isLoggedInNow = true;
+          setTimeout(() => this.cdr.detectChanges(), 0);
+
+          // بعد تسجيل الدخول نروح على صفحة الأوردر
+          this.router.navigate(['/order']);
+        } else {
+          alert('❌ You must log in before placing an order.');
+        }
+      });
+
+      return;
+    }
+
+    // لو مسجل بالفعل، نروح على صفحة الأوردر
+    this.router.navigate(['/order']);
   }
-
-  const sizeObj = this.product.productSizes?.find(
-    (s) => s.size === this.selectedSize
-  );
-
-  if (!sizeObj) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Selected size is not valid.',
-    });
-    return;
-  }
-
-  const buyNowItem = {
-    productId: this.product.id,
-    productSizeId: sizeObj.id,
-    productName: this.product.name,
-    productSizeName: sizeObj.size,
-    productImageUrl: this.product.productImagesPaths?.[0]
-      ? environment.baseServerUrl + this.product.productImagesPaths[0].imagePath
-      : '/assets/images/default.png',
-    quantity: this.quantity,
-    unitPrice: this.product.price,
-    totalPriceForOneItemType: this.product.price * this.quantity,
-  };
-
-  sessionStorage.setItem('buyNowItem', JSON.stringify(buyNowItem));
-
-  if (!isLoggedIn) {
-    const dialogRef = this.dialog.open(Login, {
-     panelClass: 'no-padding-dialog',
-  backdropClass: 'custom-backdrop',
-  width: '60%',
-  maxWidth: 'none'
-    });
-
-
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result?.token) {
-        this.authService.setLogin(result.token);
-        this.isLoggedInNow = true;
-        setTimeout(() => this.cdr.detectChanges(), 0);
-
-        // بعد تسجيل الدخول نروح على صفحة الأوردر
-        this.router.navigate(['/order']);
-      } else {
-        alert('❌ You must log in before placing an order.');
-      }
-    });
-
-    return;
-  }
-
-  // لو مسجل بالفعل، نروح على صفحة الأوردر
-  this.router.navigate(['/order']);
-}
 }
