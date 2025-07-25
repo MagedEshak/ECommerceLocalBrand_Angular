@@ -54,6 +54,8 @@ export class ProductDetails implements OnInit {
         },
       });
     }
+
+    this.isLoggedInNow = !!this.authService.getToken();
   }
 
   getSizes(): string[] {
@@ -235,35 +237,33 @@ export class ProductDetails implements OnInit {
       return;
     }
 
-    this.authService.isLoggedIn().subscribe((isAuthenticated) => {
-      if (isAuthenticated) {
-        this.cartItemService
-          .addToCart(this.product!, this.selectedSize!, this.quantity)
-          .subscribe({
-            next: () => {
-              this.showAlert('✅ Product added to cart');
-              this.cartItemService.getCurrentUserCart().subscribe((cart) => {
-                const count = cart?.cartItems?.length || 0;
-                this.cartItemService.updateCartCount(count);
-              });
-            },
-            error: (err) =>
-              Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: err?.message || 'Failed to add product to cart.',
-                showConfirmButton: false,
-                timer: 2500,
-              }),
-          });
-      } else {
-        this.addToLocalStorageCart(
-          this.product!,
-          this.selectedSize!,
-          this.quantity
-        );
-      }
-    });
+    if (this.isLoggedInNow) {
+      this.cartItemService
+        .addToCart(this.product!, this.selectedSize!, this.quantity)
+        .subscribe({
+          next: () => {
+            this.showAlert('✅ Product added to cart');
+            this.cartItemService.getCurrentUserCart().subscribe((cart) => {
+              const count = cart?.cartItems?.length || 0;
+              this.cartItemService.updateCartCount(count);
+            });
+          },
+          error: (err) =>
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: err?.message || 'Failed to add product to cart.',
+              showConfirmButton: false,
+              timer: 2500,
+            }),
+        });
+    } else {
+      this.addToLocalStorageCart(
+        this.product!,
+        this.selectedSize!,
+        this.quantity
+      );
+    }
   }
 
   onSizeChange(): void {

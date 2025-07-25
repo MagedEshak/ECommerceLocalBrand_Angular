@@ -130,27 +130,35 @@ export class Login {
         const guestCartRaw = localStorage.getItem('guestCart');
         if (guestCartRaw) {
           try {
-            const cart = await firstValueFrom(this._cartItemService.getCurrentUserCart());
+            const cart = await firstValueFrom(
+              this._cartItemService.getCurrentUserCart()
+            );
             const cartId = cart?.id;
 
             // ✅ جهّز الـ Payload النهائي بشكل صحيح
-            const guestCartItems: ICartItem[] = JSON.parse(guestCartRaw).map((item: any) => ({
-              id: 0,
-              productId: item.productId,
-              productSizeId: item.productSizeId,
-              quantity: item.quantity,
-              unitPrice: item.unitPrice,
-              totalPriceForOneItemType: item.totalPriceForOneItemType,
-              productName: item.productName || item.name || 'Unknown',
-              productImageUrl: item.productImageUrl || item.image || '',
-              productSizeName: item.productSizeName || '',
-            }));
+            const guestCartItems: ICartItem[] = JSON.parse(guestCartRaw).map(
+              (item: any) => ({
+                id: 0,
+                productId: item.productId,
+                productSizeId: item.productSizeId,
+                quantity: item.quantity,
+                unitPrice: item.unitPrice,
+                totalPriceForOneItemType: item.totalPriceForOneItemType,
+                productName: item.productName || item.name || 'Unknown',
+                productImageUrl: item.productImageUrl || item.image || '',
+                productSizeName: item.productSizeName || '',
+              })
+            );
 
             console.log('📦 Payload to /add-multiple:', guestCartItems);
 
+            console.log('🔁 Calling addToCartFromLocalStorageAfterLogin...');
             const result = await firstValueFrom(
-              this._cartItemService.addToCartFromLocalStorageAfterLogin(guestCartItems)
+              this._cartItemService.addToCartFromLocalStorageAfterLogin(
+                guestCartItems
+              )
             );
+            console.log('✅ Done calling addToCartFromLocalStorageAfterLogin');
 
             console.log('✅ API Response from /add-multiple:', result);
 
@@ -174,7 +182,6 @@ export class Login {
 
         // ✅ تنقل للصفحة الرئيسية
         this.isVerificationPopupVisible = false;
-        this.router.navigate(['/home']);
       },
       error: () => {
         Swal.fire({
@@ -196,4 +203,4 @@ export class Login {
     }
   }
 }
-// 
+//

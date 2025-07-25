@@ -11,6 +11,7 @@ import { ICartItem } from '../../../models/ICartItem';
 })
 export class CartItemService {
   private apiUrl = `${environment.baseServerUrl}/api/CartItem/add-single`;
+  private addMultipleUrl = `${environment.baseServerUrl}/api/CartItem/add-multiple`;
   private updateUrl = `${environment.baseServerUrl}/api/CartItem/`;
   private DeleteUrl = `${environment.baseServerUrl}/api/CartItem/`;
 
@@ -93,12 +94,14 @@ export class CartItemService {
   }
 
   addToCartFromLocalStorageAfterLogin(cartItems: ICartItem[]) {
+    const token = this.authService.getToken();
+    let headers = new HttpHeaders();
+    if (token) {
+      headers = headers.set('Authorization', `Bearer ${token}`);
+    }
 
-    return this.http.post('/api/cart/add-multiple', cartItems);
-
-}
-
-
+    return this.http.post(this.addMultipleUrl, cartItems, { headers });
+  }
 
   getCurrentUserCart(): Observable<any> {
     const token = this.authService.getToken();
