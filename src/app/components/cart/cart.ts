@@ -33,7 +33,6 @@ export class Cart implements OnInit {
   cartItems: ICartItem[] = [];
   estimatedTotal = 0;
   isLoggedInNow = false;
-  ImageUrl!: string;
   cartCount = 0; // <-- نضيف عداد السلة هنا
   constructor(
     private cartService: CartItemService,
@@ -68,7 +67,7 @@ export class Cart implements OnInit {
           id: item.id, // ✅ خد الآي دي هنا
           productId: item.productId,
           productName: item.productName ?? 'Unknown',
-          productImageUrl: `${(this.ImageUrl = item.productImageUrl)}`,
+          productImageUrl: item.productImageUrl,
           productSizeName: item.productSizeName ?? '',
           quantity: item.quantity,
           unitPrice: item.unitPrice,
@@ -87,11 +86,20 @@ export class Cart implements OnInit {
     const storedCart = localStorage.getItem('guestCart');
     if (storedCart) {
       try {
-        const rawItems = JSON.parse(storedCart);
-
-        this.cartItems = rawItems.map((item: any) => {
-          ({ ...item, productImageUrl: `${(this.ImageUrl = item.image)}` });
-        });
+     const rawItems = JSON.parse(storedCart);
+      this.cartItems = rawItems.map((item: any) => {
+        return {
+          id: 0, // id مش موجود في local cart
+          productId: item.productId,
+          productSizeId: item.productSizeId,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          totalPriceForOneItemType: item.totalPriceForOneItemType,
+          productName: item.productName || item.name || 'Unknown',
+          productImageUrl: item.productImageUrl || item.image || '',
+          productSizeName: item.productSizeName || '',
+        } as ICartItem;
+      });
 
         this.calculateTotal();
       } catch (e) {
