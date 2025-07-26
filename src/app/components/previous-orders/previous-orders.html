@@ -63,7 +63,9 @@
           'bg-gray-300': i > statusBar.indexOf(order.shippingStatus)
         }"
                 ></div>
+
                 <div
+
                   class="w-4 h-4 rounded-full border-2"
                   [ngClass]="{
           'bg-black border-black': i <= statusBar.indexOf(order.shippingStatus),
@@ -79,6 +81,18 @@
             class="text-red-600 font-bold"
           >
             Cancelled
+          </p>
+           <p
+            *ngIf="order.orderStatus === 'Returned'"
+            class="text-red-600 font-bold"
+          >
+            Returned
+          </p>
+           <p
+            *ngIf="order.shippingStatus=== 'DeliveryFailed'"
+            class="text-red-600 font-bold"
+          >
+            Delivery Failed
           </p>
           <div class="flex justify-between text-xs mt-2 text-gray-500">
             <div *ngFor="let step of statusBar" class="text-center w-full">

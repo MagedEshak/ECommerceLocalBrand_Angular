@@ -27,8 +27,8 @@ export class PreviousOrders implements OnInit {
   showRefundForm = false;
   showProductRefundForm = false;
   statusBar = [
-    'Pending',
-    'Processing',
+    'NotApplicable',
+    'NotShipped',
     'ReadyToShip',
     'Shipped',
     'OutForDelivery',
@@ -209,7 +209,7 @@ export class PreviousOrders implements OnInit {
   // Progress labels
   shouldShowProgress(order: IPreviousOrder): boolean {
     // Cancelled: لا تظهر البار
-    if (order.orderStatus === 'Cancelled') return false;
+    if (order.orderStatus === 'Cancelled' || order.orderStatus === 'Returned') return false;
 
     // الدفع اونلاين: نعرضه لو الحالة وصلت لـ Processing فقط أو بعدها
     if (order.paymentMethod !== 'COD') {
@@ -219,6 +219,7 @@ export class PreviousOrders implements OnInit {
           order.shippingStatus
         )
       );
+
     }
 
     // الدفع كاش: نعرضه من أول ReadyToShip

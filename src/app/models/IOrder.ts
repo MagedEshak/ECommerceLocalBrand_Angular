@@ -32,8 +32,10 @@ export enum OrderStatus {
 }
 
 export enum PaymentMethods {
-  Online = 0, 
-  COD = 1
+ Online = 0,
+ COD = 1,
+ card = 2,
+ wallet = 3,
 }
 
 export interface ICustomer {
