@@ -51,7 +51,7 @@
         </div>
 
         <!-- Shipping Progress -->
-        <div>
+        <div *ngIf="shouldShowProgress(order)" class="mb-4">
           <p class="text-sm font-semibold mb-2">Shipping Progress</p>
           <div class="flex items-center gap-2 justify-between">
             <ng-container *ngFor="let step of statusBar; let i = index">
@@ -73,7 +73,13 @@
               </div>
             </ng-container>
           </div>
-
+          <!-- لو ملغي نظهر كلمة بدل البار -->
+          <p
+            *ngIf="order.orderStatus === 'Cancelled'"
+            class="text-red-600 font-bold"
+          >
+            Cancelled
+          </p>
           <div class="flex justify-between text-xs mt-2 text-gray-500">
             <div *ngFor="let step of statusBar" class="text-center w-full">
               {{ getStepLabel(step) }}
@@ -100,6 +106,7 @@
 
             <!-- Cancel Product Button -->
             <button
+              *ngIf="canRequestRefund(order)"
               (click)="openProductRefundForm(order.orderId, item.productId)"
               class="mt-3 text-xs px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
             >
@@ -143,7 +150,9 @@
             <span class="font-semibold">${{ order.totalOrderPrice }}</span>
           </p>
 
+          <!-- زر Cancel للطلب -->
           <button
+            *ngIf="canRequestRefund(order)"
             (click)="openRefundForm(order.orderId)"
             class="bg-black text-white px-5 py-2 rounded hover:bg-gray-800 text-sm font-medium"
           >
