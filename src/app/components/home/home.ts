@@ -18,16 +18,16 @@ export class Home implements OnInit {
 
   images = [
     {
-      desktop: 'assets/images/images.jpeg',
-      mobile: 'assets/images/images.jpeg',
+      desktop: 'assets/images/1.png',
+      mobile: 'assets/images/1.png',
     },
     {
-      desktop: 'assets/images/Screenshot 2025-06-22 202717.png',
-      mobile: 'assets/images/Screenshot 2025-06-22 202717.png',
+      desktop: 'assets/images/2.png',
+      mobile: 'assets/images/2.png',
     },
     {
-      desktop: 'assets/images/images.jpeg',
-      mobile: 'assets/images/images.jpeg',
+      desktop: 'assets/images/3.png',
+      mobile: 'assets/images/3.png',
     },
   ];
 
