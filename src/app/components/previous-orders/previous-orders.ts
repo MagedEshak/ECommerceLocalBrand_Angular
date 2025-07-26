@@ -29,11 +29,12 @@ export class PreviousOrders implements OnInit {
   statusBar = [
     'Pending',
     'Processing',
+    'ReadyToShip',
     'Shipped',
+    'OutForDelivery',
     'Delivered',
-    'Cancelled',
-    'Rejected',
   ];
+
   filterOptions = ['All Orders', 'Completed', 'Cancelled', 'Pending'];
   selectedFilter = 'All Orders';
   constructor(
@@ -45,6 +46,7 @@ export class PreviousOrders implements OnInit {
     this.previousOrderService.getPreviousOrders().subscribe({
       next: (response) => {
         this.orders = response;
+        console.log('Previous orders fetched:', this.orders);
       },
       error: () => {
         Swal.fire({
@@ -76,14 +78,18 @@ export class PreviousOrders implements OnInit {
   // دالة ترجمة التسمية في الزر
   getStepLabel(status: string): string {
     switch (status) {
-      case 'All Orders':
-        return 'All Orders';
-      case 'Completed':
-        return 'Completed';
-      case 'Cancelled':
-        return 'Cancelled';
       case 'Pending':
         return 'Pending';
+      case 'Processing':
+        return 'Processing';
+      case 'ReadyToShip':
+        return ' ReadyToShip';
+      case 'Shipped':
+        return 'Shipped';
+      case 'OutForDelivery':
+        return 'OutForDelivery';
+      case 'Delivered':
+        return 'Delivered';
       default:
         return status;
     }
@@ -196,6 +202,28 @@ export class PreviousOrders implements OnInit {
         });
     }
   }
+  canRequestRefund(order: IPreviousOrder): boolean {
+    return order.shippingStatus === 'Delivered';
+  }
 
   // Progress labels
+  shouldShowProgress(order: IPreviousOrder): boolean {
+    // Cancelled: لا تظهر البار
+    if (order.orderStatus === 'Cancelled') return false;
+
+    // الدفع اونلاين: نعرضه لو الحالة وصلت لـ Processing فقط أو بعدها
+    if (order.paymentMethod !== 'COD') {
+      return (
+        order.orderStatus === 'Processing' ||
+        ['ReadyToShip', 'Shipped', 'OutForDelivery', 'Delivered'].includes(
+          order.shippingStatus
+        )
+      );
+    }
+
+    // الدفع كاش: نعرضه من أول ReadyToShip
+    return ['ReadyToShip', 'Shipped', 'OutForDelivery', 'Delivered'].includes(
+      order.shippingStatus
+    );
+  }
 }
