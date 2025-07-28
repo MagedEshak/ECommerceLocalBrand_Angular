@@ -33,13 +33,42 @@ export class App implements AfterViewInit, OnInit {
     private cartService: CartItemService
   ) {}
 
-  ngOnInit() {
-    this.router.events
-      .pipe(filter((event) => event instanceof NavigationEnd))
-      .subscribe(() => {
-        this.cartService.loadCartCountFromLocalStorage();
+ngOnInit() {
+    if (isPlatformBrowser(this.platformId)) {
+      // تحديث السلة عند بدء التطبيق
+      this.cartService.refreshCartState();
+
+      // تحديث السلة عند تغيير الصفحات
+      this.router.events
+        .pipe(filter((event) => event instanceof NavigationEnd))
+        .subscribe(() => {
+          this.cartService.refreshCartState();
+        });
+
+      // تحديث السلة كل 30 ثانية للتأكد من مزامنة البيانات
+      setInterval(() => {
+        this.cartService.refreshCartState();
+      }, 30000);
+    }
+}
+
+private loadCartCount() {
+    const isLoggedIn = !!localStorage.getItem('token');
+    if (isLoggedIn) {
+      // تحميل السلة من السيرفر
+      this.cartService.getCurrentUserCart().subscribe({
+        error: (err) => {
+          console.error('Error loading cart:', err);
+          // في حالة الخطأ، نحاول تحميل السلة المحلية
+          this.cartService.loadCartCountFromLocalStorage();
+        }
       });
-  }
+    } else {
+      // تحميل السلة من التخزين المحلي
+      this.cartService.loadCartCountFromLocalStorage();
+    }
+}
+
 
   ngAfterViewInit(): void {
     if (isPlatformBrowser(this.platformId)) {

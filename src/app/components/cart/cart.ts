@@ -74,13 +74,12 @@
             totalPriceForOneItemType: item.totalPriceForOneItemType,
           }));
           this.calculateTotal();
-          this.cartService.updateCartCount(this.cartItems.length);
+          // العداد يتم تحديثه تلقائياً في CartItemService
         },
         error: (err) => {
           console.error('❌ Error fetching server cart:', err);
         },
       });
-      // تحديث عداد السلة
     }
     loadLocalCart(): void {
       const storedCart = localStorage.getItem('guestCart');
@@ -256,6 +255,33 @@
 
         dialogRef.afterClosed().subscribe((result) => {
           if (result?.token) {
+            // بعد تسجيل الدخول بنجاح، نقوم بتحميل سلة المستخدم من السيرفر
+            this.loadServerCart();
+            
+            // نحفظ سلة الضيف في السيرفر إذا كانت موجودة
+            const guestCart = localStorage.getItem('guestCart');
+            if (guestCart) {
+              const items = JSON.parse(guestCart);
+              if (items && items.length > 0) {
+                // أضف كل منتج من سلة الضيف إلى سلة المستخدم في السيرفر
+                let completedItems = 0;
+                items.forEach((item: ICartItem) => {
+                  this.cartService.addGuestCartItem(item).subscribe({
+                    next: () => {
+                      completedItems++;
+                      if (completedItems === items.length) {
+                        // تحديث السلة بعد إضافة كل المنتجات
+                        this.loadServerCart();
+                      }
+                    },
+                    error: (err) => console.error('Error adding guest item to server cart:', err)
+                  });
+                });
+                // نمسح سلة الضيف من localStorage
+                localStorage.removeItem('guestCart');
+              }
+            }
+            
             this.router.navigate(['/order']);
           }
         });
