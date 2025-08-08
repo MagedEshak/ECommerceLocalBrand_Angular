@@ -256,20 +256,8 @@ export class Order implements OnInit, OnDestroy {
     };
     this.order.paymentMethod = this.orderForm.value.paymentMethod;
 
-    this.orderService.getCustomerById().subscribe({
-      next: (customerData) => {
-        if (!customerData?.email || !customerData?.phoneNumber) {
-          alert('❌ Please complete your profile before placing an order.');
-          return;
-        }
-        this.prepareAndSendOrder();
-      },
-      error: () => {
-        alert(
-          '❌ Could not load your profile. Please complete your account first.'
-        );
-      },
-    });
+      this.prepareAndSendOrder();
+
   }
 
   private prepareAndSendOrder(): void {
@@ -426,6 +414,12 @@ export class Order implements OnInit, OnDestroy {
       next: (addresses) => {
         console.log('Addresses loaded:', addresses);
         this.savedAddresses = addresses;
+        if (this.savedAddresses.length === 0) {
+             this.useNewAddress = true;
+  this.addNewAddressControl.setValue(true, { emitEvent: false });
+  this.onToggleNewAddress(); // عشان يجهز الفورم
+}
+
       },
       error: (err) => {
         console.error('Error fetching addresses:', err);
