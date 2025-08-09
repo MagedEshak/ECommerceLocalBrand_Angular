@@ -6,15 +6,9 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-
-interface ContactFormData {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone?: string;
-  subject: string;
-  message: string;
-}
+import { finalize } from 'rxjs/operators';
+import Swal from 'sweetalert2';
+import { ContactUsService } from '../services/contact-us/contct-us.service';
 
 @Component({
   selector: 'app-contact-us',
@@ -24,18 +18,10 @@ interface ContactFormData {
   styleUrl: './contact-us.css',
 })
 export class ContactUs implements OnInit {
-  contactForm: FormGroup;
-  showSuccessMessage = false;
-  isSubmitting = false;
+  contactForm!: FormGroup;
 
-  subjectOptions = [
-    { value: '', label: 'Select Subject' },
-    { value: 'general', label: 'General Inquiry' },
-    { value: 'support', label: 'Technical Support' },
-    { value: 'sales', label: 'Sales' },
-    { value: 'partnership', label: 'Partnership' },
-    { value: 'other', label: 'Other' },
-  ];
+  isSubmitting = false;
+  serverError: string | null = null;
 
   contactInfo = {
     email: 'info@company.com',
@@ -49,46 +35,71 @@ export class ContactUs implements OnInit {
     { days: 'Saturday', hours: 'Closed' },
   ];
 
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private _contactUsService: ContactUsService,
+    private fb: FormBuilder
+  ) {}
+
+  ngOnInit(): void {
+    this.buildForm();
+  }
+
+  private buildForm(): void {
     this.contactForm = this.fb.group({
       firstName: ['', [Validators.required, Validators.minLength(2)]],
       lastName: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
       phone: [''],
-      subject: ['', Validators.required],
+      subject: [''],
       message: ['', [Validators.required, Validators.minLength(10)]],
     });
   }
 
-  ngOnInit(): void {}
-
   onSubmit(): void {
-    if (this.contactForm.valid) {
-      this.isSubmitting = true;
-      const formData: ContactFormData = this.contactForm.value;
-
-      // You can replace this with a real API call if needed
-      console.log('Form submitted:', formData);
-
-      setTimeout(() => {
-        this.isSubmitting = false;
-        this.showSuccessMessage = true;
-        this.contactForm.reset();
-
-        setTimeout(() => {
-          this.showSuccessMessage = false;
-        }, 4000);
-      }, 800);
-    } else {
-      this.markFormGroupTouched();
+    if (this.contactForm.invalid) {
+      this.contactForm.markAllAsTouched();
+      return;
     }
-  }
 
-  private markFormGroupTouched(): void {
-    Object.keys(this.contactForm.controls).forEach((field) => {
-      const control = this.contactForm.get(field);
-      control?.markAsTouched({ onlySelf: true });
-    });
+    this.serverError = null;
+    this.isSubmitting = true;
+
+    this._contactUsService
+      .SendContactUsEmail(this.contactForm.value)
+      .pipe(finalize(() => (this.isSubmitting = false)))
+      .subscribe({
+        next: () => {
+          Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: 'Your Message added successfully!',
+            toast: true,
+            position: 'bottom',
+            showConfirmButton: false,
+            timer: 5000,
+            background: '#166534',
+            color: '#fff',
+            customClass: { popup: 'custom-swal-toast' },
+          });
+          this.contactForm.reset();
+        },
+        error: (err) => {
+          this.serverError =
+            err?.error?.message || 'Failed to add Your Message!';
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Faild to send Your Message!',
+            toast: true,
+            position: 'bottom',
+            showConfirmButton: false,
+            timer: 5000,
+            background: '#651616',
+            color: '#fff',
+            customClass: { popup: 'custom-swal-toast' },
+          });
+        },
+      });
   }
 
   isFieldInvalid(fieldName: string): boolean {
@@ -98,17 +109,13 @@ export class ContactUs implements OnInit {
 
   getFieldError(fieldName: string): string {
     const field = this.contactForm.get(fieldName);
-    if (field?.errors) {
-      if (field.errors['required']) {
-        return 'This field is required.';
-      }
-      if (field.errors['email']) {
-        return 'Please enter a valid email address.';
-      }
-      if (field.errors['minlength']) {
-        return `Minimum ${field.errors['minlength'].requiredLength} characters required.`;
-      }
+    if (!field?.errors) return '';
+    if (field.errors['required']) return 'This field is required.';
+    if (field.errors['email']) return 'Please enter a valid email address.';
+    if (field.errors['minlength']) {
+      return `Minimum ${field.errors['minlength'].requiredLength} characters required.`;
     }
+    if (field.errors['pattern']) return 'Please enter a valid value.';
     return '';
   }
 }
