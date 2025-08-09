@@ -49,7 +49,6 @@ export class ProductDetails implements OnInit {
           this.isLoading = false;
         },
         error: (err) => {
-          console.error('Error fetching product details', err);
           this.isLoading = false;
         },
       });

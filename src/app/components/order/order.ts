@@ -188,9 +188,7 @@ export class Order implements OnInit, OnDestroy {
           });
           this.cdr.detectChanges();
         },
-        error: (err) => {
-          console.error('❌ Failed to fetch customer info.', err);
-        },
+        error: (err) => {},
       });
 
       this.loadAddresses(user.id);
@@ -256,8 +254,7 @@ export class Order implements OnInit, OnDestroy {
     };
     this.order.paymentMethod = this.orderForm.value.paymentMethod;
 
-      this.prepareAndSendOrder();
-
+    this.prepareAndSendOrder();
   }
 
   private prepareAndSendOrder(): void {
@@ -303,7 +300,6 @@ export class Order implements OnInit, OnDestroy {
         });
       },
       error: (err) => {
-        console.error('❌ Error during checkout:', err);
         Swal.fire({
           title: 'Error',
           text: 'An error occurred while placing your order. Please try again later.',
@@ -354,9 +350,7 @@ export class Order implements OnInit, OnDestroy {
 
         this.calculateTotal();
       },
-      error: (err) => {
-        console.error('❌ Error fetching server cart:', err);
-      },
+      error: (err) => {},
     });
   }
 
@@ -377,9 +371,7 @@ export class Order implements OnInit, OnDestroy {
           totalPriceForOneItemType: item.totalPriceForOneItemType,
         }));
         this.calculateTotal();
-      } catch (e) {
-        console.error('❌ Error parsing local guest cart:', e);
-      }
+      } catch (e) {}
     }
   }
 
@@ -388,9 +380,7 @@ export class Order implements OnInit, OnDestroy {
       next: (res) => {
         this.governorates = res;
       },
-      error: (err) => {
-        console.error('❌ Error loading governorates:', err);
-      },
+      error: (err) => {},
     });
   }
 
@@ -412,17 +402,14 @@ export class Order implements OnInit, OnDestroy {
   loadAddresses(userId: string): void {
     this.orderService.getAddressesByUserId(userId).subscribe({
       next: (addresses) => {
-        console.log('Addresses loaded:', addresses);
         this.savedAddresses = addresses;
         if (this.savedAddresses.length === 0) {
-             this.useNewAddress = true;
-  this.addNewAddressControl.setValue(true, { emitEvent: false });
-  this.onToggleNewAddress(); // عشان يجهز الفورم
-}
-
+          this.useNewAddress = true;
+          this.addNewAddressControl.setValue(true, { emitEvent: false });
+          this.onToggleNewAddress(); // عشان يجهز الفورم
+        }
       },
       error: (err) => {
-        console.error('Error fetching addresses:', err);
       },
     });
   }

@@ -27,7 +27,6 @@ export class CartItemService {
       if (token) {
         this.getCurrentUserCart().subscribe({
           error: (err) => {
-            console.error('Error refreshing cart:', err);
             // في حالة الخطأ نحاول تحميل السلة المحلية
             this.loadCartCountFromLocalStorage();
           }
@@ -163,7 +162,6 @@ export class CartItemService {
     return new Observable((observer) => {
       this.http.get<any>(this.cartUrl, { headers }).subscribe({
         next: (cart) => {
-          console.log('✅ Cart loaded successfully:', cart);
           // إضافة base URL للصور
           if (cart?.cartItems) {
             cart.cartItems = cart.cartItems.map((item: any) => ({

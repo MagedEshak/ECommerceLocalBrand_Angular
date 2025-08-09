@@ -11,8 +11,4 @@ export class Footer {
 
   constructor(public routerState: RouterStateService) {
   }
-  // get isNotFound(): boolean {
-  //   console.log('Footer isNotFound:', this.routerState.isNotFound);
-  //   return this.routerState.isNotFound;
-  // }
 }

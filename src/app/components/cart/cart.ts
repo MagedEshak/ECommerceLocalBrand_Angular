@@ -46,7 +46,6 @@
     ngOnInit(): void {
       this.cartService.cartCount$.subscribe((count) => {
         this.cartCount = count; // <-- نحدث عداد السلة هنا
-        console.log('Cart count updated:', count);
       });
       const token = this.authService.getToken(); // ✅ استخدم AuthService مباشرة
 
@@ -61,8 +60,6 @@
       this.cartService.getCurrentUserCart().subscribe({
         next: (res: any) => {
           const items = res?.cartItems ?? [];
-          console.log(items);
-
           this.cartItems = items.map((item: any) => ({
             id: item.id, // ✅ خد الآي دي هنا
             productId: item.productId,
@@ -77,7 +74,6 @@
           // العداد يتم تحديثه تلقائياً في CartItemService
         },
         error: (err) => {
-          console.error('❌ Error fetching server cart:', err);
         },
       });
     }
@@ -102,7 +98,6 @@
 
           this.calculateTotal();
         } catch (e) {
-          console.error('❌ Error parsing local guest cart:', e);
         }
       }
       this.cartService.updateCartCount(this.cartItems.length); // تحديث عداد السلة
@@ -173,7 +168,6 @@
             }
           },
           error: (err) => {
-            console.error('❌ Failed to fetch stock info:', err);
             Swal.fire({
               icon: 'error',
               title: 'Something went wrong',
@@ -274,7 +268,6 @@
                         this.loadServerCart();
                       }
                     },
-                    error: (err) => console.error('Error adding guest item to server cart:', err)
                   });
                 });
                 // نمسح سلة الضيف من localStorage

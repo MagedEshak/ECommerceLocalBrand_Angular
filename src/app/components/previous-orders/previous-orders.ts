@@ -46,7 +46,6 @@ export class PreviousOrders implements OnInit {
     this.previousOrderService.getPreviousOrders().subscribe({
       next: (response) => {
         this.orders = response;
-        console.log('Previous orders fetched:', this.orders);
       },
       error: () => {
         Swal.fire({

@@ -32,7 +32,6 @@ export class ProfileComponent implements OnInit {
 loadProfile() {
   this.http.get<ProfileDto>('https://localhost:port/api/Auth/GetProfileById').subscribe({
     next: (data) => {
-      console.log('Profile data:', data);
       this.profileForm.patchValue({
         ...data,
         dateOfBirth: data.dateOfBirth?.substring(0, 10) 
@@ -40,7 +39,6 @@ loadProfile() {
       this.isLoading = false;
     },
     error: (err) => {
-      console.error('Error loading profile', err);
       this.isLoading = false;
     }
   });
@@ -58,7 +56,6 @@ loadProfile() {
         this.isSaving = false;
       },
       error: (err) => {
-        console.error('Error updating profile', err);
         alert('Failed to update profile');
         this.isSaving = false;
       }

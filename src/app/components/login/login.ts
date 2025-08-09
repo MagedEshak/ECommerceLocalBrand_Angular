@@ -66,7 +66,6 @@ export class Login {
         this.isVerificationPopupVisible = true;
       },
       error: (err) => {
-        console.error(err);
         alert('Failed to send verification code.');
       },
     });
@@ -149,22 +148,13 @@ export class Login {
                 productSizeName: item.productSizeName || '',
               })
             );
-
-            console.log('📦 Payload to /add-multiple:', guestCartItems);
-
-            console.log('🔁 Calling addToCartFromLocalStorageAfterLogin...');
             const result = await firstValueFrom(
               this._cartItemService.addToCartFromLocalStorageAfterLogin(
                 guestCartItems
               )
             );
-            console.log('✅ Done calling addToCartFromLocalStorageAfterLogin');
-
-            console.log('✅ API Response from /add-multiple:', result);
-
             localStorage.removeItem('guestCart'); // ✅ تنظيف الجست كارت بعد النجاح
           } catch (err) {
-            console.error('❌ Failed to sync guest cart to DB:', err);
             localStorage.removeItem('guestCart'); // حتى لو حصل خطأ
           }
         }

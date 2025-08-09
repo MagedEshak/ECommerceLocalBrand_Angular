@@ -64,8 +64,6 @@ getCustomerById(): Observable<ICustomer> {
       }
 
       // اختياري: اطبع أو سجل الخطأ في الـ console
-      console.error('Error fetching customer:', error);
-
       return throwError(() => new Error(errorMessage));
     })
   );

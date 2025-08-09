@@ -45,7 +45,6 @@ export class NewArrival implements OnInit {
         this.totalPages = response.totalPages;
       },
       error: (err) => {
-        console.log('error fetch data', err);
       },
     });
   }

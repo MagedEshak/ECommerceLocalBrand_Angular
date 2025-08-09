@@ -32,8 +32,6 @@ export class AllProducts implements OnInit  {
 
         // قلل العدد عشان يفضل ثابت
         this.filteredProducts = updatedProducts.slice(0, totalPerPage);
-        console.log('🟡 Real-time products:', newProducts);
-
       }
     });
   }
@@ -61,7 +59,6 @@ export class AllProducts implements OnInit  {
         }, 1000);
       },
       error: (err) => {
-        console.log('error fetch data', err);
       },
     });
   }

@@ -13,15 +13,11 @@ export class RealTimeService {
       .withAutomaticReconnect()
       .build();
 
-    this.hubConnection
-      .start()
-      .then(() => console.log('✅ SignalR connection started.'))
-      .catch((err) => console.error('❌ SignalR connection error:', err));
+    this.hubConnection.start().then().catch();
   }
 
   public onNewProductsArrived(callback: (products: any[]) => void): void {
     this.hubConnection.on('NewProductsArrived', (products) => {
-      console.log('📦 Received products:', products);
       callback(products);
     });
   }

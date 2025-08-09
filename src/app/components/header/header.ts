@@ -45,7 +45,6 @@ export class Header implements OnInit {
   }
   ngOnInit(): void {
     this.cartservice.cartCount$.subscribe((count) => {
-      console.log('Cart Count:', count);
       this.cartCount = count;
     });
   }

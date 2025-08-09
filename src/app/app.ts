@@ -58,8 +58,6 @@ private loadCartCount() {
       // تحميل السلة من السيرفر
       this.cartService.getCurrentUserCart().subscribe({
         error: (err) => {
-          console.error('Error loading cart:', err);
-          // في حالة الخطأ، نحاول تحميل السلة المحلية
           this.cartService.loadCartCountFromLocalStorage();
         }
       });
